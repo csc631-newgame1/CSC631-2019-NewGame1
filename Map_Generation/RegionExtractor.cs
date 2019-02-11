@@ -5,6 +5,7 @@ using UnityEngine;
 
 using MapUtils;
 using LoopExtractor;
+using static MapUtils.MapConstants;
 
 namespace RegionUtils
 {
@@ -49,7 +50,7 @@ namespace RegionUtils
 			this.count = count;
 			this.startpos = pos;
 			this.closest = new List<Connection>();
-			LoopTurtle turtle = new LoopTurtle(map, pos);
+			LoopTurtle turtle = new LoopTurtle(map, pos, EMPTY, true);
 			this.cmds = turtle.cmdlist;
 			this.connected_to_main = false;
 			this.connections = new List<Region>();
@@ -73,9 +74,12 @@ namespace RegionUtils
 		private static int flood_fill(int[,] map, int x, int y, int ID, int fill_ID)
 		{
 			int count = 1;
+			int width = map.GetLength(0);
+			int height = map.GetLength(1);
 			map[x, y] = ID;
 			Stack<Pos> fill_tiles = new Stack<Pos>();
 			fill_tiles.Push(new Pos(x, y));
+			bool touches_edge = false;
 			
 			while (fill_tiles.Count > 0) {
 				
@@ -83,27 +87,33 @@ namespace RegionUtils
 				int sx = tile.x;
 				int sy = tile.y;
 				
-				if (map[sx-1, sy] == fill_ID) {
+				if (sx == 0 || sx == width - 1 || sy == 0 || sy == height - 1)
+					touches_edge = true;
+				
+				if (sx > 0 && map[sx-1, sy] == fill_ID) {
 					fill_tiles.Push(new Pos(sx-1, sy));
 					map[sx-1, sy] = ID;
 					count += 1;
 				}
-				if (map[sx, sy-1] == fill_ID) {
+				if (sy > 0 && map[sx, sy-1] == fill_ID) {
 					fill_tiles.Push(new Pos(sx, sy-1));
 					map[sx, sy-1] = ID;
 					count += 1;
 				}
-				if (map[sx+1, sy] == fill_ID) {
+				if (sx < width - 1 && map[sx+1, sy] == fill_ID) {
 					fill_tiles.Push(new Pos(sx+1, sy));
 					map[sx+1, sy] = ID;
 					count += 1;
 				}
-				if (map[sx, sy+1] == fill_ID) {
+				if (sy < height - 1 && map[sx, sy+1] == fill_ID) {
 					fill_tiles.Push(new Pos(sx, sy+1));
 					map[sx, sy+1] = ID;
 					count += 1;
 				}
 			}
+			
+			if (touches_edge)
+				return 0;
 			
 			return count;
 		}
@@ -117,18 +127,50 @@ namespace RegionUtils
 			
 			for (int x = 1; x < width - 1; x++) {
 				for (int y = 1; y < height - 1; y++) {
-					if (map[x, y] == 0) {
-						int count = flood_fill(map, x, y, ID, 0);
+					if (map[x, y] == FILLED) {
+						int count = flood_fill(map, x, y, ID, FILLED);
 						if (count > threshold) {
 							regions.Add(new Region(map, ID, count, new Pos(x, y)));
 							ID++;
 						} else {
-							flood_fill(map, x, y, 1, ID); // if region is too small (below the threshold) fill it in
+							flood_fill(map, x, y, EMPTY, ID); // if region is too small (below the threshold) fill it in
 						}
 					}
 				}
 			}
 			return regions;
+		}
+		
+		// the purpose of extracting inner regions is purely cosmetic, so no actual regions are returned, just the wall geometry
+		// this step should be performed before normal region extraction
+		public static List<List<Cmd>> extract_inner_regions(int[,] map, int threshold)
+		{
+			int width = map.GetLength(0);
+			int height = map.GetLength(1);
+			List<List<Cmd>> wall_geometry = new List<List<Cmd>>();
+			
+			for (int x = 1; x < width - 1; x++) {
+				for (int y = 1; y < height - 1; y++) {
+					if (map[x, y] == EMPTY) {
+						int count = flood_fill(map, x, y, INNER_REGION, EMPTY);
+						if (count > threshold) {
+							LoopTurtle turtle = new LoopTurtle(map, new Pos(x, y), FILLED, false);
+							turtle.cmdlist.Reverse();
+							wall_geometry.Add(turtle.cmdlist);
+						}
+						else if (count != 0) {
+							flood_fill(map, x, y, FILLED, INNER_REGION);
+						}
+					}
+				}
+			}
+			// clear the inner region markers
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < width; y++) {
+					map[x, y] = map[x, y] == INNER_REGION ? EMPTY : map[x, y];
+				}
+			}
+			return wall_geometry;
 		}
 		
 		public static void clear_regions(int[,] map)
@@ -137,8 +179,8 @@ namespace RegionUtils
 			int height = map.GetLength(1);
 			for (int x = 1; x < width - 1; x++) {
 				for (int y = 1; y < height - 1; y++) {
-					if (map[x, y] > 1) {
-						map[x, y] = 0;
+					if (map[x, y] > FILLED) {
+						map[x, y] = FILLED;
 					}
 				}
 			}

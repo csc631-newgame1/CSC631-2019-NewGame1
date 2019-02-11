@@ -102,8 +102,8 @@ public class WallMeshGenerator : MonoBehaviour
 						break;
 					case ALLEY :
 						WallNode midpt = new WallNode((x + 0.5f), (y + 0.5f), cell_size, length - sqrt2 / 2.0f, depth);
-						nodes.Add(midpt);
 						nodes.Add(endpt);
+						nodes.Add(midpt);
 						break;
 				}
 			}

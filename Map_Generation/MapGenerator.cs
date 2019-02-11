@@ -14,6 +14,7 @@ public class MapGenerator : MonoBehaviour
 	public int height;
 	public int fill_percent;
 	public int smoothness;
+	[Range(1,100)]
 	public int region_cull_threshold;
 	public float cell_size;
 	public string seed;
@@ -54,13 +55,6 @@ public class MapGenerator : MonoBehaviour
 		
 		Debug.Log("done generating map!");
 		
-		// post-processing cleanup
-		clear_regions();
-		
-		// this is a quick hack I came up with to render empty tiles as full, and vice versa
-		// the map comes out looking like a collection of islands, rather than a cave
-		negate_map(); 
-		
 		Vector3 offset = new Vector3(width / 2 * cell_size, 0.0f, height / 2 * cell_size);
 		
 		SurfaceMeshGenerator surface_mesh_gen = GetComponent<SurfaceMeshGenerator>();
@@ -98,11 +92,13 @@ public class MapGenerator : MonoBehaviour
 	void smooth(int smoothness)
 	{
 		for(int i = 0; i < smoothness; i++) {
+			int[,] temp = map.Clone() as int[,];
 			for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
-					map[x, y] = neighbors(x, y) > 4 ? FILLED : EMPTY;
+					temp[x, y] = neighbors(x, y) > 4 ? EMPTY : FILLED;
 				}
 			}
+			map = temp.Clone() as int[,];
 		}
 	}
 	
@@ -127,13 +123,13 @@ public class MapGenerator : MonoBehaviour
 	void pad_edges()
 	{
 		for (int x = 0; x < width; x++) {
-			map[x,0] = FILLED;
-			map[x,height-1] = FILLED;
+			map[x,0] = EMPTY;
+			map[x,height-1] = EMPTY;
 		}
 		
 		for (int y = 0; y < height; y++) {
-			map[0,y] = FILLED;
-			map[width-1,y] = FILLED;
+			map[0,y] = EMPTY;
+			map[width-1,y] = EMPTY;
 		}
 	}
 	
@@ -143,6 +139,10 @@ public class MapGenerator : MonoBehaviour
 	
 	void extract_regions()
 	{
+		// inner regions, or pools, are regions of empty space within other regions.
+		// since these pools are not actually distinct regions, only their wall geometries are extracted so that they can be properly rendered
+		cmds = Region.extract_inner_regions(map, region_cull_threshold);
+		
 		regions = Region.extract_regions(map, region_cull_threshold);
 		main_region = regions[0];
 		foreach (Region region in regions) {
@@ -152,11 +152,9 @@ public class MapGenerator : MonoBehaviour
 		}
 		main_region.connected_to_main = true;
 		
-		cmds = new List<List<Cmd>>();
 		foreach(Region region in regions) {
 			cmds.Add(region.cmds);
 		}
-		
 		foreach (List<Cmd> cmdlist in cmds) {
 			foreach (Cmd cmd in cmdlist) {
 				if (cmd.type != LINE) {
@@ -379,15 +377,16 @@ public class MapGenerator : MonoBehaviour
             for (int x = 0; x < width; x ++) {
                 for (int y = 0; y < height; y++) {
 					switch (map[x, y]) {
-						case 1 : Gizmos.color = Color.black; break;
-						case -1: Gizmos.color = Color.red; break;
 						case -2: Gizmos.color = Color.grey; break;
+						case -1: Gizmos.color = Color.red; break;
+						case 0 : Gizmos.color = Color.white; break;
+						case 1 : Gizmos.color = Color.black; break;
 						case 2 : Gizmos.color = Color.yellow; break;
 						case 3 : Gizmos.color = Color.blue; break;
 						case 4 : Gizmos.color = Color.green; break;
 						case 5 : Gizmos.color = Color.magenta; break;
 						case 6 : Gizmos.color = Color.cyan; break;
-						default : Gizmos.color = Color.white; break;
+						default : Gizmos.color = Color.black; break;
 					}
                     Vector3 pos = new Vector3(-width/2 + x + .5f,0, height/2 - y+.5f);
                     Gizmos.DrawCube(pos,Vector3.one);
