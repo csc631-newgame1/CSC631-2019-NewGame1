@@ -14,6 +14,21 @@ namespace MapUtils
 	
 	public static class EnumUtils
 	{
+		public static Dir right(this Dir dir, int amt = 1)
+		{
+			return (Dir) (((int)dir + amt) % 4);
+		}
+		public static Dir left(this Dir dir, int amt = 1)
+		{
+			amt %= 4;
+			int ndir = (int)dir - amt;
+			if (ndir < 0) {
+				return (Dir) (4 + ndir);
+			}
+			else {
+				return (Dir) ndir;
+			}
+		}
 		public static string GetString(this Dir dir)
 		{
 			switch (dir) {
@@ -102,10 +117,12 @@ namespace MapUtils
 	
 	public static class MapConstants
 	{
+		// all values greater than filled indicate a region marker
 		public const int FILLED = 1;
 		public const int EMPTY = 0;
 		public const int BRIDGE = -1;
 		public const int EDGE = -2;
+		public const int INNER_REGION = -3;
 	}
 	
 }

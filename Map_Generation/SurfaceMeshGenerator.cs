@@ -95,7 +95,7 @@ public class SurfaceMeshGenerator : MonoBehaviour
 	{
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				if (map[x,y] == FILLED) {
+				if (map[x,y] >= FILLED) {
 					SurfaceNode n00 = node_map[x + 0, y + 0].upleft;
 					SurfaceNode n01 = node_map[x + 1, y + 0].upleft;
 					SurfaceNode n10 = node_map[x + 0, y + 1].upleft;
@@ -126,30 +126,30 @@ public class SurfaceMeshGenerator : MonoBehaviour
 				if (cmd.type == CORNER) {
 					switch (cmd.dir) {
 						// commented out bits are for when the map's parity is reversed
-						case RIGHT: //LEFT:
+						case LEFT: // RIGHT
 							triangulate_corner(n01.upleft, n11.upleft, n10.upleft); break;
-						case DOWN: //UP:
+						case UP: // DOWN
 							triangulate_corner(n11.upleft, n10.upleft, n00.upleft); break;
-						case LEFT: //RIGHT:
+						case RIGHT: // LEFT
 							triangulate_corner(n10.upleft, n00.upleft, n01.upleft); break;
-						case UP: //DOWN:
+						case DOWN: // UP
 							triangulate_corner(n00.upleft, n01.upleft, n11.upleft); break;
 					}
 				}
 				if (cmd.type == ALLEY) {
 					switch (cmd.dir) {
 						case LEFT:
-							//triangulate_alley(n00.middle, n00.upleft, n01.upleft, n11.upleft, n10.upleft); break;
-							triangulate_corner(n00.upleft, n00.middle, n10.upleft); break;
+							triangulate_alley(n00.middle, n00.upleft, n01.upleft, n11.upleft, n10.upleft); break;
+							//triangulate_corner(n00.upleft, n00.middle, n10.upleft); break;
 						case UP:
-							//triangulate_alley(n00.middle, n01.upleft, n11.upleft, n10.upleft, n00.upleft); break;
-							triangulate_corner(n01.upleft, n00.middle, n00.upleft); break;
+							triangulate_alley(n00.middle, n01.upleft, n11.upleft, n10.upleft, n00.upleft); break;
+							//triangulate_corner(n01.upleft, n00.middle, n00.upleft); break;
 						case RIGHT:
-							//triangulate_alley(n00.middle, n11.upleft, n10.upleft, n00.upleft, n01.upleft); break;
-							triangulate_corner(n11.upleft, n00.middle, n01.upleft); break;
+							triangulate_alley(n00.middle, n11.upleft, n10.upleft, n00.upleft, n01.upleft); break;
+							//triangulate_corner(n11.upleft, n00.middle, n01.upleft); break;
 						case DOWN:
-							//triangulate_alley(n00.middle, n10.upleft, n00.upleft, n01.upleft, n11.upleft); break;
-							triangulate_corner(n10.upleft, n00.middle, n11.upleft); break;
+							triangulate_alley(n00.middle, n10.upleft, n00.upleft, n01.upleft, n11.upleft); break;
+							//triangulate_corner(n10.upleft, n00.middle, n11.upleft); break;
 					}
 				}
 			}
