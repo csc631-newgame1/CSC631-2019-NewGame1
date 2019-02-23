@@ -205,6 +205,7 @@ public class NavigationHandler
 		get_visible_vertices(new_vert);
 		foreach (Vertex vertex in new_vert.visible)
 			vertex.visible.Add(new_vert);
+		nav_graph.Add(new_vert);
 		return new_vert;
 	}
 	
@@ -213,6 +214,7 @@ public class NavigationHandler
 		Vertex old_vert = vertex_map[pos.x, pos.y];
 		foreach (Vertex vertex in old_vert.visible)
 			vertex.visible.Remove(old_vert);
+		nav_graph.Remove(old_vert);
 		vertex_map[pos.x, pos.y] = null;
 	}
 	
@@ -238,17 +240,13 @@ public class NavigationHandler
 		Vertex target = insert_vertex_at(p_target);
 		
 		// create a temporary graph of vertices to be pulled from during pathfinding
-		List<Vertex> tmp_graph = new List<Vertex>();
-		tmp_graph.AddRange(nav_graph);
-		tmp_graph.Add(source);
-		tmp_graph.Add(target);
+		List<Vertex> tmp_graph = new List<Vertex>(nav_graph);
 		
 		source.dist = 0;
 		Vertex min_vert = pop_min_dist_vert(tmp_graph);
 		
 		// uses dijkstra method to find minimum distance from origin to target
-		int limit = 0;
-		while (tmp_graph.Count > 0 && min_vert != target && limit < 20000) {
+		while (tmp_graph.Count > 0 && min_vert != target) {
 			foreach (Vertex neighbor in min_vert.visible) {
 				int alt_dist = min_vert.dist + Pos.abs_dist(min_vert.pos, neighbor.pos);
 				if (alt_dist < neighbor.dist) {
@@ -257,7 +255,6 @@ public class NavigationHandler
 				}
 			}
 			min_vert = pop_min_dist_vert(tmp_graph);
-			limit++;
 		}
 		
 		// construct path leading back from target
