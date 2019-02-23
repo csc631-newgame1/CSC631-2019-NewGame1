@@ -156,12 +156,12 @@ public class NavigationHandler
 		 * KEY { C: current vertex being tested, X: non-visible vertex, V: visible vertex, [space]: walkable, ■: unwalkable, ~: in purview of visibility check }
 		 * 
 		 * ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
-		 * ■     ■ ■ ■ ~ ~ ~ ~ ~ ■ ■ ■
-		 * ■   X     ■ ~ ~ ~ ~ ~ ■ ■ ■
+		 * ■   ~ ■ ■ ■ ~ ~ ~ ~ ~ ■ ■ ■
+		 * ■   V ~ ~ ■ ~ ~ ~ ~ ~ ■ ■ ■
 		 * ■ ■ ~ V V ~ C V ~ V V ~ ■ ■
-		 * ■ ■ ■ ~ ~ ~ V ~ ■     X   ■
-		 * ■ ■   V ~ ~ ~ ■ ■ ■ ■   X ■
-		 * ■   X ~ ~ ~ ~ ■ ■ ■ ■ ■   ■
+		 * ■ ■ ■ ~ ~ ~ V ~ ■ ~ ~ V   ■
+		 * ■ ■   V ~ ~ ~ ■ ■ ■ ■ ~ X ■
+		 * ■   X ~ ~ ~ ~ ■ ■ ■ ■ ■ X ■
 		 * ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
 		 * 
 		 * Placement of vertices in this map follows the placement of vertices in an actual navmap, i.e: at the corners of unwalkable tiles
