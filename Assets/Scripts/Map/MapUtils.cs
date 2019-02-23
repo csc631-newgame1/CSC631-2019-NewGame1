@@ -78,10 +78,18 @@ namespace MapUtils
 		}
 		public static bool operator ==(Pos a, Pos b)
 		{
+			if (object.ReferenceEquals(a, null))
+				return object.ReferenceEquals(b, null);
+			if (object.ReferenceEquals(b, null))
+				return object.ReferenceEquals(a, null);
 			return a.x == b.x && a.y == b.y;
 		}
 		public static bool operator !=(Pos a, Pos b)
 		{
+			if (object.ReferenceEquals(a, null))
+				return !object.ReferenceEquals(b, null);
+			if (object.ReferenceEquals(b, null))
+				return !object.ReferenceEquals(a, null);
 			return a.x != b.x || a.y != b.y;
 		}
 		public override string ToString()
