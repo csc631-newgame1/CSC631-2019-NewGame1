@@ -198,6 +198,30 @@ public class NavigationHandler
 		}
 	}
 	
+	Vertex insert_vertex_at(Pos pos)
+	{
+		Vertex new_vert = new Vertex(pos.x, pos.y);
+		vertex_map[pos.x, pos.y] = new_vert;
+		get_visible_vertices(new_vert);
+		foreach (Vertex vertex in new_vert.visible)
+			vertex.visible.Add(new_vert);
+		return new_vert;
+	}
+	
+	void remove_vertex_at(Pos pos)
+	{
+		Vertex old_vert = vertex_map[pos.x, pos.y];
+		foreach (Vertex vertex in old_vert.visible)
+			vertex.visible.Remove(old_vert);
+		vertex_map[pos.x, pos.y] = null;
+	}
+	
+	void clean_up_graph()
+	{
+		foreach(Vertex vertex in nav_graph)
+			vertex.reset();
+	}
+	
 	Vertex pop_min_dist_vert(List<Vertex> graph)
 	{
 		Vertex min = graph[0];
@@ -210,15 +234,8 @@ public class NavigationHandler
 	
 	public Stack<Pos> find_shortest_path(Pos p_origin, Pos p_target)
 	{
-		Vertex source = new Vertex(p_origin);
-		Vertex target = new Vertex(p_target);
-		vertex_map[p_origin.x, p_origin.y] = source;
-		vertex_map[p_target.x, p_target.y] = target;
-		get_visible_vertices(source);
-		get_visible_vertices(target);
-		
-		foreach(Vertex vertex in target.visible)
-			vertex.visible.Add(target);
+		Vertex source = insert_vertex_at(p_origin);
+		Vertex target = insert_vertex_at(p_target);
 		
 		// create a temporary graph of vertices to be pulled from during pathfinding
 		List<Vertex> tmp_graph = new List<Vertex>();
@@ -253,12 +270,9 @@ public class NavigationHandler
 		path.Push(source.pos);
 		
 		// post path-finding cleanup
-		foreach(Vertex vertex in target.visible)
-			vertex.visible.Remove(target);
-		vertex_map[p_origin.x, p_origin.y] = null;
-		vertex_map[p_target.x, p_target.y] = null;
-		foreach(Vertex vertex in nav_graph)
-			vertex.reset();
+		remove_vertex_at(p_origin);
+		remove_vertex_at(p_target);
+		clean_up_graph();
 		
 		return clean_up_path(path);
 	}
@@ -289,10 +303,10 @@ public class NavigationHandler
 			return null;
 		
 		for (int x = p1.x; x != p2.x; x += Math.Sign(p2.x - p1.x))
-			if (map[x, p1.y] == EMPTY)
+			if (impassable(map[x, p1.y]))
 				return new Pos(p1.x, p2.y);
 		for (int y = p1.y; y != p2.y; y += Math.Sign(p2.y - p1.y))
-			if (map[p2.x, y] == EMPTY)
+			if (impassable(map[p2.x, y]))
 				return new Pos(p1.x, p2.y);
 			
 		return new Pos(p2.x, p1.y);
