@@ -49,7 +49,7 @@ public class TileSelector : MonoBehaviour
 				if (hitx >= 0 && hitx < width && hity >= 0 && hity < height) {
 					if (map[hitx, hity] != EMPTY && map[hitx, hity] != EDGE) {
 						grid_position = new Pos(hitx, hity);
-						hover_position = new Vector3(hitx + cell_size / 2f, 0f, hity + cell_size / 2f) - offset;
+						hover_position = new Vector3(hitx * cell_size + cell_size / 2f, 0f, hity * cell_size + cell_size / 2f) - offset;
 						select_square.gameObject.SetActive(true);
 						select_square.position = hover_position;
 					}

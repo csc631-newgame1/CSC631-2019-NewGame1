@@ -19,6 +19,7 @@ public class MapGenerator : MonoBehaviour
 	private int region_cull_threshold;
 	private float cell_size;
 	private string seed;
+	private Vector3 offset;
 	
 	[HideInInspector]
 	public int[,] map;
@@ -27,6 +28,9 @@ public class MapGenerator : MonoBehaviour
 	private Region main_region;
 	
 	private List<Connection> debug_connections;
+	
+	[HideInInspector]
+	public int iteration = -1;
 	
     void Start()
     {
@@ -67,9 +71,10 @@ public class MapGenerator : MonoBehaviour
 		create_adjacency_lists();
 		bridge_all_regions();
 		
+		iteration++;
 		Debug.Log("done generating map!");
 		
-		Vector3 offset = new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
+		offset = new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
 		
 		// create meshes for all objects
 		SurfaceMeshGenerator surface_mesh_gen = transform.Find("Surfaces").GetComponent<SurfaceMeshGenerator>();
@@ -336,6 +341,15 @@ public class MapGenerator : MonoBehaviour
 				}
 			}
 		}
+	}
+	
+	/*********************/
+	/* UTILITY FUNCTIONS */
+	/*********************/
+	
+	public Vector3 grid_to_world(Pos pos)
+	{
+		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
 	}
 	
 	/*******************/
