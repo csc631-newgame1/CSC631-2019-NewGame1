@@ -35,5 +35,8 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-# Imported Assets
+# exclude imported assets
 Assets/ImportedAssets/*
+
+# keep one file so that the folder remains
+!Assets/ImportedAssets/.gitkeep 
