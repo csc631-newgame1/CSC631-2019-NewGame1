@@ -131,6 +131,13 @@ namespace MapUtils
 		public const int BRIDGE = -1;
 		public const int EDGE = -2;
 		public const int INNER_REGION = -3;
+		
+		public static bool traversable(int tile)
+		{
+			if (tile >= FILLED || tile == BRIDGE)
+				return true;
+			return false;
+		}
 	}
 	
 }
