@@ -21,6 +21,7 @@ public class MapConfiguration : MonoBehaviour
 	public float surface_texture_scale;
 	public float bridge_texture_scale;
 	public float floor_texture_scale;
+    public float object_size_scale;
 	
 	public string seed;
 }
