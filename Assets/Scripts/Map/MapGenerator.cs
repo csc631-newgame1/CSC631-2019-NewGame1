@@ -32,18 +32,6 @@ public class MapGenerator : MonoBehaviour
 	[HideInInspector]
 	public int iteration = -1;
 	
-    void Start()
-    {
-        generate_map();
-    }
-	
-	void Update()
-	{
-		if(Input.GetButtonDown("Fire1")) {
-			generate_map();
-		}
-	}
-	
 	void set_variables()
 	{
 		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
@@ -56,7 +44,7 @@ public class MapGenerator : MonoBehaviour
 		this.seed = config.seed;
 	}
 
-    void generate_map()
+    public void generate_map()
 	{
 		set_variables();
 		map = new int[width,height];

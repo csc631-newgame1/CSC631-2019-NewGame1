@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using MapUtils;
+// includes definition for tile types, as well as traversable()
 using static MapUtils.MapConstants;
 
 public class NavigationHandler
@@ -75,23 +76,18 @@ public class NavigationHandler
 	
 	bool is_corner(int[,] map, int x, int y)
 	{
-		if (x == 0 || x == width - 1 || y == 0 || y == height - 1 || impassable(map[x, y]))
+		if (x == 0 || x == width - 1 || y == 0 || y == height - 1 || !traversable(map[x, y]))
 			return false;
 		
 		bool has_immediate =
-			!impassable(map[x - 1, y]) && !impassable(map[x + 1, y]) &&
-			!impassable(map[x, y - 1]) && !impassable(map[x, y + 1]);
+			traversable(map[x - 1, y]) && traversable(map[x + 1, y]) &&
+			traversable(map[x, y - 1]) && traversable(map[x, y + 1]);
 			
 		int num_adjacent_corners =
-			(impassable(map[x - 1, y - 1]) ? 1 : 0) + (impassable(map[x + 1, y - 1]) ? 1 : 0) +
-			(impassable(map[x - 1, y + 1]) ? 1 : 0) + (impassable(map[x + 1, y + 1]) ? 1 : 0);
+			(!traversable(map[x - 1, y - 1]) ? 1 : 0) + (!traversable(map[x + 1, y - 1]) ? 1 : 0) +
+			(!traversable(map[x - 1, y + 1]) ? 1 : 0) + (!traversable(map[x + 1, y + 1]) ? 1 : 0);
 			
 		return num_adjacent_corners > 0 && !has_immediate;
-	}
-	
-	bool impassable(int mapval)
-	{
-		return mapval == EMPTY || mapval == EDGE;
 	}
 	
 	void build_visibility_graph()
@@ -109,7 +105,7 @@ public class NavigationHandler
 		
 		// get the maximum and minimum visible x and y values (checks straight lines up, down, left, and right from the vertex origin)
 		for (int x = vpos.x + 1; x < width; x++) {
-			if (impassable(map[x, vpos.y]))// || map[x, vpos.y] == EDGE)
+			if (!traversable(map[x, vpos.y]))// || map[x, vpos.y] == EDGE)
 				break;
 			else if (vertex_map[x, vpos.y] != null)
 				vertex.visible.Add(vertex_map[x, vpos.y]);
@@ -117,7 +113,7 @@ public class NavigationHandler
 		}
 		
 		for (int x = vpos.x - 1; x >= 0; x--) {
-			if (impassable(map[x, vpos.y]))// || map[x, vpos.y] == EDGE)
+			if (!traversable(map[x, vpos.y]))// || map[x, vpos.y] == EDGE)
 				break;
 			else if (vertex_map[x, vpos.y] != null)
 				vertex.visible.Add(vertex_map[x, vpos.y]);
@@ -125,7 +121,7 @@ public class NavigationHandler
 		}
 		
 		for (int y = vpos.y + 1; y < height; y++) {
-			if (impassable(map[vpos.x, y]))// || map[vpos.x, y] == EDGE)
+			if (!traversable(map[vpos.x, y]))// || map[vpos.x, y] == EDGE)
 				break;
 			else if (vertex_map[vpos.x, y] != null)
 				vertex.visible.Add(vertex_map[vpos.x, y]);
@@ -133,7 +129,7 @@ public class NavigationHandler
 		}
 		
 		for (int y = vpos.y - 1; y >= 0; y--) {
-			if (impassable(map[vpos.x, y]))// || map[vpos.x, y] == EDGE)
+			if (!traversable(map[vpos.x, y]))// || map[vpos.x, y] == EDGE)
 				break;
 			else if (vertex_map[vpos.x, y] != null)
 				vertex.visible.Add(vertex_map[vpos.x, y]);
@@ -169,13 +165,13 @@ public class NavigationHandler
 		
 		for (int x = min_x; x <= max_x; x++) {
 			int y = vpos.y + 1;
-			while (y < height && !impassable(map[x, y])) {
+			while (y < height && !traversable(map[x, y])) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				y++;
 			}
 			y = vpos.y - 1;
-			while (y >= 0 && !impassable(map[x, y])) {
+			while (y >= 0 && traversable(map[x, y])) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				y--;
@@ -184,13 +180,13 @@ public class NavigationHandler
 		
 		for (int y = min_y; y <= max_y; y++) {
 			int x = vpos.x + 1;
-			while (x < width && !impassable(map[x, y])) {
+			while (x < width && traversable(map[x, y])) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				x++;
 			}
 			x = vpos.x - 1;
-			while (x >= 0 && !impassable(map[x, y])) {
+			while (x >= 0 && traversable(map[x, y])) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				x--;
@@ -234,7 +230,7 @@ public class NavigationHandler
 		return min;
 	}
 	
-	public Stack<Pos> find_shortest_path(Pos p_origin, Pos p_target)
+	public List<Pos> find_shortest_path(Pos p_origin, Pos p_target)
 	{
 		Vertex source = insert_vertex_at(p_origin);
 		Vertex target = insert_vertex_at(p_target);
@@ -274,23 +270,21 @@ public class NavigationHandler
 		return clean_up_path(path);
 	}
 	
-	Stack<Pos> clean_up_path(Stack<Pos> path)
+	List<Pos> clean_up_path(Stack<Pos> path)
 	{
-		List<Pos> tmp = new List<Pos>();
+		List<Pos> new_path = new List<Pos>();
 		Pos p1 = path.Pop(), p2, mp;
-		tmp.Insert(0, p1);
+		new_path.Add(p1);
 		
 		while (path.Count > 0) {
 			p2 = path.Pop();
 			mp = get_valid_midpoint(p1, p2);
 			if (mp != null)
-				tmp.Insert(0, mp);
-			tmp.Insert(0, p2);
+				new_path.Add(mp);
+			new_path.Add(p2);
 			p1 = p2;
 		}
-		Stack<Pos> new_path = new Stack<Pos>();
-		foreach (Pos pos in tmp)
-			new_path.Push(pos);
+		
 		return new_path;
 	}
 	
@@ -300,10 +294,10 @@ public class NavigationHandler
 			return null;
 		
 		for (int x = p1.x; x != p2.x; x += Math.Sign(p2.x - p1.x))
-			if (impassable(map[x, p1.y]))
+			if (!traversable(map[x, p1.y]))
 				return new Pos(p1.x, p2.y);
 		for (int y = p1.y; y != p2.y; y += Math.Sign(p2.y - p1.y))
-			if (impassable(map[p2.x, y]))
+			if (!traversable(map[p2.x, y]))
 				return new Pos(p1.x, p2.y);
 			
 		return new Pos(p2.x, p1.y);
@@ -318,6 +312,7 @@ public class NavigationHandler
 		while (connected_graph.Count > 0) {
 			count++;
 			Vertex current = connected_graph.Pop();
+			draw_lines_to_neighbors(current);
 			foreach (Vertex vertex in current.visible) {
 				if (!vertex.visited) {
 					vertex.visited = true;
@@ -333,6 +328,15 @@ public class NavigationHandler
 		Debug.Log("Vertices connected together: " + count.ToString());
 		if (count < nav_graph.Count) {
 			Debug.Log("Some areas are not connected!");
+		}
+	}
+	
+	void draw_lines_to_neighbors(Vertex v)
+	{
+		Vector3 origin = new Vector3(-width/2 + v.pos.x + .5f, 0f, -height/2 + v.pos.y + .5f);
+		foreach(Vertex n in v.visible) {
+			Vector3 neighbor = new Vector3(-width/2 + n.pos.x + .5f, 0f, -height/2 + n.pos.y + .5f);
+			Debug.DrawLine(origin, neighbor, Color.white, 1.5f, false);
 		}
 	}
 }
