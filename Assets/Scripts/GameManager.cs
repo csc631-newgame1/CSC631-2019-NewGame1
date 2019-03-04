@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 	private MapGenerator map_gen;
 	private MapManager map_manager;
 	
-	public GameAgent player;
+	public GameObject player;
 	
     void Start()
     {

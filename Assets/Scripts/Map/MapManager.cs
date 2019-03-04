@@ -31,10 +31,6 @@ public class MapManager : MonoBehaviour
     private MapCell[,] map;
 	private NavigationHandler nav_map;
 	
-	// flags
-	[HideInInspector]
-	public bool map_ready = false;
-	
 	private void set_config_variables()
 	{
 		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
@@ -42,7 +38,6 @@ public class MapManager : MonoBehaviour
 		this.height = config.height;
 		this.cell_size = config.cell_size;
 		this.offset = new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
-		map_ready = false;
 	}
 	
 	// called by gamemanager once map is done being generated
@@ -59,11 +54,9 @@ public class MapManager : MonoBehaviour
 		}
 		
 		nav_map = new NavigationHandler(map_raw);
-		
-		map_ready = true;
 	}
 	
-	public void instantiate_randomly(GameAgent type)
+	public void instantiate_randomly(GameObject type)
 	{
 		System.Random rng = new System.Random(0);
 		
@@ -78,15 +71,16 @@ public class MapManager : MonoBehaviour
 		instantiate(type, new Pos(x, y));
 	}
 	
-	// can be called by other scripts to create a player or enemy at 
-	public void instantiate(GameAgent type, Pos pos)
+	public void instantiate(GameObject prefab, Pos pos)
 	{
-		GameAgent agent = Instantiate(type, grid_to_world(pos), Quaternion.identity);
+		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
+		GameAgent agent = clone.GetComponent<GameAgent>();
 		agent.init_agent(pos);
 		map[pos.x, pos.y].resident = agent;
 		map[pos.x, pos.y].occupied = true;
 	}
 	
+	// destroys all game objects currently on the map
 	public void clear_map()
 	{
 		for (int x = 0; x < width; x++) {

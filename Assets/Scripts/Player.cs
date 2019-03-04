@@ -32,12 +32,9 @@ public class Player : GameAgent
 	// if hover position is on a bridge tile, change the player model
     void Update()
     {
-        if (map_manager.map_ready) {
-			
-			if (Input.GetMouseButtonDown(1) && !moving) {
-				if (map_manager.move(grid_pos, tile_selector.grid_position)) {
-					grid_pos = tile_selector.grid_position;
-				}
+		if (Input.GetMouseButtonDown(1) && !moving) {
+			if (map_manager.move(grid_pos, tile_selector.grid_position)) {
+				grid_pos = tile_selector.grid_position;
 			}
 		}
     }

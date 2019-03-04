@@ -250,50 +250,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: 150, z: 0}
---- !u!1 &909363276
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 909363277}
-  - component: {fileID: 909363278}
-  m_Layer: 0
-  m_Name: Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &909363277
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 909363276}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1789417550}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &909363278
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 909363276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1281cb76421430648b4367a29ff2e0bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  map_ready: 0
 --- !u!1 &1591538335
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,7 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e64ed4f4fd8ebb408eef1be1f07d77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 1760152440315872998, guid: 5259c1a250b90414b90567437c577f5d, type: 3}
 --- !u!4 &1591538337
 Transform:
   m_ObjectHideFlags: 0
@@ -338,12 +294,25 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1789417550 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2575192234826197368, guid: 11a1c6efdaf767a419170c3cf0563017,
+--- !u!1 &1789417547 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2575192234826197373, guid: 11a1c6efdaf767a419170c3cf0563017,
     type: 3}
   m_PrefabInstance: {fileID: 5037296377605254441}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1789417551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1789417547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1281cb76421430648b4367a29ff2e0bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  map_ready: 0
 --- !u!1 &1867890175
 GameObject:
   m_ObjectHideFlags: 0
@@ -537,6 +506,11 @@ PrefabInstance:
         type: 3}
       propertyPath: wall_texture_scale
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2575192234826197374, guid: 11a1c6efdaf767a419170c3cf0563017,
+        type: 3}
+      propertyPath: seed
+      value: yeeeeeeeeehawwwww
       objectReference: {fileID: 0}
     - target: {fileID: 2575192236529764854, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
