@@ -5,49 +5,73 @@ using UnityEngine;
 using MapUtils;
 using static MapUtils.MapConstants;
 
-public class Player : MonoBehaviour
+public class Player : GameAgent
 {
-	private MapGenerator map_instance; // reference to MapGenerator instance with map data
+	private MapManager map_manager; // reference to MapManager instance with map data
 	private TileSelector tile_selector; // reference to map tile selector
 	
+	// private reference to position in map grid
 	private Pos grid_pos;
 	private bool moving = false;
+	private int current_map_iteration = -1;
+	
+	private int move_budget;
+	private int health = 100;
+	private bool player_turn = false;
+	public float speed;
 	
     // Gets references to necessary game components
-    void Start()
+    public override void init_agent(Pos position)
     {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
-		map_instance = GameObject.FindGameObjectWithTag("Map").GetComponent<MapGenerator>();
+		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
+		grid_pos = position;
     }
 
 	// if right mouse button is pressed, move player model to hover position
 	// if hover position is on a bridge tile, change the player model
     void Update()
     {
-        if (Input.GetMouseButtonDown(1) && map_instance.map != null && !moving) {
+        if (map_manager.map_ready) {
 			
-			grid_pos = tile_selector.grid_position;
-			StartCoroutine(smooth_movement(transform.position, tile_selector.hover_position));
+			if (Input.GetMouseButtonDown(1) && !moving) {
+				if (map_manager.move(grid_pos, tile_selector.grid_position)) {
+					grid_pos = tile_selector.grid_position;
+				}
+			}
 		}
     }
 	
-	IEnumerator smooth_movement(Vector3 origin, Vector3 target)
+	public override void take_damage(int amount)
 	{
-		float speed = 30f;
-		float distance_to_target = Vector3.Distance(origin, target);
-		float time = 0f;
-		
+		health -= amount;
+	}
+	
+	public override void take_turn()
+	{
+		player_turn = true;
+	}
+	
+	public override IEnumerator smooth_movement(List<Pos> path)
+	{
 		moving = true;
-		transform.LookAt(target);
 		
-		while(time < Mathf.PI / 2f) {
-			
-			time += (Time.deltaTime * speed) / distance_to_target;
-			transform.position = Vector3.Lerp(origin, target, Mathf.Sin(time));
-			yield return null;
+		Vector3 origin, target;
+		foreach(Pos step in path) {
+			origin = transform.position;
+			target = map_manager.grid_to_world(step);
+			float dist = Vector3.Distance(origin, target);
+			float time = 0f;
+			while(time < 1f && dist > 0f) {
+				
+				time += (Time.deltaTime * speed) / dist;
+				transform.position = Vector3.Lerp(origin, target, time);
+				yield return null;
+			}
 		}
-		
-		transform.position = target;
+		transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+
 		moving = false;
 	}
+	
 }
