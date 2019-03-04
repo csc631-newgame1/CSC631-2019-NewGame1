@@ -78,10 +78,18 @@ namespace MapUtils
 		}
 		public static bool operator ==(Pos a, Pos b)
 		{
+			if (object.ReferenceEquals(a, null))
+				return object.ReferenceEquals(b, null);
+			if (object.ReferenceEquals(b, null))
+				return object.ReferenceEquals(a, null);
 			return a.x == b.x && a.y == b.y;
 		}
 		public static bool operator !=(Pos a, Pos b)
 		{
+			if (object.ReferenceEquals(a, null))
+				return !object.ReferenceEquals(b, null);
+			if (object.ReferenceEquals(b, null))
+				return !object.ReferenceEquals(a, null);
 			return a.x != b.x || a.y != b.y;
 		}
 		public override string ToString()
@@ -123,6 +131,13 @@ namespace MapUtils
 		public const int BRIDGE = -1;
 		public const int EDGE = -2;
 		public const int INNER_REGION = -3;
+		
+		public static bool traversable(int tile)
+		{
+			if (tile >= FILLED || tile == BRIDGE)
+				return true;
+			return false;
+		}
 	}
 	
 }
