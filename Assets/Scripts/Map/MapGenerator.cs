@@ -86,8 +86,8 @@ public class MapGenerator : MonoBehaviour
 		TileSelector tile_select = transform.Find("TileSelector").GetComponent<TileSelector>();
 		tile_select.init_tile_selector(map);
 
-        RockGenerator rockGenerator = transform.Find("Surfaces").GetComponent<RockGenerator>();
-        rockGenerator.generateRocks(map, offset, object_size_scale);
+        //RockGenerator rockGenerator = transform.Find("Surfaces").GetComponent<RockGenerator>();
+        //rockGenerator.generateRocks(map, offset, object_size_scale);
 	}
 	
 	/*****************/
