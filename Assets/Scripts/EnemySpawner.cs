@@ -61,9 +61,9 @@ public class EnemySpawner : MonoBehaviour
 
     
     bool IsValid(Vector3 candidate, List<Vector3> points, int[,] grid) {
-        //if (!mapManager.IsTraversable(new Pos((int)candidate.x, (int)candidate.y))) {
-        //    return false;
-        //}
+        if (!mapManager.IsTraversable(new Pos((int)candidate.x, (int)candidate.y))) {
+            return false;
+        }
 
         if (candidate.x >=0 && candidate.x < regionSize.x && candidate.y >= 0 && candidate.y < regionSize.y) {
             int cellX = (int)(candidate.x / cell_size);
