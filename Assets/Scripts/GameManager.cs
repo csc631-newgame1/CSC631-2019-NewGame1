@@ -11,7 +11,6 @@ public class GameManager : MonoBehaviour
     private EnemySpawner enemySpawner;
 
     private List<SpawnZone> spawnZones;
-    public float displayRadius;
 
     public GameAgent player;
     public bool debugEnemySpawnZones = true;
@@ -27,7 +26,6 @@ public class GameManager : MonoBehaviour
         map_manager.instantiate_randomly(player);
 
         mapConfiguration = map.GetComponent<MapConfiguration>();
-        displayRadius = mapConfiguration.cell_size * Mathf.Sqrt(2);
 
         enemySpawner = GetComponent<EnemySpawner>();
         enemySpawner.Init(map_manager);
