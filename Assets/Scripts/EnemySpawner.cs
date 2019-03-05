@@ -9,7 +9,7 @@ public class EnemySpawner : MonoBehaviour {
     private Vector3 offset;
     private Vector3 regionSize;
     private float radius;
-    private MapManager mapManager;
+    private MapManager mapManager;  
 
     [Header("Enemy Spawn Zone Settings")]
     [Tooltip("Increase slightly to increase distance between zones.")]
