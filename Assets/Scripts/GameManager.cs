@@ -38,7 +38,13 @@ public class GameManager : MonoBehaviour
         if (debugEnemySpawnZones) {
             if (spawnZones != null) {
                 foreach (SpawnZone zone in spawnZones) {
-                    Gizmos.DrawSphere(map_manager.grid_to_world(new MapUtils.Pos((int)zone.GetPosition().x, (int)zone.GetPosition().y)), zone.GetRadius());
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawWireSphere(map_manager.grid_to_world(new MapUtils.Pos((int)zone.GetPosition().x, (int)zone.GetPosition().y)), zone.GetRadius());
+                    List<Vector3> zoneTiles = zone.GetZoneTiles();
+                    foreach (Vector3 tile in zoneTiles) {
+                        Gizmos.color = Color.red;
+                        Gizmos.DrawWireCube(map_manager.grid_to_world(new MapUtils.Pos((int)tile.x, (int)tile.y)), new Vector3(mapConfiguration.cell_size, 0, mapConfiguration.cell_size));
+                    }
                 }
             }
         }
