@@ -324,6 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e64ed4f4fd8ebb408eef1be1f07d77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  displayRadius: 0
   player: {fileID: 1760152440315872998, guid: 5259c1a250b90414b90567437c577f5d, type: 3}
   debugEnemySpawnZones: 1
 --- !u!4 &1591538337
@@ -352,6 +353,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e7913fe360f8a049a458a0ee8989c0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  distanceBetweenZonesScale: 0.1
+  lowerRadius: 2
+  upperRadius: 4.06
 --- !u!4 &1789417550 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2575192234826197368, guid: 11a1c6efdaf767a419170c3cf0563017,
