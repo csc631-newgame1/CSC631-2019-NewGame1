@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 956bb2b40f257e843a228735ecea6524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hover_position: {x: 0, y: 0, z: 0}
 --- !u!65 &2575192234604634101
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -69,6 +70,7 @@ GameObject:
   - component: {fileID: 2575192234826197368}
   - component: {fileID: 2575192234826197375}
   - component: {fileID: 2575192234826197374}
+  - component: {fileID: 7388849555472874660}
   m_Layer: 0
   m_Name: Map
   m_TagString: Map
@@ -109,6 +111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 0
+  iteration: -1
 --- !u!114 &2575192234826197374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,7 +135,21 @@ MonoBehaviour:
   surface_texture_scale: 1
   bridge_texture_scale: 1
   floor_texture_scale: 1
+  object_size_scale: 0
   seed: 
+--- !u!114 &7388849555472874660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2575192234826197373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1281cb76421430648b4367a29ff2e0bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  map_ready: 0
 --- !u!1 &2575192235340130525
 GameObject:
   m_ObjectHideFlags: 0

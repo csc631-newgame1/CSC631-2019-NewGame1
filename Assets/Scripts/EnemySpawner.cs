@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using MapUtils;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,9 +10,10 @@ public class EnemySpawner : MonoBehaviour
     private Vector3 offset;
     private Vector3 regionSize;
     private float radius;
+    private MapManager mapManager;
 
     // Start is called before the first frame update
-    public void init()
+    public void Init(MapManager _mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         this.width = config.width;
@@ -20,12 +21,14 @@ public class EnemySpawner : MonoBehaviour
         regionSize = new Vector2(width, height);
         this.cell_size = config.cell_size;
         this.radius = cell_size * Mathf.Sqrt(2);
-        this.offset = new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
+        this.offset = config.GetOffset();
+        this.mapManager = _mapManager;
     }
 
     public List<Vector3> GeneratePoints(int numSamplesBeforeRejection = 30) {
         Debug.Log("GeneratePoints called");
-        int[,] grid = new int[Mathf.CeilToInt(width / cell_size), Mathf.CeilToInt(height / cell_size)];
+        //int[,] grid = new int[Mathf.CeilToInt(width / cell_size), Mathf.CeilToInt(height / cell_size)];
+        int[,] grid = new int[width, height];
         List<Vector3> points = new List<Vector3>();
         List<Vector3> spawnPoints = new List<Vector3>();
 
@@ -58,6 +61,10 @@ public class EnemySpawner : MonoBehaviour
 
     
     bool IsValid(Vector3 candidate, List<Vector3> points, int[,] grid) {
+        //if (!mapManager.IsTraversable(new Pos((int)candidate.x, (int)candidate.y))) {
+        //    return false;
+        //}
+
         if (candidate.x >=0 && candidate.x < regionSize.x && candidate.y >= 0 && candidate.y < regionSize.y) {
             int cellX = (int)(candidate.x / cell_size);
             int cellY = (int)(candidate.y / cell_size);
@@ -70,14 +77,17 @@ public class EnemySpawner : MonoBehaviour
 
             for (int x = searchStartX; x <= searchEndX; x++) {
                 for (int y = searchStartY; y <= searchEndY; y++) {
+                    
+
                     int pointIndex = grid[x, y] - 1;
                     if (pointIndex != -1) {
                         float sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
-                        if (sqrDst < radius*radius) {
+                        if (sqrDst < radius * radius) {
                             // Candidate too close to the point
                             return false;
                         }
                     }
+                    
                 }
             }
 

@@ -24,4 +24,8 @@ public class MapConfiguration : MonoBehaviour
     public float object_size_scale;
 	
 	public string seed;
+
+    public Vector3 GetOffset() {
+        return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
+    }
 }
