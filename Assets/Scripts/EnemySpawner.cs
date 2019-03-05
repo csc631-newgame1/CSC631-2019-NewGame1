@@ -12,7 +12,6 @@ public class EnemySpawner : MonoBehaviour
     private float radius;
     private MapManager mapManager;
 
-    // Start is called before the first frame update
     public void Init(MapManager _mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
@@ -26,8 +25,6 @@ public class EnemySpawner : MonoBehaviour
     }
 
     public List<Vector3> GeneratePoints(int numSamplesBeforeRejection = 30) {
-        Debug.Log("GeneratePoints called");
-        //int[,] grid = new int[Mathf.CeilToInt(width / cell_size), Mathf.CeilToInt(height / cell_size)];
         int[,] grid = new int[width, height];
         List<Vector3> points = new List<Vector3>();
         List<Vector3> spawnPoints = new List<Vector3>();
