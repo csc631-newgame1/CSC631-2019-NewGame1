@@ -13,7 +13,10 @@ public class GameManager : MonoBehaviour
     private List<SpawnZone> spawnZones;
 
     public GameAgent player;
-    public bool debugEnemySpawnZones = true;
+
+    [Header("Debug Settings")]
+    [Tooltip("Shows wire spheres where the Spawn Zones are mapped, and the wire cubes for the tiles within the Spawn Zone.")]
+    public bool showEnemySpawnZones = true;
 	
     void Start()
     {
@@ -33,8 +36,9 @@ public class GameManager : MonoBehaviour
     }
 
     void OnDrawGizmos() {
-        List<Color> gizColors = new List<Color> {Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey};
-        if (debugEnemySpawnZones) {
+        if (showEnemySpawnZones) {
+            List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
+
             if (spawnZones != null) {
                 for(int i=0; i<spawnZones.Count-1; i++) {
                     Gizmos.color = Color.white;
