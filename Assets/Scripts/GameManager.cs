@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     private MapConfiguration mapConfiguration;
     private EnemySpawner enemySpawner;
 
-    private List<Vector3> points;
-    public float displayRadius = 1f;
+    private List<SpawnZone> spawnZones;
+    private float displayRadius;
 
     public GameAgent player;
     public bool debugEnemySpawnZones = true;
@@ -27,17 +27,19 @@ public class GameManager : MonoBehaviour
         map_manager.instantiate_randomly(player);
 
         mapConfiguration = map.GetComponent<MapConfiguration>();
+        displayRadius = mapConfiguration.cell_size * Mathf.Sqrt(2);
 
         enemySpawner = GetComponent<EnemySpawner>();
         enemySpawner.Init(map_manager);
-        points = enemySpawner.GeneratePoints();
+        spawnZones = enemySpawner.GeneratePoints();
+        Debug.Log(spawnZones.Count);
     }
 
     void OnDrawGizmos() {
         if (debugEnemySpawnZones) {
-            if (points != null) {
-                foreach (Vector3 point in points) {
-                    Gizmos.DrawSphere(map_manager.grid_to_world(new MapUtils.Pos((int)point.x, (int)point.y)), displayRadius);
+            if (spawnZones != null) {
+                foreach (SpawnZone zone in spawnZones) {
+                    Gizmos.DrawSphere(map_manager.grid_to_world(new MapUtils.Pos((int)zone.GetPosition().x, (int)zone.GetPosition().y)), displayRadius);
                 }
             }
         }

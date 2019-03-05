@@ -324,8 +324,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e64ed4f4fd8ebb408eef1be1f07d77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayRadius: 1
   player: {fileID: 1760152440315872998, guid: 5259c1a250b90414b90567437c577f5d, type: 3}
+  debugEnemySpawnZones: 1
 --- !u!4 &1591538337
 Transform:
   m_ObjectHideFlags: 0

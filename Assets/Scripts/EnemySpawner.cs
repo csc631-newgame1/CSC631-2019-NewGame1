@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySpawner : MonoBehaviour
-{
+public class EnemySpawner : MonoBehaviour {
     private int width;
     private int height;
     private float cell_size;
@@ -12,7 +11,9 @@ public class EnemySpawner : MonoBehaviour
     private float radius;
     private MapManager mapManager;
 
-    public void Init(MapManager _mapManager)
+    public float spawnZoneSize = 4;
+
+    public void Init(MapManager mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         this.width = config.width;
@@ -21,28 +22,30 @@ public class EnemySpawner : MonoBehaviour
         this.cell_size = config.cell_size;
         this.radius = cell_size * Mathf.Sqrt(2);
         this.offset = config.GetOffset();
-        this.mapManager = _mapManager;
+        this.mapManager = mapManager;
     }
 
-    public List<Vector3> GeneratePoints(int numSamplesBeforeRejection = 30) {
+    public List<SpawnZone> GeneratePoints(int numSamplesBeforeRejection = 60) {
         int[,] grid = new int[width, height];
-        List<Vector3> points = new List<Vector3>();
-        List<Vector3> spawnPoints = new List<Vector3>();
+        List<SpawnZone> points = new List<SpawnZone>();
+        List<SpawnZone> spawnPoints = new List<SpawnZone>();
 
-        spawnPoints.Add(regionSize / 2);
+        spawnPoints.Add(new SpawnZone(regionSize / 2, radius));
         while (spawnPoints.Count > 0) {
             int spawnIndex = Random.Range(0, spawnPoints.Count);
-            Vector3 spawnCenter = spawnPoints[spawnIndex];
+            SpawnZone spawnCenter = spawnPoints[spawnIndex];
             bool candidateAccepted = false;
 
             for (int i=0; i<numSamplesBeforeRejection; i++) {
                 float angle = Random.value * Mathf.PI * 2;
+                float spawnZoneRadius = Random.Range(radius, spawnZoneSize * radius);
                 Vector3 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
-                Vector3 candidate = spawnCenter + dir * Random.Range(radius, 2 * radius);
+                Vector3 candidate = spawnCenter.GetPosition() + dir * spawnZoneRadius;
 
-                if(IsValid(candidate, points, grid)) {
-                    points.Add(candidate);
-                    spawnPoints.Add(candidate);
+                if(IsValid(candidate, points, grid, spawnZoneRadius)) {
+                    SpawnZone newSpawnZone = new SpawnZone(candidate, spawnZoneRadius);
+                    points.Add(newSpawnZone);
+                    spawnPoints.Add(newSpawnZone);
                     grid[(int)(candidate.x / cell_size), (int)(candidate.y / cell_size)] = points.Count;
                     candidateAccepted = true;
                     break;
@@ -57,7 +60,7 @@ public class EnemySpawner : MonoBehaviour
     }
 
     
-    bool IsValid(Vector3 candidate, List<Vector3> points, int[,] grid) {
+    bool IsValid(Vector3 candidate, List<SpawnZone> points, int[,] grid, float spawnZoneRadius) {
         if (!mapManager.IsTraversable(new Pos((int)candidate.x, (int)candidate.y))) {
             return false;
         }
@@ -74,12 +77,10 @@ public class EnemySpawner : MonoBehaviour
 
             for (int x = searchStartX; x <= searchEndX; x++) {
                 for (int y = searchStartY; y <= searchEndY; y++) {
-                    
-
                     int pointIndex = grid[x, y] - 1;
                     if (pointIndex != -1) {
-                        float sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
-                        if (sqrDst < radius * radius) {
+                        float dst = (candidate - points[pointIndex].GetPosition()).magnitude;
+                        if (dst < spawnZoneRadius) {
                             // Candidate too close to the point
                             return false;
                         }
