@@ -104,6 +104,9 @@ public class MapManager : MonoBehaviour
 	}
 
     public bool IsTraversable(Pos pos) {
+        if (pos.x < 0 || pos.x >= map.GetLength(0) || pos.y < 0 || pos.y >= map.GetLength(1)) {
+            return false;
+        }
         return map[pos.x, pos.y].traversable;
     }
 	
