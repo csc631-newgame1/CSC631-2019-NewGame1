@@ -7,19 +7,6 @@ using static MapUtils.MapConstants;
 
 public class MapManager : MonoBehaviour
 {
-	private class MapCell
-	{
-		public bool traversable;
-		public bool occupied;
-		public GameAgent resident;
-		public MapCell(bool traversable) 
-		{
-			this.traversable = traversable;
-			occupied = false;
-			resident = null;
-		}
-	}
-	
 	// config variables
 	private int width;
 	private int height;
@@ -41,7 +28,7 @@ public class MapManager : MonoBehaviour
 		this.width = config.width;
 		this.height = config.height;
 		this.cell_size = config.cell_size;
-		this.offset = new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
+		this.offset = config.GetOffset();
 		map_ready = false;
 	}
 	
@@ -115,6 +102,10 @@ public class MapManager : MonoBehaviour
 		StartCoroutine(agent.smooth_movement(path));
 		return true;
 	}
+
+    public bool IsTraversable(Pos pos) {
+        return map[pos.x, pos.y].traversable;
+    }
 	
 	public bool attack(Pos dest, int damage_amount)
 	{
