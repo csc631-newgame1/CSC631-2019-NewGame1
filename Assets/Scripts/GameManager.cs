@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     private EnemySpawner enemySpawner;
 
     private List<SpawnZone> spawnZones;
-    private float displayRadius;
+    public float displayRadius;
 
     public GameAgent player;
     public bool debugEnemySpawnZones = true;
@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
         if (debugEnemySpawnZones) {
             if (spawnZones != null) {
                 foreach (SpawnZone zone in spawnZones) {
-                    Gizmos.DrawSphere(map_manager.grid_to_world(new MapUtils.Pos((int)zone.GetPosition().x, (int)zone.GetPosition().y)), displayRadius);
+                    Gizmos.DrawSphere(map_manager.grid_to_world(new MapUtils.Pos((int)zone.GetPosition().x, (int)zone.GetPosition().y)), zone.GetRadius());
                 }
             }
         }
