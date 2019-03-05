@@ -18,6 +18,7 @@ public class MapGenerator : MonoBehaviour
 	private int smoothness;
 	private int region_cull_threshold;
 	private float cell_size;
+    private float object_size_scale;
 	private string seed;
 	private Vector3 offset;
 	
@@ -41,6 +42,7 @@ public class MapGenerator : MonoBehaviour
 		this.smoothness = config.smoothness;
 		this.region_cull_threshold = config.region_cull_threshold;
 		this.cell_size = config.cell_size;
+        this.object_size_scale = config.object_size_scale;
 		this.seed = config.seed;
 	}
 
@@ -83,6 +85,9 @@ public class MapGenerator : MonoBehaviour
 		// init tile hover detector with map data
 		TileSelector tile_select = transform.Find("TileSelector").GetComponent<TileSelector>();
 		tile_select.init_tile_selector(map);
+
+        //RockGenerator rockGenerator = transform.Find("Surfaces").GetComponent<RockGenerator>();
+        //rockGenerator.generateRocks(map, offset, object_size_scale);
 	}
 	
 	/*****************/
