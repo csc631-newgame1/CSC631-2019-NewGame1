@@ -11,7 +11,7 @@ public class EnemySpawner : MonoBehaviour {
     private float radius;
     private MapManager mapManager;
 
-    public float spawnZoneSize = 4;
+    public float spawnZoneSize = 2.5f;
 
     public void Init(MapManager mapManager)
     {
@@ -25,7 +25,7 @@ public class EnemySpawner : MonoBehaviour {
         this.mapManager = mapManager;
     }
 
-    public List<SpawnZone> GeneratePoints(int numSamplesBeforeRejection = 60) {
+    public List<SpawnZone> GeneratePoints(int numSamplesBeforeRejection = 40) {
         int[,] grid = new int[width, height];
         List<SpawnZone> points = new List<SpawnZone>();
         List<SpawnZone> spawnPoints = new List<SpawnZone>();
@@ -40,7 +40,8 @@ public class EnemySpawner : MonoBehaviour {
                 float angle = Random.value * Mathf.PI * 2;
                 float spawnZoneRadius = Random.Range(radius, spawnZoneSize * radius);
                 Vector3 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
-                Vector3 candidate = spawnCenter.GetPosition() + dir * spawnZoneRadius;
+                float distanceIncrease = Mathf.Max(1, i / 10);
+                Vector3 candidate = spawnCenter.GetPosition() + dir * spawnZoneRadius * distanceIncrease;
 
                 if(IsValid(candidate, points, grid, spawnZoneRadius)) {
                     SpawnZone newSpawnZone = new SpawnZone(candidate, spawnZoneRadius);
@@ -68,19 +69,20 @@ public class EnemySpawner : MonoBehaviour {
         if (candidate.x >=0 && candidate.x < regionSize.x && candidate.y >= 0 && candidate.y < regionSize.y) {
             int cellX = (int)(candidate.x / cell_size);
             int cellY = (int)(candidate.y / cell_size);
+            int numOfCellsToScan = Mathf.CeilToInt(spawnZoneRadius / cell_size);
 
-            // Search around 5 cells
-            int searchStartX = Mathf.Max(0, cellX - 2);
-            int searchEndX = Mathf.Min(cellX + 2, grid.GetLength(0) - 1);
-            int searchStartY = Mathf.Max(0, cellY - 2);
-            int searchEndY = Mathf.Min(cellY + 2, grid.GetLength(1) - 1);
+            // Search around the candidate cell
+            int searchStartX = Mathf.Max(0, cellX - numOfCellsToScan);
+            int searchEndX = Mathf.Min(cellX + numOfCellsToScan, grid.GetLength(0) - 1);
+            int searchStartY = Mathf.Max(0, cellY - numOfCellsToScan);
+            int searchEndY = Mathf.Min(cellY + numOfCellsToScan, grid.GetLength(1) - 1);
 
             for (int x = searchStartX; x <= searchEndX; x++) {
                 for (int y = searchStartY; y <= searchEndY; y++) {
                     int pointIndex = grid[x, y] - 1;
                     if (pointIndex != -1) {
                         float dst = (candidate - points[pointIndex].GetPosition()).magnitude;
-                        if (dst < spawnZoneRadius) {
+                        if (dst < (spawnZoneRadius + points[pointIndex].GetRadius())) {
                             // Candidate too close to the point
                             return false;
                         }
