@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
 
         enemySpawner = GetComponent<EnemySpawner>();
         enemySpawner.Init(map_manager);
-        spawnZones = enemySpawner.GeneratePoints();
+        spawnZones = enemySpawner.GenerateSpawnZones();
     }
 
     void OnDrawGizmos() {
