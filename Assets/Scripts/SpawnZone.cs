@@ -31,6 +31,11 @@ public class SpawnZone {
         this.zoneTiles = zoneTiles;
     }
 
+    // Gets the traversable tiles within the radius of the Spawn Zone
+    public List<Vector3> GetZoneTiles() {
+        return zoneTiles;
+    }
+
     // Returns the number of traversable tiles within the radius
     // of the Spawn Zone
     public int GetNumberOfTilesInZone() {
