@@ -295,9 +295,9 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 		
-		map[conn.endpt1.x, conn.endpt1.y] = BRIDGE;
-		map[conn.endpt2.x, conn.endpt2.y] = BRIDGE;
-		map[conn.endpt1.x, conn.endpt2.y] = BRIDGE;
+		map[conn.endpt1.x, conn.endpt1.y] = PLATFORM;
+		map[conn.endpt2.x, conn.endpt2.y] = PLATFORM;
+		map[conn.endpt1.x, conn.endpt2.y] = PLATFORM;
 		
 		for (int x = conn.endpt1.x + ix; x != conn.endpt2.x; x += ix) {
 			map[x, conn.endpt2.y] = BRIDGE;

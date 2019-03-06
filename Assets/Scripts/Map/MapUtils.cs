@@ -129,12 +129,13 @@ namespace MapUtils
 		public const int FILLED = 1;
 		public const int EMPTY = 0;
 		public const int BRIDGE = -1;
-		public const int EDGE = -2;
-		public const int INNER_REGION = -3;
+		public const int PLATFORM = -2;
+		public const int EDGE = -3;
+		public const int INNER_REGION = -4;
 		
 		public static bool traversable(int tile)
 		{
-			if (tile >= FILLED || tile == BRIDGE)
+			if (tile >= FILLED || tile == BRIDGE || tile == PLATFORM)
 				return true;
 			return false;
 		}

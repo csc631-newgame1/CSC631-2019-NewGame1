@@ -65,7 +65,7 @@ public class NavigationHandler
 		
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)
-				if (is_corner(map, x, y)) {
+				if (is_vertex(x, y)) {
 					Vertex new_vert = new Vertex(x, y);
 					vertex_map[x, y] = new_vert;
 					nav_graph.Add(new_vert);
@@ -74,20 +74,45 @@ public class NavigationHandler
 		build_visibility_graph();
 	}
 	
-	bool is_corner(int[,] map, int x, int y)
+	int tile_traversable(int x, int y)
 	{
-		if (x == 0 || x == width - 1 || y == 0 || y == height - 1 || !traversable(map[x, y]))
+		if (x < 0 || x >= width || y < 0 || y >= height)
+			return 0;
+		
+		if (traversable(map[x, y]))
+			return 1;
+		
+		return 0;
+	}
+	
+	bool is_vertex(int x, int y)
+	{
+		if (map[x, y] == PLATFORM)
+			return true;
+		
+		if (tile_traversable(x, y) == 0 || map[x, y] == BRIDGE)
 			return false;
 		
-		bool has_immediate =
-			traversable(map[x - 1, y]) && traversable(map[x + 1, y]) &&
-			traversable(map[x, y - 1]) && traversable(map[x, y + 1]);
-			
-		int num_adjacent_corners =
-			(!traversable(map[x - 1, y - 1]) ? 1 : 0) + (!traversable(map[x + 1, y - 1]) ? 1 : 0) +
-			(!traversable(map[x - 1, y + 1]) ? 1 : 0) + (!traversable(map[x + 1, y + 1]) ? 1 : 0);
-			
-		return num_adjacent_corners > 0 && !has_immediate;
+		int t_left	= tile_traversable(x - 1, y + 0);
+		int t_right	= tile_traversable(x + 1, y + 0);
+		int t_up	= tile_traversable(x + 0, y - 1);
+		int t_down	= tile_traversable(x + 0, y + 1);
+		
+		int c_left	= tile_traversable(x - 1, y - 1) + tile_traversable(x - 1, y + 1);
+		int c_right	= tile_traversable(x + 1, y - 1) + tile_traversable(x + 1, y + 1);
+		int c_up	= tile_traversable(x - 1, y + 1) + tile_traversable(x + 1, y + 1);
+		int c_down	= tile_traversable(x - 1, y - 1) + tile_traversable(x + 1, y - 1);
+		
+		int adjacent_horizontal = t_left + t_right;
+		int adjacent_vertical	= t_up + t_down;
+		
+		int corners_total	= c_up + c_down;
+		int adjacent_total	= adjacent_horizontal + adjacent_vertical;
+		
+		// decide if this is a valid "clinching" point
+		// clinching points are relatively uncommon, but frequent enough points that stop 
+		
+		return (corners_total < 4 && adjacent_total == 4) || (corners_total == 0);
 	}
 	
 	void build_visibility_graph()
@@ -105,7 +130,7 @@ public class NavigationHandler
 		
 		// get the maximum and minimum visible x and y values (checks straight lines up, down, left, and right from the vertex origin)
 		for (int x = vpos.x + 1; x < width; x++) {
-			if (!traversable(map[x, vpos.y]))// || map[x, vpos.y] == EDGE)
+			if (tile_traversable(x, vpos.y) == 0)
 				break;
 			else if (vertex_map[x, vpos.y] != null)
 				vertex.visible.Add(vertex_map[x, vpos.y]);
@@ -113,7 +138,7 @@ public class NavigationHandler
 		}
 		
 		for (int x = vpos.x - 1; x >= 0; x--) {
-			if (!traversable(map[x, vpos.y]))// || map[x, vpos.y] == EDGE)
+			if (tile_traversable(x, vpos.y) == 0)
 				break;
 			else if (vertex_map[x, vpos.y] != null)
 				vertex.visible.Add(vertex_map[x, vpos.y]);
@@ -121,7 +146,7 @@ public class NavigationHandler
 		}
 		
 		for (int y = vpos.y + 1; y < height; y++) {
-			if (!traversable(map[vpos.x, y]))// || map[vpos.x, y] == EDGE)
+			if (tile_traversable(vpos.x, y) == 0)
 				break;
 			else if (vertex_map[vpos.x, y] != null)
 				vertex.visible.Add(vertex_map[vpos.x, y]);
@@ -129,14 +154,12 @@ public class NavigationHandler
 		}
 		
 		for (int y = vpos.y - 1; y >= 0; y--) {
-			if (!traversable(map[vpos.x, y]))// || map[vpos.x, y] == EDGE)
+			if (tile_traversable(vpos.x, y) == 0)
 				break;
 			else if (vertex_map[vpos.x, y] != null)
 				vertex.visible.Add(vertex_map[vpos.x, y]);
 			min_y = y;
 		}
-		
-		int temp_maxy = max_y;
 		
 		/* Visualization of quadrants:
 		 * 
@@ -165,13 +188,13 @@ public class NavigationHandler
 		
 		for (int x = min_x; x <= max_x; x++) {
 			int y = vpos.y + 1;
-			while (y < height && !traversable(map[x, y])) {
+			while (y < height && tile_traversable(x, y) == 1) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				y++;
 			}
 			y = vpos.y - 1;
-			while (y >= 0 && traversable(map[x, y])) {
+			while (y >= 0 && tile_traversable(x, y) == 1) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				y--;
@@ -180,13 +203,13 @@ public class NavigationHandler
 		
 		for (int y = min_y; y <= max_y; y++) {
 			int x = vpos.x + 1;
-			while (x < width && traversable(map[x, y])) {
+			while (x < width && tile_traversable(x, y) == 1) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				x++;
 			}
 			x = vpos.x - 1;
-			while (x >= 0 && traversable(map[x, y])) {
+			while (x >= 0 && tile_traversable(x, y) == 1) {
 				if (vertex_map[x, y] != null)
 					vertex.visible.Add(vertex_map[x, y]);
 				x--;
@@ -196,6 +219,9 @@ public class NavigationHandler
 	
 	Vertex insert_vertex_at(Pos pos)
 	{
+		if (is_vertex(pos.x, pos.y))
+			return vertex_map[pos.x, pos.y];
+		
 		Vertex new_vert = new Vertex(pos.x, pos.y);
 		vertex_map[pos.x, pos.y] = new_vert;
 		get_visible_vertices(new_vert);
@@ -207,6 +233,9 @@ public class NavigationHandler
 	
 	void remove_vertex_at(Pos pos)
 	{
+		if (is_vertex(pos.x, pos.y))
+			return;
+		
 		Vertex old_vert = vertex_map[pos.x, pos.y];
 		foreach (Vertex vertex in old_vert.visible)
 			vertex.visible.Remove(old_vert);
@@ -234,6 +263,9 @@ public class NavigationHandler
 	{
 		Vertex source = insert_vertex_at(p_origin);
 		Vertex target = insert_vertex_at(p_target);
+		
+		//display_vertices();
+		//print_debug_info();
 		
 		// create a temporary graph of vertices to be pulled from during pathfinding
 		List<Vertex> tmp_graph = new List<Vertex>(nav_graph);
@@ -301,6 +333,18 @@ public class NavigationHandler
 				return new Pos(p1.x, p2.y);
 			
 		return new Pos(p2.x, p1.y);
+	}
+	
+	void display_vertices()
+	{
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (vertex_map[x, y] != null) {
+					Vector3 pos = new Vector3(-width/2 + x + .5f, 0f, -height/2 + y + .5f);
+					Debug.DrawLine(pos, pos + Vector3.up, Color.white, 15f, false);
+				}
+			}
+		}
 	}
 	
 	void print_debug_info()
