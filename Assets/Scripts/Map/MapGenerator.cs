@@ -295,9 +295,9 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 		
-		map[conn.endpt1.x, conn.endpt1.y] = BRIDGE;
-		map[conn.endpt2.x, conn.endpt2.y] = BRIDGE;
-		map[conn.endpt1.x, conn.endpt2.y] = BRIDGE;
+		map[conn.endpt1.x, conn.endpt1.y] = PLATFORM;
+		map[conn.endpt2.x, conn.endpt2.y] = PLATFORM;
+		map[conn.endpt1.x, conn.endpt2.y] = PLATFORM;
 		
 		for (int x = conn.endpt1.x + ix; x != conn.endpt2.x; x += ix) {
 			map[x, conn.endpt2.y] = BRIDGE;
@@ -409,7 +409,8 @@ public class MapGenerator : MonoBehaviour
             for (int x = 0; x < width; x ++) {
                 for (int y = 0; y < height; y++) {
 					switch (map[x, y]) {
-						case -2: Gizmos.color = Color.grey; break;
+						case -3: Gizmos.color = Color.grey; break;
+						case -2: Gizmos.color = Color.red; break;
 						case -1: Gizmos.color = Color.red; break;
 						case 0 : Gizmos.color = Color.white; break;
 						case 1 : Gizmos.color = Color.black; break;

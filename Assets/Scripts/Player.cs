@@ -13,12 +13,13 @@ public class Player : GameAgent
 	// private reference to position in map grid
 	private Pos grid_pos;
 	private bool moving = false;
-	private int current_map_iteration = -1;
 	
 	private int move_budget;
 	private int health = 100;
 	private bool player_turn = false;
 	public float speed;
+	
+	Animator animator;
 	
     // Gets references to necessary game components
     public override void init_agent(Pos position)
@@ -26,18 +27,16 @@ public class Player : GameAgent
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
 		grid_pos = position;
+		animator = GetComponent<Animator>();
     }
 
 	// if right mouse button is pressed, move player model to hover position
 	// if hover position is on a bridge tile, change the player model
     void Update()
     {
-        if (map_manager.map_ready) {
-			
-			if (Input.GetMouseButtonDown(1) && !moving) {
-				if (map_manager.move(grid_pos, tile_selector.grid_position)) {
-					grid_pos = tile_selector.grid_position;
-				}
+		if (Input.GetMouseButtonDown(1) && !moving) {
+			if (map_manager.move(grid_pos, tile_selector.grid_position)) {
+				grid_pos = tile_selector.grid_position;
 			}
 		}
     }
@@ -56,13 +55,20 @@ public class Player : GameAgent
 	{
 		moving = true;
 		
+		animator.SetBool("Moving", true);
+		
 		Vector3 origin, target;
 		foreach(Pos step in path) {
 			origin = transform.position;
 			target = map_manager.grid_to_world(step);
 			float dist = Vector3.Distance(origin, target);
 			float time = 0f;
+			
+			transform.LookAt(target);
+			
 			while(time < 1f && dist > 0f) {
+				
+				animator.SetFloat("Velocity Z", speed);
 				
 				time += (Time.deltaTime * speed) / dist;
 				transform.position = Vector3.Lerp(origin, target, time);
@@ -70,8 +76,13 @@ public class Player : GameAgent
 			}
 		}
 		transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+		
+		animator.SetBool("Moving", false);
 
 		moving = false;
 	}
+	
+	public void FootR(){}
+	public void FootL(){}
 	
 }

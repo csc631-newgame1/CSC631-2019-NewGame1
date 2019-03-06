@@ -7,12 +7,13 @@ public class GameManager : MonoBehaviour
 	private GameObject map;
 	private MapGenerator map_gen;
 	private MapManager map_manager;
+
     private MapConfiguration mapConfiguration;
     private EnemySpawner enemySpawner;
 
     private List<SpawnZone> spawnZones;
 
-    public GameAgent player;
+    public GameObject player;
 
     [Header("Debug Settings")]
     [Tooltip("Shows wire spheres where the Spawn Zones are mapped, and the wire cubes for the tiles within the Spawn Zone.")]
@@ -26,7 +27,8 @@ public class GameManager : MonoBehaviour
 		
 		map_manager = map.GetComponent<MapManager>();
         map_manager.init(map_gen.map);
-        map_manager.instantiate_randomly(player);
+        GameObject clone = map_manager.instantiate_randomly(player);
+		Camera.main.GetComponent<CameraControl>().SetTarget(clone);
 
         mapConfiguration = map.GetComponent<MapConfiguration>();
 
@@ -60,7 +62,8 @@ public class GameManager : MonoBehaviour
 			
 			map_manager.clear_map();
 			map_manager.init(map_gen.map);
-			map_manager.instantiate_randomly(player);
+			GameObject clone = map_manager.instantiate_randomly(player);
+			Camera.main.GetComponent<CameraControl>().SetTarget(clone);
 		}
 	}
 }

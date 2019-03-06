@@ -55,7 +55,7 @@ public class BridgeMeshGenerator : MonoBehaviour
 	{
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				if (map[x, y] == BRIDGE) {
+				if (map[x, y] == BRIDGE || map[x, y] == PLATFORM) {
 					triangulate_bridge(x, y);
 				}
 			}
