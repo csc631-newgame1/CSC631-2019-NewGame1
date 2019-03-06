@@ -5,13 +5,10 @@ using UnityEngine;
 public class EnemySpawnProperty : MonoBehaviour
 {
     public GameAgent enemy;
-    public float attack;
+    public GameAgentStats stats;
     public float attackVariance;
-    public float health;
     public float healthVariance;
-    public float range;
     public float rangeVariance;
-    public float speed;
     public float speedVariance;
 
     public int quantityOfEnemyInGroup;
@@ -22,19 +19,18 @@ public class EnemySpawnProperty : MonoBehaviour
 
     public float powerLevel = 0;
 
-    // Variance should be between 0 and 1
-    public EnemySpawnProperty(GameAgent enemy, float attack, float health, float range, float speed, int quantityOfEnemyInGroup, 
+    // Variance is based on a percentage from 0 to 1 (1 = 100%)
+    // The stat can be potentially rasied to any percetage, but cannot fall below 50% the original stat
+    public EnemySpawnProperty(GameAgent enemy, GameAgentStats stats, int quantityOfEnemyInGroup, 
                                 float attackVariance = 0f,  float healthVariance = 0f,
                                 float rangeVariance = 0f, float speedVariance = 0f,
                                 bool randomNumberOfEnemies = false, 
                                 int minNumberOfEnemiesInGroup = -1, int maxNumberOfEnemiesInGroup = -1) {
-        this.attack = attack;
+        this.enemy = enemy;
+        this.stats = stats;
         this.attackVariance = attackVariance;
-        this.health = health;
         this.healthVariance = healthVariance;
-        this.range = range;
         this.rangeVariance = rangeVariance;
-        this.speed = speed;
         this.speedVariance = speedVariance;
         this.quantityOfEnemyInGroup = quantityOfEnemyInGroup;
         this.randomNumberOfEnemies = randomNumberOfEnemies;
@@ -45,64 +41,29 @@ public class EnemySpawnProperty : MonoBehaviour
     }
 
     public float GetAttackWithVariance() {
-        if (attackVariance >= 1f || attackVariance <= -1f) {
-            attackVariance /= 100f;
-        }
-
-        return (attack + (Random.Range(-attackVariance, attackVariance) * attack));
+        return Mathf.Max(stats.attack / 2, (stats.attack + (Random.Range(-attackVariance, attackVariance) * stats.attack)));
     }
 
     public float GetHealthWithVariance() {
-        if (healthVariance >= 1f || healthVariance <= -1f) {
-            healthVariance /= 100f;
-        }
-
-        return (health + (Random.Range(-healthVariance, healthVariance) * health));
+        return Mathf.Max(stats.health / 2, (stats.health + (Random.Range(-healthVariance, healthVariance) * stats.health)));
     }
 
     public float GetRangeWithVariance() {
-        if (rangeVariance >= 1f || rangeVariance <= -1f) {
-            rangeVariance /= 100f;
-        }
-
-        return (range + (Random.Range(-rangeVariance, rangeVariance) * range));
+        return Mathf.Max(stats.range / 2, (stats.range + (Random.Range(-rangeVariance, rangeVariance) * stats.range)));
     }
 
     public float GetSpeedWithVariance() {
-
-        if (speedVariance >= 1f || speedVariance <= -1f) {
-            speedVariance /= 100f;
-        }
-
-        return (speed + (Random.Range(-speedVariance, speedVariance) * speed));
+        return Mathf.Max(stats.speed / 2, (stats.speed + (Random.Range(-speedVariance, speedVariance) * stats.speed)));
     }
 
     public float GetPowerLevel() {
         return powerLevel;
     }
 
-    private void CalculateEnemyStats() {
-        if (attackVariance > 0f) {
-            attack = GetAttackWithVariance();
-        }
-
-        if (healthVariance > 0f) {
-            health = GetHealthWithVariance();
-        }
-
-        if (rangeVariance > 0f) {
-            range = GetRangeWithVariance();
-        }
-
-        if (speedVariance > 0f) {
-            speed = GetSpeedWithVariance();
-        }
-    }
-
     private void CalculatePowerLevel() {
-        powerLevel += attack * attack;
-        powerLevel += health * health;
-        powerLevel *= Mathf.Sqrt(range);
-        powerLevel *= Mathf.Sqrt(speed);
+        powerLevel += stats.attack * stats.attack;
+        powerLevel += stats.health * stats.health;
+        powerLevel *= Mathf.Sqrt(stats.range);
+        powerLevel *= Mathf.Sqrt(stats.speed);
     }
 }
