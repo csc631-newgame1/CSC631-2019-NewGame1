@@ -15,26 +15,26 @@ public class EnemyGroup : MonoBehaviour
     [Header("Customize Group based on Power")]
     public bool powerBalance = false;
 
-    private List<EnemySpawnProperty> enemies;
-    private int numberOfEnemies = 0;
+    private List<EnemySpawnProperty> typesOfEnemies;
+    private List<GameAgent> enemies;
     private Distribution dist;
 
-    public EnemyGroup(List<EnemySpawnProperty> enemies, Distribution dist, bool randomRangeNumberOfEnemies = false,
+    public EnemyGroup(List<EnemySpawnProperty> typesOfEnemies, Distribution dist, bool randomRangeNumberOfEnemies = false,
                         int minNumberOfEnemies = -1, int maxNumberOfEnemies = -1, bool powerBalance = false) {
 
-        this.enemies = enemies;
+        this.typesOfEnemies = typesOfEnemies;
         this.dist = dist;
         this.randomRangeNumberOfEnemies = randomRangeNumberOfEnemies;
         this.minNumberOfEnemies = minNumberOfEnemies;
         this.maxNumberOfEnemies = maxNumberOfEnemies;
         this.powerBalance = powerBalance;
 
-        CalculateNumberOfEnemies();
+        CreateEnemiesInGroup();
     }
 
-    void CalculateNumberOfEnemies() {
-        foreach (EnemySpawnProperty enemy in enemies) {
-            numberOfEnemies += enemy.quantityOfEnemyInGroup;
+    void CreateEnemiesInGroup() {
+        foreach (EnemySpawnProperty enemy in typesOfEnemies) {
+            //numberOfEnemies += enemy.quantityOfEnemyInGroup;
         }
     }
 }
