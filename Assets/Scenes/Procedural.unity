@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -278,11 +278,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e64ed4f4fd8ebb408eef1be1f07d77e, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  displayRadius: 0
-  player: {fileID: 1760152440315872998, guid: 5259c1a250b90414b90567437c577f5d, type: 3}
-  debugEnemySpawnZones: 1
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
+  showEnemySpawnZones: 1
 --- !u!4 &1591538337
 Transform:
   m_ObjectHideFlags: 0
@@ -307,30 +306,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e7913fe360f8a049a458a0ee8989c0f, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   distanceBetweenZonesScale: 0.1
   lowerRadius: 2
   upperRadius: 4.06
---- !u!4 &1789417550 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2575192234826197368, guid: 11a1c6efdaf767a419170c3cf0563017,
-    type: 3}
-  m_PrefabInstance: {fileID: 5037296377605254441}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1789417551
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1789417547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1281cb76421430648b4367a29ff2e0bc, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  map_ready: 0
+  minimumNumberOfTilesInSpawnZone: 1
+  maximumNumberOfTilesInSpawnZone: 50
 --- !u!1 &1867890175
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,7 +365,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 100
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 25
   m_Depth: -1
   m_CullingMask:
@@ -424,10 +406,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d546559bc8eed1d4883416b315e1fd35, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  camera_abs_position: {x: 30, y: 30, z: 30}
-  speed: 0
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 2, y: -2, z: 2}
+  pitch: 2
+  currentZoom: 9
+  zoomSpeed: 4
+  minZoom: 9
+  maxZoom: 16
 --- !u!1001 &5037296377605254441
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -568,7 +554,7 @@ PrefabInstance:
     - target: {fileID: 2575192236637778345, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
-      value:
+      value: 
       objectReference: {fileID: 2100000, guid: 7768f43ce3b67ec4c9f6459eaef46b0c, type: 2}
     - target: {fileID: 2575192234604634107, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
@@ -613,7 +599,7 @@ PrefabInstance:
     - target: {fileID: 2575192235340130520, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
-      value:
+      value: 
       objectReference: {fileID: 2100000, guid: 86f9f27a838a2b44c8f80953384a3698, type: 2}
     - target: {fileID: 2575192235646208245, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
@@ -623,7 +609,7 @@ PrefabInstance:
     - target: {fileID: 2575192235646208245, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
-      value:
+      value: 
       objectReference: {fileID: 2100000, guid: 86f9f27a838a2b44c8f80953384a3698, type: 2}
     - target: {fileID: 2575192236078191259, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
@@ -638,7 +624,7 @@ PrefabInstance:
     - target: {fileID: 2575192236108116083, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
-      value:
+      value: 
       objectReference: {fileID: 2100000, guid: 71eb92d509bad4141a5b47734ba3a66a, type: 2}
     - target: {fileID: 2575192236108116083, guid: 11a1c6efdaf767a419170c3cf0563017,
         type: 3}
