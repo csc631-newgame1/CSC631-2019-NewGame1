@@ -25,7 +25,6 @@ public class MapManager : MonoBehaviour
 		this.height = config.height;
 		this.cell_size = config.cell_size;
 		this.offset = config.GetOffset();
-		map_ready = false;
 	}
 	
 	// called by gamemanager once map is done being generated
@@ -44,7 +43,7 @@ public class MapManager : MonoBehaviour
 		nav_map = new NavigationHandler(map_raw);
 	}
 	
-	public void instantiate_randomly(GameObject type)
+	public GameObject instantiate_randomly(GameObject type)
 	{
 		System.Random rng = new System.Random(0);
 		
@@ -56,16 +55,17 @@ public class MapManager : MonoBehaviour
 			y = rng.Next(0, height - 1);
 		}
 		
-		instantiate(type, new Pos(x, y));
+		return instantiate(type, new Pos(x, y));
 	}
 	
-	public void instantiate(GameObject prefab, Pos pos)
+	public GameObject instantiate(GameObject prefab, Pos pos)
 	{
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
 		GameAgent agent = clone.GetComponent<GameAgent>();
 		agent.init_agent(pos);
 		map[pos.x, pos.y].resident = agent;
 		map[pos.x, pos.y].occupied = true;
+		return clone;
 	}
 	
 	// destroys all game objects currently on the map
