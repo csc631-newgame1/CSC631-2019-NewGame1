@@ -98,21 +98,22 @@ public class NavigationHandler
 		int t_up	= tile_traversable(x + 0, y - 1);
 		int t_down	= tile_traversable(x + 0, y + 1);
 		
-		int c_left	= tile_traversable(x - 1, y - 1) + tile_traversable(x - 1, y + 1);
-		int c_right	= tile_traversable(x + 1, y - 1) + tile_traversable(x + 1, y + 1);
-		int c_up	= tile_traversable(x - 1, y + 1) + tile_traversable(x + 1, y + 1);
-		int c_down	= tile_traversable(x - 1, y - 1) + tile_traversable(x + 1, y - 1);
+		int c_ul	= tile_traversable(x - 1, y - 1);
+		int c_ur	= tile_traversable(x + 1, y - 1);
+		int c_dl	= tile_traversable(x - 1, y + 1);
+		int c_dr	= tile_traversable(x + 1, y + 1);
 		
 		int adjacent_horizontal = t_left + t_right;
 		int adjacent_vertical	= t_up + t_down;
 		
-		int corners_total	= c_up + c_down;
+		int corners_total	= c_ul + c_ur + c_dl + c_dr;
 		int adjacent_total	= adjacent_horizontal + adjacent_vertical;
 		
 		// decide if this is a valid "clinching" point
-		// clinching points are relatively uncommon, but frequent enough points that stop 
+		// clinching points are relatively uncommon, but frequent enough that they close off areas they affect from pathfinding
+		bool clinching = ((c_ul == 0 && c_dr == 0) || (c_ur == 0 && c_dl == 0)) && adjacent_total == 3;
 		
-		return (corners_total < 4 && adjacent_total == 4) || (corners_total == 0);
+		return (corners_total < 4 && adjacent_total == 4) || (corners_total <= 1) || clinching;
 	}
 	
 	void build_visibility_graph()
