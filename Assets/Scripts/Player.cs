@@ -13,7 +13,6 @@ public class Player : GameAgent
 	// private reference to position in map grid
 	private Pos grid_pos;
 	private bool moving = false;
-	private int current_map_iteration = -1;
 	
 	private int move_budget;
 	private int health = 100;
