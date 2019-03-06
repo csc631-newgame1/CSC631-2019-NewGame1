@@ -102,7 +102,7 @@ public class EnemySpawnProperty : MonoBehaviour
     private void CalculatePowerLevel() {
         powerLevel += attack * attack;
         powerLevel += health * health;
-        //powerLevel *= Mathf.sqr(range);
-        //powerLevel *= Mathf.sqr(speed);
+        powerLevel *= Mathf.Sqrt(range);
+        powerLevel *= Mathf.Sqrt(speed);
     }
 }
