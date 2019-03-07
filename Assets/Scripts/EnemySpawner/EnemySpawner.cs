@@ -27,6 +27,8 @@ public class EnemySpawner : MonoBehaviour {
     [Tooltip("Largest number of spawnable tiles a zone can contain.")]
     public int maximumNumberOfTilesInSpawnZone = 50;
 
+    public int maxNumberOfSpawnZones = 50;
+
     // Initializes map data
     public void Init(MapManager mapManager, MapConfiguration mapConfiguration)
     {
@@ -43,12 +45,34 @@ public class EnemySpawner : MonoBehaviour {
         spawnZones = new List<SpawnZone>();
     }
 
-    public void SpawnEnemies(ref MapManager mapManagerReference) {
+    public void SpawnEnemies(ref MapManager mapManagerReference, GameObject enemyPrefab) {
         GenerateSpawnZones();
+        TrimSpawnZones();
+
+        // Create random TestEnemies
+        List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
+        for (int groupIndex = 0; groupIndex < maxNumberOfSpawnZones; groupIndex++) {
+            List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
+
+            for (int enemyPropertyIndex = 0; enemyPropertyIndex < Random.Range(1, 3); enemyPropertyIndex++) {
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(10f, 10f, 4f, 4f),
+                                                                 Random.Range(1, 2), 0.5f, 0.5f, 0.5f, 0.5f));
+            }
+
+            enemyGroups.Add(new EnemyGroup(enemyGroupDescriptions, Distribution.Balanaced));
+        }
+
+        EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, spawnZones);
+        List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
+        //GameObject enemyPrefab = (GameObject)Resources.Load("prefabs/TestEnemy", typeof(GameObject));
+        foreach (EnemyToSpawn enemy in enemies) {
+            GameObject clone = mapManagerReference.instantiate(enemyPrefab, enemy.gridPosition);
+        }
     }
 
     // Creates a list of Spawn Zones of varrying sizes in the map
-    public List<SpawnZone> GenerateSpawnZones(int numSamplesBeforeRejection = 50) {
+    private void GenerateSpawnZones(int numSamplesBeforeRejection = 50) {
+
         int[,] grid = new int[width, height];
         // A list of the remaining Spawn Zones to randomly generate new Spawn Zones
         List<SpawnZone> remainingSpawnZones = new List<SpawnZone>();
@@ -70,12 +94,13 @@ public class EnemySpawner : MonoBehaviour {
                 // Creates a potential position for the center of the Spawn Zone
                 Vector3 candidate = spawnCenter.GetPosition() + dir * spawnZoneRadius * distanceBetweenZones;
 
-                if(IsValid(candidate, spawnZones, grid, spawnZoneRadius)) {
+                if (IsValid(candidate, spawnZones, grid, spawnZoneRadius)) {
                     SpawnZone spawnZone = CreateSpawnZone(candidate, spawnZoneRadius);
 
                     // Checks if the number of zone tiles is acceptable
                     if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
                         && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
+
                         // Spawn Zone is accepted and added to the list
                         spawnZones.Add(spawnZone);
                         remainingSpawnZones.Add(spawnZone);
@@ -90,7 +115,16 @@ public class EnemySpawner : MonoBehaviour {
                 remainingSpawnZones.RemoveAt(spawnIndex);
             }
         }
-        return spawnZones;
+    }
+
+    private void TrimSpawnZones() {
+        if (spawnZones.Count > maxNumberOfSpawnZones) {
+            int numOfZonesToRemove = spawnZones.Count - maxNumberOfSpawnZones;
+            for (int i = 0; i < numOfZonesToRemove; i++) {
+                int randomIndex = Random.Range(0, spawnZones.Count - 1);
+                spawnZones.Remove(spawnZones[randomIndex]);
+            }
+        }
     }
 
     // Checks if the center of the Spawn Zone (candidate) will create a valid Spawn Zone
@@ -170,14 +204,17 @@ public class EnemySpawner : MonoBehaviour {
         if (showEnemySpawnZones) {
             List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
 
-            if (spawnZones != null) {
-                for (int i = 0; i < spawnZones.Count - 1; i++) {
-                    Gizmos.color = Color.white;
-                    Gizmos.DrawWireSphere(mapManager.grid_to_world(new Pos((int)spawnZones[i].GetPosition().x, (int)spawnZones[i].GetPosition().y)), spawnZones[i].GetRadius());
-                    List<Vector3> zoneTiles = spawnZones[i].GetUnpopulatedZoneTiles();
-                    foreach (Vector3 tile in zoneTiles) {
-                        Gizmos.color = gizColors[i % gizColors.Count];
-                        Gizmos.DrawWireCube(mapManager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(mapConfiguration.cell_size, 0, mapConfiguration.cell_size));
+            if (spawnZones.Count > 0) {
+                for (int i = 0; i < spawnZones.Count; i++) {
+
+                    if (spawnZones[i].IsPopulated()) {
+                        Gizmos.color = Color.white;
+                        Gizmos.DrawWireSphere(mapManager.grid_to_world(new Pos((int)spawnZones[i].GetPosition().x, (int)spawnZones[i].GetPosition().y)), spawnZones[i].GetRadius());
+                        List<Vector3> zoneTiles = spawnZones[i].GetUnpopulatedZoneTiles();
+                        foreach (Vector3 tile in zoneTiles) {
+                            Gizmos.color = gizColors[i % gizColors.Count];
+                            Gizmos.DrawWireCube(mapManager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(mapConfiguration.cell_size, 0, mapConfiguration.cell_size));
+                        }
                     }
                 }
             }
