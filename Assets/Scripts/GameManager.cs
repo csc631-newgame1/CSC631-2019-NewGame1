@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     private List<SpawnZone> spawnZones;
 
     public GameObject player;
+    public GameObject enemyPrefab;
 
     [Header("Debug Settings")]
     [Tooltip("Shows wire spheres where the Spawn Zones are mapped, and the wire cubes for the tiles within the Spawn Zone.")]
@@ -40,15 +41,15 @@ public class GameManager : MonoBehaviour
         // Create random TestEnemies
         List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
         for (int groupIndex=0; groupIndex < 15; groupIndex++) {
-            List<EnemySpawnProperty> enemySpawnProperties = new List<EnemySpawnProperty>();
+            List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
 
             for (int enemyPropertyIndex=0; enemyPropertyIndex<Random.Range(1,10); enemyPropertyIndex++) {
-                enemySpawnProperties.Add(new EnemySpawnProperty(new GameAgentStats(10f, 10f, 4f, 4f),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(10f, 10f, 4f, 4f),
                                                                  Random.Range(1, 2), 0.5f, 0.5f, 0.5f, 0.5f));
                 
             }
 
-            enemyGroups.Add(new EnemyGroup(enemySpawnProperties, Distribution.Balanaced));
+            enemyGroups.Add(new EnemyGroup(enemyGroupDescriptions, Distribution.Balanaced));
         }
 
         enemySpawner.Init(map_manager, mapConfiguration);
@@ -56,6 +57,11 @@ public class GameManager : MonoBehaviour
         enemySpawner.ShowEnemySpawnZones(showEnemySpawnZones);
 
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, enemySpawner.GetSpawnZones());
+        List<GameAgent> enemies = enemyGroupManager.GetEnemiesToSpawn();
+        //GameObject enemyPrefab = (GameObject)Resources.Load("prefabs/TestEnemy", typeof(GameObject));
+        foreach (GameAgent enemy in enemies) {
+            GameObject clone = map_manager.instantiate(enemyPrefab, enemy.grid_pos);
+        }
     }
 
     void Update()

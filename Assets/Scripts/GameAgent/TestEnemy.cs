@@ -9,11 +9,11 @@ public class TestEnemy : GameAgent
     private TileSelector tile_selector; // reference to map tile selector
 
     // private reference to position in map grid
-    private bool moving = false;
+    private bool moving;
 
     private int move_budget;
-    private int health = 100;
-    private bool player_turn = false;
+    private int health;
+    private bool player_turn;
     public float speed;
 
     Animator animator;
@@ -22,7 +22,6 @@ public class TestEnemy : GameAgent
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
         map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
         grid_pos = position;
-        animator = GetComponent<Animator>();
 
         this.stats = stats;
     }

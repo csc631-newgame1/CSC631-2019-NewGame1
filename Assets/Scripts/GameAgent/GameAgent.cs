@@ -6,7 +6,7 @@ using MapUtils;
 
 public abstract class GameAgent : MonoBehaviour
 {
-	protected Pos grid_pos;
+	public Pos grid_pos;
     protected GameAgentStats stats;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);

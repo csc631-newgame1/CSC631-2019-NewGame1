@@ -14,13 +14,13 @@ public class EnemyGroup
     [Header("Customize Group based on Power")]
     public bool powerBalance = false;
 
-    private List<EnemySpawnProperty> typesOfEnemies;
+    private List<EnemyGroupDescription> typesOfEnemies;
     private List<GameAgentStats> enemies;
     private Distribution dist;
 
     public int count;
 
-    public EnemyGroup(List<EnemySpawnProperty> typesOfEnemies, Distribution dist, bool randomRangeNumberOfEnemies = false,
+    public EnemyGroup(List<EnemyGroupDescription> typesOfEnemies, Distribution dist, bool randomRangeNumberOfEnemies = false,
                         int minNumberOfEnemies = -1, int maxNumberOfEnemies = -1, bool powerBalance = false) {
 
         this.typesOfEnemies = typesOfEnemies;
@@ -36,7 +36,7 @@ public class EnemyGroup
     }
 
     void CreateEnemyStatsInGroup() {
-        foreach (EnemySpawnProperty enemy in typesOfEnemies) {
+        foreach (EnemyGroupDescription enemy in typesOfEnemies) {
             for (int i=0; i<enemy.quantityOfEnemyInGroup; i++) {
                 GameAgentStats stats = new GameAgentStats(enemy.GetAttackWithVariance(), enemy.GetHealthWithVariance(),
                                                           enemy.GetRangeWithVariance(), enemy.GetSpeedWithVariance());
