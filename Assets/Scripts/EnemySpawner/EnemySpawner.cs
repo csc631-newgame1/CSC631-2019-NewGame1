@@ -9,7 +9,11 @@ public class EnemySpawner : MonoBehaviour {
     private Vector3 offset;
     private Vector3 regionSize;
     private float radius;
-    private MapManager mapManager;  
+    private MapManager mapManager;
+    // A list of all accepted Spawn Zones
+    private List<SpawnZone> spawnZones;
+    private bool showEnemySpawnZones;
+    private MapConfiguration mapConfiguration;
 
     [Header("Enemy Spawn Zone Settings")]
     [Tooltip("Increase slightly to increase distance between zones.")]
@@ -24,7 +28,7 @@ public class EnemySpawner : MonoBehaviour {
     public int maximumNumberOfTilesInSpawnZone = 50;
 
     // Initializes map data
-    public void Init(MapManager mapManager)
+    public void Init(MapManager mapManager, MapConfiguration mapConfiguration)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         this.width = config.width;
@@ -34,13 +38,18 @@ public class EnemySpawner : MonoBehaviour {
         this.radius = cell_size * Mathf.Sqrt(2);
         this.offset = config.GetOffset();
         this.mapManager = mapManager;
+        this.mapConfiguration = mapConfiguration;
+
+        spawnZones = new List<SpawnZone>();
+    }
+
+    public void SpawnEnemies(ref MapManager mapManagerReference) {
+        GenerateSpawnZones();
     }
 
     // Creates a list of Spawn Zones of varrying sizes in the map
     public List<SpawnZone> GenerateSpawnZones(int numSamplesBeforeRejection = 50) {
         int[,] grid = new int[width, height];
-        // A list of all accepted Spawn Zones
-        List<SpawnZone> spawnZones = new List<SpawnZone>();
         // A list of the remaining Spawn Zones to randomly generate new Spawn Zones
         List<SpawnZone> remainingSpawnZones = new List<SpawnZone>();
 
@@ -147,5 +156,31 @@ public class EnemySpawner : MonoBehaviour {
         spawnZone.SetZoneTiles(zoneTiles);
 
         return spawnZone;
+    }
+
+    public List<SpawnZone> GetSpawnZones() {
+        return spawnZones;
+    }
+
+    public void ShowEnemySpawnZones(bool showEnemySpawnZones) {
+        this.showEnemySpawnZones = showEnemySpawnZones;
+    }
+
+    void OnDrawGizmos() {
+        if (showEnemySpawnZones) {
+            List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
+
+            if (spawnZones != null) {
+                for (int i = 0; i < spawnZones.Count - 1; i++) {
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawWireSphere(mapManager.grid_to_world(new Pos((int)spawnZones[i].GetPosition().x, (int)spawnZones[i].GetPosition().y)), spawnZones[i].GetRadius());
+                    List<Vector3> zoneTiles = spawnZones[i].GetZoneTiles();
+                    foreach (Vector3 tile in zoneTiles) {
+                        Gizmos.color = gizColors[i % gizColors.Count];
+                        Gizmos.DrawWireCube(mapManager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(mapConfiguration.cell_size, 0, mapConfiguration.cell_size));
+                    }
+                }
+            }
+        }
     }
 }
