@@ -66,7 +66,7 @@ public class EnemySpawner : MonoBehaviour {
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
         //GameObject enemyPrefab = (GameObject)Resources.Load("prefabs/TestEnemy", typeof(GameObject));
         foreach (EnemyToSpawn enemy in enemies) {
-            GameObject clone = mapManagerReference.instantiate(enemyPrefab, enemy.gridPosition);
+            GameObject enemySpawn = mapManagerReference.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
         }
     }
 
