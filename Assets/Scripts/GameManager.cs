@@ -33,26 +33,9 @@ public class GameManager : MonoBehaviour
         mapConfiguration = map.GetComponent<MapConfiguration>();
 
         enemySpawner = GetComponent<EnemySpawner>();
-        enemySpawner.Init(map_manager);
-        spawnZones = enemySpawner.GenerateSpawnZones();
-    }
-
-    void OnDrawGizmos() {
-        if (showEnemySpawnZones) {
-            List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
-
-            if (spawnZones != null) {
-                for(int i=0; i<spawnZones.Count-1; i++) {
-                    Gizmos.color = Color.white;
-                    Gizmos.DrawWireSphere(map_manager.grid_to_world(new MapUtils.Pos((int)spawnZones[i].GetPosition().x, (int)spawnZones[i].GetPosition().y)), spawnZones[i].GetRadius());
-                    List<Vector3> zoneTiles = spawnZones[i].GetZoneTiles();
-                    foreach(Vector3 tile in zoneTiles) {
-                        Gizmos.color = gizColors[i % gizColors.Count];
-                        Gizmos.DrawWireCube(map_manager.grid_to_world(new MapUtils.Pos((int)tile.x, (int)tile.y)), new Vector3(mapConfiguration.cell_size, 0, mapConfiguration.cell_size));
-                    }
-                }
-            }
-        }
+        enemySpawner.Init(map_manager, mapConfiguration);
+        enemySpawner.SpawnEnemies(ref map_manager);
+        enemySpawner.ShowEnemySpawnZones(showEnemySpawnZones);
     }
 
     void Update()
@@ -66,4 +49,10 @@ public class GameManager : MonoBehaviour
 			Camera.main.GetComponent<CameraControl>().SetTarget(clone);
 		}
 	}
+
+    private void OnValidate() {
+        if (enemySpawner != null) {
+            enemySpawner.ShowEnemySpawnZones(showEnemySpawnZones);
+        }
+    }
 }

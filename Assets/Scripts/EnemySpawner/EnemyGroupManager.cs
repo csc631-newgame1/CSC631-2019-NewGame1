@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class EnemyGroupManager : MonoBehaviour
+public class EnemyGroupManager
 {
     [Header("Enemy Group Settings")]
     public int maxNumberOfEnemyGroups;

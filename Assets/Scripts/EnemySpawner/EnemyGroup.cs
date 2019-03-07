@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public enum Distribution { Balanaced, Strong, Weak, Random };
 
-public class EnemyGroup : MonoBehaviour
+public class EnemyGroup
 {
     [Header("Random Number of Enemies in Groups")]
     [Tooltip("If true, select minumum value and maximum value for number of enemies to be spawned in the group.")]
@@ -16,7 +15,7 @@ public class EnemyGroup : MonoBehaviour
     public bool powerBalance = false;
 
     private List<EnemySpawnProperty> typesOfEnemies;
-    private List<GameAgent> enemies;
+    private List<GameAgentStats> enemies;
     private Distribution dist;
 
     public EnemyGroup(List<EnemySpawnProperty> typesOfEnemies, Distribution dist, bool randomRangeNumberOfEnemies = false,
@@ -34,7 +33,15 @@ public class EnemyGroup : MonoBehaviour
 
     void CreateEnemiesInGroup() {
         foreach (EnemySpawnProperty enemy in typesOfEnemies) {
-            //numberOfEnemies += enemy.quantityOfEnemyInGroup;
+            for (int i=0; i<enemy.quantityOfEnemyInGroup; i++) {
+                GameAgentStats stats = new GameAgentStats(enemy.GetAttackWithVariance(), enemy.GetHealthWithVariance(),
+                                                          enemy.GetRangeWithVariance(), enemy.GetSpeedWithVariance());
+                enemies.Add(stats);
+            }
         }
+    }
+
+    public List<GameAgentStats> GetEnemiesToSpawn() {
+        return enemies;
     }
 }
