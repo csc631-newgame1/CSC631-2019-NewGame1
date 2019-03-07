@@ -39,10 +39,10 @@ public class GameManager : MonoBehaviour
     void SpawnEnemies() {
         // Create random TestEnemies
         List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
-        for (int groupIndex=0; groupIndex < 5; groupIndex++) {
+        for (int groupIndex=0; groupIndex < 15; groupIndex++) {
             List<EnemySpawnProperty> enemySpawnProperties = new List<EnemySpawnProperty>();
 
-            for (int enemyPropertyIndex=0; enemyPropertyIndex<Random.Range(1,3); enemyPropertyIndex++) {
+            for (int enemyPropertyIndex=0; enemyPropertyIndex<Random.Range(1,10); enemyPropertyIndex++) {
                 enemySpawnProperties.Add(new EnemySpawnProperty(new GameAgentStats(10f, 10f, 4f, 4f),
                                                                  Random.Range(1, 2), 0.5f, 0.5f, 0.5f, 0.5f));
                 
@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
         enemySpawner.Init(map_manager, mapConfiguration);
         enemySpawner.SpawnEnemies(ref map_manager);
         enemySpawner.ShowEnemySpawnZones(showEnemySpawnZones);
+
+        EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, enemySpawner.GetSpawnZones());
     }
 
     void Update()
