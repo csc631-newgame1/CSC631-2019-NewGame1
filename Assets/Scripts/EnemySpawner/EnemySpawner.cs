@@ -1,5 +1,6 @@
 ﻿using MapUtils;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour {
@@ -45,17 +46,22 @@ public class EnemySpawner : MonoBehaviour {
         spawnZones = new List<SpawnZone>();
     }
 
-    public void SpawnEnemies(ref MapManager mapManagerReference, GameObject enemyPrefab) {
+    public void SpawnEnemies(ref MapManager mapManagerReference) {
         GenerateSpawnZones();
         TrimSpawnZones();
 
+        string path;
+        GameObject enemyPrefab;
+
         // Create random TestEnemies
         List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
+        // Create Enemy Groups
         for (int groupIndex = 0; groupIndex < maxNumberOfSpawnZones; groupIndex++) {
             List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
 
+            // Create Enemies inside of the Enemy Group
             for (int enemyPropertyIndex = 0; enemyPropertyIndex < Random.Range(1, 3); enemyPropertyIndex++) {
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(EnemyType.TestEnemy, new GameAgentStats(10f, 10f, 4f, 4f),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(GameAgentType.TestEnemy, 10f, 10f, 4f, 4f),
                                                                  Random.Range(1, 2), 0.5f, 0.5f, 0.5f, 0.5f));
             }
 
@@ -66,6 +72,8 @@ public class EnemySpawner : MonoBehaviour {
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
         foreach (EnemyToSpawn enemy in enemies) {
+            path = "Assets/Prefabs/" + enemy.stats.gameAgentType + ".prefab";
+            enemyPrefab = AssetDatabase.LoadAssetAtPath(path, typeof(Object)) as GameObject;
             GameObject enemySpawn = mapManagerReference.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
         }
     }
