@@ -55,6 +55,9 @@ public class NavigationHandler
 	private int width;
 	private int height;
 	
+	private static float total_verts = 0.0f;
+	private static float total_edges = 0.0f;
+	
 	public NavigationHandler(int[,] map)
 	{
 		this.map = map;
@@ -72,6 +75,10 @@ public class NavigationHandler
 				}
 				
 		build_visibility_graph();
+		total_verts += nav_graph.Count;
+		foreach (Vertex vert in nav_graph) {
+			total_edges += vert.visible.Count;
+		}
 	}
 	
 	int tile_traversable(int x, int y)
@@ -187,6 +194,11 @@ public class NavigationHandler
 		 * 
 		 * Placement of vertices in this map follows the placement of vertices in an actual navmap, i.e: at the corners of unwalkable tiles
 		 */
+		 
+		int t_maxy = max_y;
+		int t_miny = min_y;
+		int t_maxx = max_x;
+		int t_minx = min_x;
 		
 		for (int x = min_x; x <= max_x; x++) {
 			int y = vpos.y + 1;
@@ -195,13 +207,21 @@ public class NavigationHandler
 					vertex.visible.Add(vertex_map[x, y]); break;}
 				y++;
 			}
+			if (tile_traversable(x, y) == 0)
+				max_y = y;
+			
 			y = vpos.y - 1;
 			while (y >= min_y && tile_traversable(x, y) == 1) {
 				if (vertex_map[x, y] != null) {
 					vertex.visible.Add(vertex_map[x, y]); break;}
 				y--;
 			}
+			if (tile_traversable(x, y) == 0)
+				min_y = y;
 		}
+		
+		max_y = t_maxy;
+		min_y = t_miny;
 		
 		for (int y = min_y; y <= max_y; y++) {
 			int x = vpos.x + 1;
@@ -210,12 +230,17 @@ public class NavigationHandler
 					vertex.visible.Add(vertex_map[x, y]); break;}
 				x++;
 			}
+			if (tile_traversable(x, y) == 0)
+				max_x = x;
+			
 			x = vpos.x - 1;
 			while (x >= min_x && tile_traversable(x, y) == 1) {
 				if (vertex_map[x, y] != null) {
 					vertex.visible.Add(vertex_map[x, y]); break;}
 				x--;
 			}
+			if (tile_traversable(x, y) == 0)
+				min_x = x;
 		}
 	}
 	
@@ -267,7 +292,7 @@ public class NavigationHandler
 		Vertex target = insert_vertex_at(p_target);
 		
 		//display_vertices();
-		//print_debug_info();
+		print_debug_info();
 		
 		// create a temporary graph of vertices to be pulled from during pathfinding
 		List<Vertex> tmp_graph = new List<Vertex>(nav_graph);
@@ -354,8 +379,8 @@ public class NavigationHandler
 		Stack<Vertex> connected_graph = new Stack<Vertex>();
 		connected_graph.Push(nav_graph[0]);
 		
-		int verts = 0;
-		int edges = 0;
+		float verts = 0;
+		float edges = 0;
 		while (connected_graph.Count > 0) {
 			verts++;
 			Vertex current = connected_graph.Pop();
@@ -377,6 +402,9 @@ public class NavigationHandler
 		if (verts < nav_graph.Count) {
 			Debug.Log("Some areas are not connected!");
 		}
+		
+		Debug.Log("Curr E/V ratio: " + (edges / verts));
+		Debug.Log("Avg E/V ratio: " + (total_edges / total_verts));
 	}
 	
 	void draw_lines_to_neighbors(Vertex v)
