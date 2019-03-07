@@ -74,8 +74,8 @@ public class EnemySpawner : MonoBehaviour {
                     SpawnZone spawnZone = CreateSpawnZone(candidate, spawnZoneRadius);
 
                     // Checks if the number of zone tiles is acceptable
-                    if (spawnZone.GetNumberOfTilesInZone() >= minimumNumberOfTilesInSpawnZone
-                        && spawnZone.GetNumberOfTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
+                    if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
+                        && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
                         // Spawn Zone is accepted and added to the list
                         spawnZones.Add(spawnZone);
                         remainingSpawnZones.Add(spawnZone);
@@ -174,7 +174,7 @@ public class EnemySpawner : MonoBehaviour {
                 for (int i = 0; i < spawnZones.Count - 1; i++) {
                     Gizmos.color = Color.white;
                     Gizmos.DrawWireSphere(mapManager.grid_to_world(new Pos((int)spawnZones[i].GetPosition().x, (int)spawnZones[i].GetPosition().y)), spawnZones[i].GetRadius());
-                    List<Vector3> zoneTiles = spawnZones[i].GetZoneTiles();
+                    List<Vector3> zoneTiles = spawnZones[i].GetUnpopulatedZoneTiles();
                     foreach (Vector3 tile in zoneTiles) {
                         Gizmos.color = gizColors[i % gizColors.Count];
                         Gizmos.DrawWireCube(mapManager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(mapConfiguration.cell_size, 0, mapConfiguration.cell_size));

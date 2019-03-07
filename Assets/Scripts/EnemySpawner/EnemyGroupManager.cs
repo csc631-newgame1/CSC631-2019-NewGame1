@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class EnemyGroupManager
 {
@@ -6,7 +7,7 @@ public class EnemyGroupManager
     public int maxNumberOfEnemyGroups;
     public int minNumberOfEnemyGroups;
 
-    public EnemyGroupManager() {
+    public EnemyGroupManager(List<EnemyGroup> enemyGroups, List<SpawnZone> spawnZones) {
 
     }
 }
