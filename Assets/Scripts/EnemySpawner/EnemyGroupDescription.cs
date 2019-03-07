@@ -1,9 +1,5 @@
 ﻿using UnityEngine;
 
-public static class EnemyType {
-    public const string TestEnemy = "TestEnemy";
-};
-
 public class EnemyGroupDescription
 {
     public string enemyType;
