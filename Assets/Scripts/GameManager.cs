@@ -33,6 +33,24 @@ public class GameManager : MonoBehaviour
         mapConfiguration = map.GetComponent<MapConfiguration>();
 
         enemySpawner = GetComponent<EnemySpawner>();
+        SpawnEnemies();
+    }
+
+    void SpawnEnemies() {
+        // Create random TestEnemies
+        List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
+        for (int groupIndex=0; groupIndex < 5; groupIndex++) {
+            List<EnemySpawnProperty> enemySpawnProperties = new List<EnemySpawnProperty>();
+
+            for (int enemyPropertyIndex=0; enemyPropertyIndex<Random.Range(1,3); enemyPropertyIndex++) {
+                enemySpawnProperties.Add(new EnemySpawnProperty(new GameAgentStats(10f, 10f, 4f, 4f),
+                                                                 Random.Range(1, 2), 0.5f, 0.5f, 0.5f, 0.5f));
+                
+            }
+
+            enemyGroups.Add(new EnemyGroup(enemySpawnProperties, Distribution.Balanaced));
+        }
+
         enemySpawner.Init(map_manager, mapConfiguration);
         enemySpawner.SpawnEnemies(ref map_manager);
         enemySpawner.ShowEnemySpawnZones(showEnemySpawnZones);
@@ -47,6 +65,8 @@ public class GameManager : MonoBehaviour
 			map_manager.init(map_gen.map);
 			GameObject clone = map_manager.instantiate_randomly(player);
 			Camera.main.GetComponent<CameraControl>().SetTarget(clone);
+
+            SpawnEnemies();
 		}
 	}
 
