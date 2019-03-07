@@ -55,7 +55,7 @@ public class EnemySpawner : MonoBehaviour {
             List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
 
             for (int enemyPropertyIndex = 0; enemyPropertyIndex < Random.Range(1, 3); enemyPropertyIndex++) {
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(10f, 10f, 4f, 4f),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(EnemyType.TestEnemy, new GameAgentStats(10f, 10f, 4f, 4f),
                                                                  Random.Range(1, 2), 0.5f, 0.5f, 0.5f, 0.5f));
             }
 
@@ -64,7 +64,7 @@ public class EnemySpawner : MonoBehaviour {
 
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
-        //GameObject enemyPrefab = (GameObject)Resources.Load("prefabs/TestEnemy", typeof(GameObject));
+
         foreach (EnemyToSpawn enemy in enemies) {
             GameObject enemySpawn = mapManagerReference.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
         }
