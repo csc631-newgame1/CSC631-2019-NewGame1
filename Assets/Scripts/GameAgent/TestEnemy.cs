@@ -12,8 +12,12 @@ public class TestEnemy : GameAgent
     private bool moving;
 
     private int move_budget;
-    private int health;
     private bool player_turn;
+
+    [Header("Enemy Stats")]
+    public float attack;
+    public float health;
+    public float range;
     public float speed;
 
     Animator animator;
@@ -24,6 +28,10 @@ public class TestEnemy : GameAgent
         grid_pos = position;
 
         this.stats = stats;
+        attack = stats.attack;
+        health = stats.health;
+        range = stats.range;
+        speed = stats.speed;
     }
 
     public override IEnumerator smooth_movement(List<Pos> locations) {
