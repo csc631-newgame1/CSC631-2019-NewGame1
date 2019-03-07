@@ -2,7 +2,6 @@
 
 public class EnemyGroupDescription
 {
-    public string enemyType;
     public GameAgentStats stats;
     public float attackVariance;
     public float healthVariance;
@@ -19,12 +18,11 @@ public class EnemyGroupDescription
 
     // Variance is based on a percentage from 0 to 1 (1 = 100%)
     // The stat can be potentially rasied to any percetage, but cannot fall below 50% the original stat
-    public EnemyGroupDescription(string enemyType, GameAgentStats stats, int quantityOfEnemyInGroup, 
+    public EnemyGroupDescription(GameAgentStats stats, int quantityOfEnemyInGroup, 
                                 float attackVariance = 0f,  float healthVariance = 0f,
                                 float rangeVariance = 0f, float speedVariance = 0f,
                                 bool randomNumberOfEnemies = false, 
                                 int minNumberOfEnemiesInGroup = -1, int maxNumberOfEnemiesInGroup = -1) {
-        this.enemyType = enemyType;
         this.stats = stats;
         this.attackVariance = attackVariance;
         this.healthVariance = healthVariance;
