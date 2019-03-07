@@ -9,12 +9,12 @@ public class EnemyGroupManager
 
     private List<EnemyGroup> enemyGroups;
     private List<SpawnZone> spawnZones;
-    private List<GameAgent> enemies;
+    private List<EnemyToSpawn> enemies;
 
     public EnemyGroupManager(List<EnemyGroup> enemyGroups, List<SpawnZone> spawnZones) {
         this.enemyGroups = enemyGroups;
         this.spawnZones = spawnZones;
-        enemies = new List<GameAgent>();
+        enemies = new List<EnemyToSpawn>();
 
         // Sort based on group size
         QuickSortEnemyGroups(enemyGroups, 0, enemyGroups.Count - 1);
@@ -23,6 +23,7 @@ public class EnemyGroupManager
     private void PopulateSpawnZone(EnemyGroup group, SpawnZone spawnZone) {
         List<GameAgentStats> enemyStats = group.GetEnemiesStatsForSpawn();
         List<Vector3> zoneTiles = spawnZone.GetUnpopulatedZoneTiles();
+        List<Vector3> populatedZoneTiles = new List<Vector3>();
         // Enter distribution of enemies here
 
         // Random distribution in zone
@@ -30,15 +31,17 @@ public class EnemyGroupManager
 
         foreach(GameAgentStats stats in enemyStats) {
             int randomIndex = GetRandomIntWithExclusion(0, zoneTiles.Count - 1, exclusion);
-            TestEnemy enemy = new TestEnemy();
             MapUtils.Pos enemyPos = new MapUtils.Pos((int)zoneTiles[randomIndex].x, (int)zoneTiles[randomIndex].y);
-            enemy.init_agent(enemyPos, stats);
+            populatedZoneTiles.Add(zoneTiles[randomIndex]);
+            EnemyToSpawn enemy = new EnemyToSpawn(enemyPos, stats);
+
+            exclusion.Add(randomIndex);
             enemies.Add(enemy);
         }
-
+        spawnZone.PopulateTiles(populatedZoneTiles);
     }
 
-    public List<GameAgent> GetEnemiesToSpawn() {
+    public List<EnemyToSpawn> GetEnemiesToSpawn() {
         foreach (EnemyGroup group in enemyGroups) {
             if (spawnZones.Count <= 0) {
                 break;
@@ -51,11 +54,10 @@ public class EnemyGroupManager
 
                 if(group.count <= spawnZones[randomIndex].GetNumberOfUnpopulatedTilesInZone()) {
                     PopulateSpawnZone(group, spawnZones[randomIndex]);
-                    spawnZones.RemoveAt(randomIndex);
                     break;
-                } else {
-                    exclusion.Add(randomIndex);
                 }
+
+                exclusion.Add(randomIndex);
             }
         }
         return enemies;
