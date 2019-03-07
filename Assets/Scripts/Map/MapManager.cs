@@ -62,7 +62,7 @@ public class MapManager : MonoBehaviour
 	{
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
 		GameAgent agent = clone.GetComponent<GameAgent>();
-		agent.init_agent(pos);
+		agent.init_agent(pos, new GameAgentStats());
 		map[pos.x, pos.y].resident = agent;
 		map[pos.x, pos.y].occupied = true;
 		return clone;
