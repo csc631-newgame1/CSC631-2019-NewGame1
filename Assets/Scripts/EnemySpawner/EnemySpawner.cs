@@ -46,6 +46,7 @@ public class EnemySpawner : MonoBehaviour {
         spawnZones = new List<SpawnZone>();
     }
 
+    // Call this to spawn enemies on the Map Manager
     public void SpawnEnemies(ref MapManager mapManagerReference) {
         GenerateSpawnZones();
         TrimSpawnZones();
@@ -125,6 +126,7 @@ public class EnemySpawner : MonoBehaviour {
         }
     }
 
+    // Randomly removes spawn zones until it is within the max number of spawn zones
     private void TrimSpawnZones() {
         if (spawnZones.Count > maxNumberOfSpawnZones) {
             int numOfZonesToRemove = spawnZones.Count - maxNumberOfSpawnZones;

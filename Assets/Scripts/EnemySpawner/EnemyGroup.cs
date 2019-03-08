@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+// Used to determine how the enemies should be created in the group
+// based on power level
 public enum Distribution { Balanaced, Strong, Weak, Random };
 
+// Group of enemies to be spawned in a spawn zone
 public class EnemyGroup
 {
     [Header("Random Number of Enemies in Groups")]
@@ -35,6 +38,7 @@ public class EnemyGroup
         CreateEnemyStatsInGroup();
     }
 
+    // Creates a list of enemy stats that will be used for placing in spawn zones
     void CreateEnemyStatsInGroup() {
         foreach (EnemyGroupDescription enemy in typesOfEnemies) {
             for (int i=0; i<enemy.quantityOfEnemyInGroup; i++) {
