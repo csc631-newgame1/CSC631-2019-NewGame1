@@ -25,12 +25,13 @@ public class Player : GameAgent
 	CharacterAnimator animator;
 	
     // Gets references to necessary game components
-    public override void init_agent(Pos position)
+    public override void init_agent(Pos position, GameAgentStats stats)
     {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
 		grid_pos = position;
 		animator = GetComponent<CharacterAnimator>();
+        this.stats = stats;
     }
 
 	// if right mouse button is pressed, move player model to hover position

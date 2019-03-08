@@ -29,7 +29,7 @@ public class TileSelector : MonoBehaviour
 		
 		this.map = map;
 		
-		Vector3 collider_size = new Vector3(width * cell_size, 1f, height * cell_size);
+		Vector3 collider_size = new Vector3(width * cell_size, 0.1f, height * cell_size);
 		BoxCollider selection_collider = GetComponent<BoxCollider>();
 		selection_collider.size = collider_size;
 		
