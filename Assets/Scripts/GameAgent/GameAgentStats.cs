@@ -1,4 +1,5 @@
-﻿public class GameAgentStats
+﻿// Holds information regarding the GameAgents ingame stats
+public class GameAgentStats
 {
     public string gameAgentType;
     public float attack;

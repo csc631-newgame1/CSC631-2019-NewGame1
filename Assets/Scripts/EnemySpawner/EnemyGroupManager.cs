@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+// Responsible for taking a List of enemy groups and spawn zones
+// and figuring out where to spawn the enemies within the spawn zones
 public class EnemyGroupManager
 {
     [Header("Enemy Group Settings")]
@@ -20,6 +22,8 @@ public class EnemyGroupManager
         QuickSortEnemyGroups(enemyGroups, 0, enemyGroups.Count - 1);
     }
 
+    // Takes the group of enemies and creates EnemyToSpawn objects with the location
+    // within the spawn zone of where to spawn them
     private void PopulateSpawnZone(EnemyGroup group, SpawnZone spawnZone) {
         List<GameAgentStats> enemyStats = group.GetEnemiesStatsForSpawn();
         List<Vector3> zoneTiles = spawnZone.GetUnpopulatedZoneTiles();
@@ -41,6 +45,7 @@ public class EnemyGroupManager
         spawnZone.PopulateTiles(populatedZoneTiles);
     }
 
+    // Call this to get a list of EnemiesToSpawn ready to be initialized
     public List<EnemyToSpawn> GetEnemiesToSpawn() {
         foreach (EnemyGroup group in enemyGroups) {
             if (spawnZones.Count <= 0) {

@@ -57,6 +57,7 @@ public class SpawnZone {
         return isPopulated;
     }
 
+    // Creates tiles that are populated with objects
     public void PopulateTiles(List<Vector3> populatedZoneTiles) {
         if (populatedZoneTiles.Count > 0) {
             isPopulated = true;
