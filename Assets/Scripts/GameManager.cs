@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     private List<SpawnZone> spawnZones;
 
     public GameObject player;
+	public GameObject enemy;
 
     [Header("Debug Settings")]
     [Tooltip("Shows wire spheres where the Spawn Zones are mapped, and the wire cubes for the tiles within the Spawn Zone.")]
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour
 
     void SpawnEnemies() {
         enemySpawner.Init(map_manager, mapConfiguration);
-        enemySpawner.SpawnEnemies(ref map_manager);
+        enemySpawner.SpawnEnemies(enemy);
         enemySpawner.ShowEnemySpawnZones(showEnemySpawnZones);
     }
 

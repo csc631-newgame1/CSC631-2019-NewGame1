@@ -195,6 +195,8 @@ public class NavigationHandler
 		 * Placement of vertices in this map follows the placement of vertices in an actual navmap, i.e: at the corners of unwalkable tiles
 		 */
 		 
+		// find vertices that are visible to this vertex
+		// if this is confusing, ask me (Ben) about it and I'll try and give you a better explanation than what I have here
 		int t_maxy = max_y;
 		int t_miny = min_y;
 		int t_maxx = max_x;
