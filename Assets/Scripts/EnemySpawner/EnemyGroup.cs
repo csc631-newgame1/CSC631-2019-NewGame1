@@ -10,15 +10,18 @@ public class EnemyGroup
 {
     [Header("Random Number of Enemies in Groups")]
     [Tooltip("If true, select minumum value and maximum value for number of enemies to be spawned in the group.")]
+    // TODO implement this
     public bool randomRangeNumberOfEnemies;
     public int minNumberOfEnemies;
     public int maxNumberOfEnemies;
 
     [Header("Customize Group based on Power")]
+    // TODO consider how to implement some version of this
     public bool powerBalance = false;
 
     private List<EnemyGroupDescription> typesOfEnemies;
     private List<GameAgentStats> enemies;
+    // TODO consider if power distribution should be within individual groups, or handled across all groups
     private Distribution dist;
 
     public int count;

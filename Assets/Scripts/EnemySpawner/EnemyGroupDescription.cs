@@ -10,6 +10,7 @@ public class EnemyGroupDescription
 
     public int quantityOfEnemyInGroup;
 
+    // TODO implement this
     public bool randomNumberOfEnemies;
     public int minNumberOfEnemiesInGroup;
     public int maxNumberOfEnemiesInGroup;
@@ -33,6 +34,7 @@ public class EnemyGroupDescription
         this.minNumberOfEnemiesInGroup = minNumberOfEnemiesInGroup;
         this.maxNumberOfEnemiesInGroup = maxNumberOfEnemiesInGroup;
 
+        // TODO consider using a power level scale based off stats, or using levels based off character xp
         CalculatePowerLevel();
     }
 

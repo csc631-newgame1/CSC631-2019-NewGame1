@@ -25,6 +25,7 @@ public class EnemySpawner : MonoBehaviour {
     [Tooltip("Largest size a zone can be.")]
     public float upperRadius = 4f;
     [Tooltip("Smallest number of spawnable tiles a zone can contain.")]
+    // TODO implement this
     public int minimumNumberOfTilesInSpawnZone = 1;
     [Tooltip("Largest number of spawnable tiles a zone can contain.")]
     public int maximumNumberOfTilesInSpawnZone = 50;
@@ -52,7 +53,10 @@ public class EnemySpawner : MonoBehaviour {
 		
         GenerateSpawnZones();
         TrimSpawnZones();
-		
+        // TODO CalculateEnemyDifficulty()
+        // TODO pass most of enemy creation in groups off to EnemyGroupManager
+        // TODO consider making predefined enemy group templates that are slightly randomized
+
         // Create random TestEnemies
         List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
         // Create Enemy Groups
@@ -71,7 +75,8 @@ public class EnemySpawner : MonoBehaviour {
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
-		foreach (EnemyToSpawn enemy in enemies) {
+        // TODO find a way to get enemy prefab using enemy.stats.gameAgentType
+        foreach (EnemyToSpawn enemy in enemies) {
 			GameObject enemySpawn = mapManager.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
 		}
     }

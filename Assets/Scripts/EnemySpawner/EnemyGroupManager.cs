@@ -6,7 +6,9 @@ using UnityEngine;
 public class EnemyGroupManager
 {
     [Header("Enemy Group Settings")]
+    // TODO implement this
     public int maxNumberOfEnemyGroups;
+    // TODO implement this
     public int minNumberOfEnemyGroups;
 
     private List<EnemyGroup> enemyGroups;
