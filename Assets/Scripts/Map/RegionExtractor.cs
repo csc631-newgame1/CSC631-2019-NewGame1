@@ -166,7 +166,7 @@ namespace RegionUtils
 			}
 			// clear the inner region markers
 			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < width; y++) {
+				for (int y = 0; y < height; y++) {
 					map[x, y] = map[x, y] == INNER_REGION ? EMPTY : map[x, y];
 				}
 			}
