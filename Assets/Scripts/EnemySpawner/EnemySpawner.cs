@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour {
+	
     private int width;
     private int height;
     private float cell_size;
@@ -47,13 +48,11 @@ public class EnemySpawner : MonoBehaviour {
     }
 
     // Call this to spawn enemies on the Map Manager
-    public void SpawnEnemies(ref MapManager mapManagerReference) {
+    public void SpawnEnemies(GameObject enemyPrefab) {
+		
         GenerateSpawnZones();
         TrimSpawnZones();
-
-        string path;
-        GameObject enemyPrefab;
-
+		
         // Create random TestEnemies
         List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
         // Create Enemy Groups
@@ -72,11 +71,9 @@ public class EnemySpawner : MonoBehaviour {
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
-        foreach (EnemyToSpawn enemy in enemies) {
-            path = "Assets/Prefabs/" + enemy.stats.gameAgentType + ".prefab";
-            enemyPrefab = AssetDatabase.LoadAssetAtPath(path, typeof(Object)) as GameObject;
-            GameObject enemySpawn = mapManagerReference.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
-        }
+		foreach (EnemyToSpawn enemy in enemies) {
+			GameObject enemySpawn = mapManager.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
+		}
     }
 
     // Creates a list of Spawn Zones of varrying sizes in the map
