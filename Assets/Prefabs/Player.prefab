@@ -3816,7 +3816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b26148990a1ecdc41a1ed3452f4d45e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 25
+  speed: 5
   weapon: 1
 --- !u!114 &1111223434817933391
 MonoBehaviour:
@@ -3832,8 +3832,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   magicAura: {fileID: 19895582, guid: 24e29d528f11acf42974643bee14a607, type: 3}
   magicSparks: {fileID: 19898846, guid: f828b47b39be99849b37530c987975e5, type: 3}
-  slash: {fileID: 19893024, guid: 305722bc3bbbf1f44aa7890efb7f31d9, type: 3}
-  shot: {fileID: 19881322, guid: 566e710e45a1f76418e5fa887796d778, type: 3}
+  focusSpark: {fileID: 19859158, guid: b043edfe6ed22be46b3d939fd3f3e5bb, type: 3}
+  slashCharge: {fileID: 19850302, guid: 125cbece63e40cf40a589e32859eda38, type: 3}
   healAura: {fileID: 19831716, guid: 685c97d007af49549b239b56b6d2000a, type: 3}
   blood: {fileID: 19845262, guid: fdac75e990da47649b31f10049c400b0, type: 3}
   hit: {fileID: 19810148, guid: bd9cbf3a6ae77524788b4bbdb5422498, type: 3}

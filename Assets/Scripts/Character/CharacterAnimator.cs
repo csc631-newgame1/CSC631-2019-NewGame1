@@ -8,22 +8,23 @@ public class CharacterAnimator : MonoBehaviour
     // Referenced conponents.
     Player character;
     Animator animator;
+    bool isDead = false;
 
-    // Animation variables.
+    // Animation variation variables. (Do not change)
     int animationNumber;
-    const float actionDuration = 0.5f;
-    const float particleDuration = 1f;
-
-    // Animation controller constants.
     const int maxAttackAnimations = 3;
     const int maxHitAnimations = 5;
     const int maxBlockedAnimations = 2;
 
-    // Particle variables.
+    // Animation duartion variables.
+    const float actionDuration = 0.5f;
+    const float particleDuration = 1.0f;
+
+    // Particle System objects.
     public ParticleSystem magicAura;
     public ParticleSystem magicSparks;
-    public ParticleSystem slash;
-    public ParticleSystem shot;
+    public ParticleSystem focusSpark;
+    public ParticleSystem slashCharge;
     public ParticleSystem healAura;
     public ParticleSystem blood;
     public ParticleSystem hit;
@@ -41,8 +42,7 @@ public class CharacterAnimator : MonoBehaviour
         // Size up particle effects.
         magicAura.transform.localScale = new Vector3(3f, 3f, 3f);
         magicSparks.transform.localScale = new Vector3(2f, 2f, 2f);
-        slash.transform.localScale = new Vector3(3f, 3f, 3f);
-        shot.transform.localScale = new Vector3(2f, 2f, 2f);
+        focusSpark.transform.localPosition = new Vector3(0f, 1.3f, 0.6f);
         healAura.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         blood.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         sparks.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
@@ -77,7 +77,7 @@ public class CharacterAnimator : MonoBehaviour
     }
     #endregion
 
-    // PlayAttackAnamation(), PlayUseItemAnimation()
+    // PlayAttackAnimation(), PlayUseItemAnimation()
     #region Character Action
     public IEnumerator PlayAttackAnimation()
     {
@@ -86,15 +86,21 @@ public class CharacterAnimator : MonoBehaviour
         if (animator.GetInteger("Weapon") == 6)
         {
             animator.SetTrigger("CastAttack" + (animationNumber).ToString() + "Trigger");
-            SpawnMagicAura();
-            SpawnMagicSparks();
+            SpawnParticleSystemAtCharacter(magicAura);
+            SpawnParticleSystemAtCharacter(magicSparks);
             yield return new WaitForSeconds(actionDuration);
             animator.SetTrigger("CastEndTrigger");
-        } else
+        }
+        else if (animator.GetInteger("Weapon") == 4)
         {
             animator.SetTrigger("Attack" + (animationNumber).ToString() + "Trigger");
-            if (animator.GetInteger("Weapon") == 4) SpawnShot();
-            else SpawnSlash();
+            SpawnParticleSystemAtCharacter(focusSpark);
+            yield return null;
+        }
+        else
+        {
+            animator.SetTrigger("Attack" + (animationNumber).ToString() + "Trigger");
+            SpawnParticleSystemAtCharacter(slashCharge);
             yield return null;
         }
     }
@@ -102,30 +108,30 @@ public class CharacterAnimator : MonoBehaviour
     public IEnumerator PlayUseItemAnimation()
     {
         animator.SetTrigger("ActivateTrigger");
-        SpawnHealAura();
+        SpawnParticleSystemAtCharacter(healAura);
         yield return null;
     }
     #endregion
 
-    // PlayHitAnimation(), PlayBlockedAnimation(), PlayKilledAnimation()
+    // PlayHitAnimation(), PlayBlockAnimation(), PlayKilledAnimation()
     #region Character Reaction
     public IEnumerator PlayHitAnimation()
     {
         animationNumber = Random.Range(1, maxHitAnimations + 1);
         animator.SetTrigger("GetHit" + (animationNumber).ToString() + "Trigger");
-        SpawnBlood();
-        SpawnHit();
+        SpawnParticleSystemAtCharacter(blood);
+        SpawnParticleSystemAtCharacter(hit);
         yield return null;
     }
 
-    public IEnumerator PlayBlockedAnimation()
+    public IEnumerator PlayBlockAnimation()
     {
         animator.SetBool("Blocking", true);
         animator.SetTrigger("BlockTrigger");
         animationNumber = Random.Range(1, maxBlockedAnimations + 1);
         animator.SetTrigger("BlockGetHit" + (animationNumber).ToString() + "Trigger");
-        SpawnSparks();
-        SpawnDust();
+        SpawnParticleSystemAtCharacter(sparks);
+        SpawnParticleSystemAtCharacter(dust);
         yield return new WaitForSeconds(actionDuration);
         animator.SetBool("Blocking", false);
     }
@@ -133,73 +139,18 @@ public class CharacterAnimator : MonoBehaviour
     public IEnumerator PlayKilledAimation()
     {
         animator.SetTrigger("Death1Trigger");
-        SpawnGhosts();
-        yield return new WaitForSeconds(actionDuration);
+        SpawnParticleSystemAtCharacter(ghosts);
+        yield return null;
+        isDead = true;
     }
     #endregion
 
-    // SpawnMagicAura(), SpawnHealAura(), SpawnBlood(), SpawnSparks(), SpawnGhosts()
+    // SpawnParticleSystemAtCharacter(ParticleSystem particle)
     #region Character Particle Effects
-    void SpawnMagicAura()
+    void SpawnParticleSystemAtCharacter(ParticleSystem particle)
     {
-        var magicAuraClone = Instantiate(magicAura, character.transform);
-        Destroy(magicAuraClone, particleDuration);
-    }
-
-    void SpawnMagicSparks()
-    {
-        var magicSparksClone = Instantiate(magicSparks, character.transform);
-        Destroy(magicSparksClone, particleDuration);
-    }
-
-    void SpawnSlash()
-    {
-        var slashClone = Instantiate(slash, character.transform, particleDuration);
-        Destroy(slashClone, particleDuration);
-    }
-
-
-    void SpawnShot()
-    {
-        var shotClone = Instantiate(shot, character.transform);
-        Destroy(shotClone, particleDuration);
-    }
-
-
-    void SpawnHealAura()
-    {
-        var healAuraClone = Instantiate(healAura, character.transform);
-        Destroy(healAuraClone.gameObject, particleDuration);
-    }
-
-    void SpawnBlood()
-    {
-        var bloodClone = Instantiate(blood, character.transform);
-        Destroy(bloodClone.gameObject, particleDuration);
-    }
-
-    void SpawnHit()
-    {
-        var hitClone = Instantiate(hit, character.transform);
-        Destroy(hitClone.gameObject, particleDuration);
-    }
-
-    void SpawnSparks()
-    {
-        var sparksClone = Instantiate(sparks, character.transform);
-        Destroy(sparksClone.gameObject, particleDuration);
-    }
-
-    void SpawnDust()
-    {
-        var dustClone = Instantiate(dust, character.transform);
-        Destroy(dustClone.gameObject, particleDuration);
-    }
-
-    void SpawnGhosts()
-    {
-        var ghostClone = Instantiate(ghosts, character.transform);
-        Destroy(ghostClone.gameObject, particleDuration);
+        var clone = Instantiate(particle, character.transform);
+        Destroy(clone.gameObject, particleDuration);
     }
     #endregion
 
