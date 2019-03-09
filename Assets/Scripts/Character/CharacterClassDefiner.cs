@@ -10,7 +10,7 @@ public class CharacterClassDefiner : MonoBehaviour
     Animator animator;
     Transform characterAvatar;
 
-    // Enemy variation variables.
+    // Enemy variation variables. (Do not change)
     int minOrcRange = 4;
     int maxOrcRange = 10;
     int minSkeletonRange = 12;
@@ -19,7 +19,7 @@ public class CharacterClassDefiner : MonoBehaviour
     // Weapon variation variables.
     int weaponNum;
 
-    // Weapon variables.
+    // Weapon objects.
     public GameObject sword;
     public GameObject bow;
     public GameObject staff;
@@ -33,7 +33,7 @@ public class CharacterClassDefiner : MonoBehaviour
         character = GetComponent<Player>();
         animator = GetComponent<Animator>();
 
-        // Hide weapon GameObjects.
+        // Hide all weapon objects.
         hideAllWeapons();
     }
 
@@ -52,35 +52,34 @@ public class CharacterClassDefiner : MonoBehaviour
     #region Main Methods
     public void SetCharacterClass(int characterID)
     {
-        if (characterID == 1)
+        if (characterID == 1) // Warrior
         {
             SetCharacterModel(1);
             SetCharacterWeapon(1);
         }
-        else if (characterID == 2)
+        else if (characterID == 2) // Hunter
         {
             SetCharacterModel(2);
             SetCharacterWeapon(2);
         }
-        else if (characterID == 3)
+        else if (characterID == 3) // Mage
         {
             SetCharacterModel(3);
             SetCharacterWeapon(3);
         }
-        else if (characterID == 4)
+        else if (characterID == 4) // Orc
         {
             SetCharacterModel(4);
             weaponNum = Random.Range(4, 6);
-            Debug.Log(weaponNum);
             SetCharacterWeapon(weaponNum);
         }
-        else if (characterID == 5)
+        else if (characterID == 5) // Skeleton
         {
             SetCharacterModel(5);
             weaponNum = Random.Range(4, 6);
             SetCharacterWeapon(weaponNum);
         }
-        else
+        else // Boss
         {
             SetCharacterModel(6);
             SetCharacterWeapon(6);
@@ -106,32 +105,32 @@ public class CharacterClassDefiner : MonoBehaviour
     {
         hideAllWeapons();
 
-        if (weaponID == 1)
+        if (weaponID == 1) // Sword
         {
             animator.SetInteger("Weapon", 1);
             sword.SetActive(true);
         }
-        else if (weaponID == 2)
+        else if (weaponID == 2) // Bow
         {
             animator.SetInteger("Weapon", 4);
             bow.SetActive(true);
         }
-        else if (weaponID == 3)
+        else if (weaponID == 3) // Staff
         {
             animator.SetInteger("Weapon", 6);
             staff.SetActive(true);
         }
-        else if (weaponID == 4)
+        else if (weaponID == 4) // Axe
         {
             animator.SetInteger("Weapon", 3);
             axe.SetActive(true);
         }
-        else if (weaponID == 5)
+        else if (weaponID == 5) // Club
         {
             animator.SetInteger("Weapon", 9);
             club.SetActive(true);
         }
-        else
+        else // Unarmed
         {
             animator.SetInteger("Weapon", 0);
         }
