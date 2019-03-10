@@ -25,16 +25,16 @@ public class BridgeMeshGenerator : MonoBehaviour
 		this.cell_size = config.cell_size;
 		this.wall_height = config.wall_height;
 		this.target_mesh = GetComponent<MeshFilter>();
+		this.width = config.width;
+		this.height = config.height;
+		this.offset = config.GetOffset();
+		this.offset.y -= 0.005f;
 	}
 	
-	public void generate_bridge_mesh(int[,] map, Vector3 offset)
+	public void generate_bridge_mesh(int[,] map)
 	{
 		set_config_variables();
 		this.map = map;
-		this.width = map.GetLength(0);
-		this.height = map.GetLength(1);
-		this.offset = offset;
-		this.offset.y -= 0.005f;
 		
 		vertices = new List<Vector3>();
 		uvs = new List<Vector2>();

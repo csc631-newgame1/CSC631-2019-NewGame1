@@ -14,6 +14,7 @@ public class Water : MonoBehaviour
 	private List<Vector3> vertices;
 	private List<Vector2> uvs;
 	private List<int> triangles;
+	private Vector3 base_offset;
 	private Vector3 wave_offset;
 	private Vector3 floor_offset;
 	private Vector3 origin;
@@ -39,6 +40,7 @@ public class Water : MonoBehaviour
 		this.cell_size = config.cell_size;
 		this.origin = new Vector3(0.5f, 0f, 0.5f);
 		this.wall_height = config.wall_height;
+		this.base_offset = config.GetOffset();
 	}
 	
 	void Update()
@@ -48,12 +50,12 @@ public class Water : MonoBehaviour
 		}
 	}
 	
-    public void generate_water_mesh(Vector3 offset)
+    public void generate_water_mesh()
 	{
 		set_config_variables();
 		
-		this.wave_offset = offset;
-		this.floor_offset = offset;
+		this.wave_offset = base_offset;
+		this.floor_offset = base_offset;
 		this.wave_offset.y  = (wall_height / 2f);
 		this.floor_offset.y = (wall_height);
 		
