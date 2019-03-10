@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿	using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,17 +57,6 @@ public class MapMeshGenerator : MonoBehaviour
 					intermediate_map[x, y] = HMAP_FILLED;
 				}
 				
-		// debug - print height map values
-		string pstr = "";
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				pstr += intermediate_char(intermediate_map[x, y]);
-			}
-			pstr += "\n";
-		}
-		Debug.Log(pstr);
-		
-				
 		/* STEP 2: GENERATE HEIGHT MAP
 		 * Intermediate map is iterated over multiple times to determine each cell's distance to a walkable cell
 		 * These distances are recorded in the height map, which is used later down the line */
@@ -120,6 +109,8 @@ public class MapMeshGenerator : MonoBehaviour
 				vertex_map[x, y] = new Vector3((float) x / 2f, 0f, (float) y / 2f) - offset;
 		
 		// Generate vertex_map height values based on height map
+		// vertex heights are the average heights of all the tiles they touch
+		// e.g: the lower right vertex of a tile actually lies on the intersection of four tiles, so it is the average of their heights
 		for (int x = 1; x < width * 2 + 1; x+=2) {
 			for (int y = 1; y < height * 2 + 1; y+=2) {
 				
@@ -168,6 +159,7 @@ public class MapMeshGenerator : MonoBehaviour
 			vertex_map[0, y + 1].y 	= (center_tile + lower_tile) / 2f;
 		}
 		
+		// anchor all vertices that touch walkable tiles to height 0
 		for (int x = 1; x < width * 2 + 1; x+=2) {
 			for (int y = 1; y < height * 2 + 1; y+=2) {
 				if (traversable(map[(x - 1) / 2, (y - 1) / 2]) && map[(x - 1) / 2, (y - 1) / 2] != BRIDGE && map[(x - 1) / 2, (y - 1) / 2] != PLATFORM) {
@@ -183,6 +175,7 @@ public class MapMeshGenerator : MonoBehaviour
 					vertex_map[x - 0, y + 1].y = 0;
 					vertex_map[x + 1, y + 1].y = 0;
 				}
+				// if the tile is an edge, just anchor the center vertex
 				else if (map[(x - 1) / 2, (y - 1) / 2] == EDGE) {
 					vertex_map[x + 0, y + 0].y = 0;
 				}
@@ -192,10 +185,10 @@ public class MapMeshGenerator : MonoBehaviour
 		/* STEP 4: CREATE TRIANGLES & FINALIZE MESH
 		 * Once the mesh nodes are created, an array of triangles, representing the map surface, is constructed from it */
 
-		Vector3[] vertices = new Vector3[width * height * 3 * 2 * 4]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
-		Vector2[] uvs = new Vector2[width * height * 3 * 2 * 4];
-		Color[] colors = new Color[width * height * 3 * 2 * 4];
-		int[] triangles = new int[width * height * 3 * 2 * 4];
+		Vector3[] vertices = new Vector3[width * height * 4 * 2 * 3]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
+		Vector2[] uvs = new Vector2[width * height * 4 * 2 * 3];
+		Color[] colors = new Color[width * height * 4 * 2 * 3];
+		int[] triangles = new int[width * height * 4 * 2 * 3];
 		
 		int i = 0; // keeps track of triangles index
 		
