@@ -44,6 +44,7 @@ public class MapGenerator : MonoBehaviour
 		this.cell_size = config.cell_size;
         this.object_size_scale = config.object_size_scale;
 		this.seed = config.seed;
+		this.offset = config.GetOffset();
 	}
 
     public void generate_map()
@@ -63,27 +64,15 @@ public class MapGenerator : MonoBehaviour
 		
 		iteration++;
 		Debug.Log("done generating map!");
-		
-		offset = new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
-		
-		// create meshes for all objects
-		/*SurfaceMeshGenerator surface_mesh_gen = transform.Find("Surfaces").GetComponent<SurfaceMeshGenerator>();
-		surface_mesh_gen.generate_surface_mesh(map, cmds, offset);
-		
-		WallMeshGenerator wall_mesh_gen = transform.Find("Walls").GetComponent<WallMeshGenerator>();
-		wall_mesh_gen.generate_wall_mesh(cmds, offset);*/
-		
+
 		MapMeshGenerator surface_gen = transform.Find("Surface").GetComponent<MapMeshGenerator>();
 		surface_gen.generate_map_mesh(map);
 		
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
-		bridge_mesh_gen.generate_bridge_mesh(map, offset);
-		
-		//Floor floor_gen = transform.Find("Floor").GetComponent<Floor>();
-		//floor_gen.generate_floor();
-		
+		bridge_mesh_gen.generate_bridge_mesh(map);
+
 		Water water_gen = transform.Find("Water").GetComponent<Water>();
-		water_gen.generate_water_mesh(offset);
+		water_gen.generate_water_mesh();
 		
 		// init tile hover detector with map data
 		TileSelector tile_select = transform.Find("TileSelector").GetComponent<TileSelector>();
