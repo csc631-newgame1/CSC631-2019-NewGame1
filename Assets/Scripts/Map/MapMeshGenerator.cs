@@ -31,159 +31,166 @@ public class MapMeshGenerator : MonoBehaviour
 	public void generate_map_mesh(int[,] map)
 	{
 		/* STEP 1: INIT COMPONENTS
-		 * Intermediate and height map arrays are constructed */
+		 * Intermediate and height map arrays are constructed 
+		 * the intermediate map holds only the data that is relevant to height map construction
+		 */
 		
-		set_config_variables();
-		
-		int[,] intermediate_map = new int[width, height];
-		float[,] height_map = new float[width, height];
-		
-		for (int x = 0; x < width; x++)
-			for (int y = 0; y < height; y++)
-				if (traversable(map[x, y]) && map[x, y] != BRIDGE && map[x, y] != PLATFORM) {
-					
-					if (x - 1 >= 0 && !traversable(map[x - 1, y]))
-						intermediate_map[x - 1, y] = HMAP_EDGE;
-					
-					if (x + 1 < width && !traversable(map[x + 1, y]))
-						intermediate_map[x + 1, y] = HMAP_EDGE;
-					
-					if (y - 1 >= 0 && !traversable(map[x, y - 1]))
-						intermediate_map[x, y - 1] = HMAP_EDGE;
-					
-					if (y + 1 < height && !traversable(map[x, y + 1]))
-						intermediate_map[x, y + 1] = HMAP_EDGE;
-					
-					intermediate_map[x, y] = HMAP_FILLED;
-				}
+			set_config_variables();
+			
+			int[,] intermediate_map = new int[width, height];
+			float[,] height_map = new float[width, height];
+			
+			for (int x = 0; x < width; x++)
+				for (int y = 0; y < height; y++)
+					// exclude bridges and platforms, their mesh is generated separately
+					if (traversable(map[x, y]) && map[x, y] != BRIDGE && map[x, y] != PLATFORM) {
+						
+						if (x - 1 >= 0 && !traversable(map[x - 1, y]))
+							intermediate_map[x - 1, y] = HMAP_EDGE;
+						
+						if (x + 1 < width && !traversable(map[x + 1, y]))
+							intermediate_map[x + 1, y] = HMAP_EDGE;
+						
+						if (y - 1 >= 0 && !traversable(map[x, y - 1]))
+							intermediate_map[x, y - 1] = HMAP_EDGE;
+						
+						if (y + 1 < height && !traversable(map[x, y + 1]))
+							intermediate_map[x, y + 1] = HMAP_EDGE;
+						
+						intermediate_map[x, y] = HMAP_FILLED;
+					}
 				
 		/* STEP 2: GENERATE HEIGHT MAP
 		 * Intermediate map is iterated over multiple times to determine each cell's distance to a walkable cell
-		 * These distances are recorded in the height map, which is used later down the line */
+		 * These distances are recorded in the height map, which is used in the next step
+		 */
 				
-		bool finished = false;
-		int curr_iteration = 1;
-		
-		while (!finished) {
+			bool finished = false;
+			int curr_iteration = 1;
 			
-			finished = true;
-			int[,] temp = intermediate_map.Clone() as int[,];
-			
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					
-					if (intermediate_map[x, y] == HMAP_EDGE) {
+			while (!finished) {
+				
+				finished = true;
+				int[,] temp = intermediate_map.Clone() as int[,];
+				
+				for (int x = 0; x < width; x++) {
+					for (int y = 0; y < height; y++) {
 						
-						finished = false;
-						height_map[x, y] = height_func(curr_iteration, x, y);
-						
-						if (x > 0 && intermediate_map[x - 1, y] == HMAP_EMPTY)
-							temp[x - 1, y] = HMAP_EDGE;
-						
-						if (x < width - 1 && intermediate_map[x + 1, y] == HMAP_EMPTY)
-							temp[x + 1, y] = HMAP_EDGE;
-						
-						if (y > 0 && intermediate_map[x, y - 1] == HMAP_EMPTY)
-							temp[x, y - 1] = HMAP_EDGE;
-						
-						if (y < height - 1 && intermediate_map[x, y + 1] == HMAP_EMPTY)
-							temp[x, y + 1] = HMAP_EDGE;
-						
-						temp[x, y] = HMAP_FILLED;
+						if (intermediate_map[x, y] == HMAP_EDGE) {
+							
+							finished = false;
+							height_map[x, y] = height_func(curr_iteration, x, y);
+							
+							if (x > 0 && intermediate_map[x - 1, y] == HMAP_EMPTY)
+								temp[x - 1, y] = HMAP_EDGE;
+							
+							if (x < width - 1 && intermediate_map[x + 1, y] == HMAP_EMPTY)
+								temp[x + 1, y] = HMAP_EDGE;
+							
+							if (y > 0 && intermediate_map[x, y - 1] == HMAP_EMPTY)
+								temp[x, y - 1] = HMAP_EDGE;
+							
+							if (y < height - 1 && intermediate_map[x, y + 1] == HMAP_EMPTY)
+								temp[x, y + 1] = HMAP_EDGE;
+							
+							temp[x, y] = HMAP_FILLED;
+						}
 					}
 				}
+				intermediate_map = temp.Clone() as int[,];
+				curr_iteration++;
 			}
-			intermediate_map = temp.Clone() as int[,];
-			curr_iteration++;
-		}
 		
 		/* STEP 3: CREATE MESH NODES
 		 * Now, a surface mesh is created according to these generated height values
-		 * Optionally, a function may be applied to each height value, to amplify or minimize terrain in some fashion */
+		 * Optionally, a function may be applied to each height value, to amplify or minimize terrain in some fashion 
+		 */
 		
-		Vector3[,] vertex_map = new Vector3[width * 2 + 1, height * 2 + 1];
-		
-		// initialize vertex_map with vector x and z values
-		for(int x = 0; x < width * 2 + 1; x++)
-			for(int y = 0; y < height * 2 + 1; y++)
-				vertex_map[x, y] = new Vector3((float) x / 2f, 0f, (float) y / 2f) - offset;
-		
-		// Generate vertex_map height values based on height map
-		// vertex heights are the average heights of all the tiles they touch
-		// e.g: the lower right vertex of a tile actually lies on the intersection of four tiles, so it is the average of their heights
-		for (int x = 1; x < width * 2 + 1; x+=2) {
-			for (int y = 1; y < height * 2 + 1; y+=2) {
+			Vector3[,] vertex_map = new Vector3[width * 2 + 1, height * 2 + 1];
+			
+			// initialize vertex_map with vector x and z values
+			for(int x = 0; x < width * 2 + 1; x++)
+				for(int y = 0; y < height * 2 + 1; y++)
+					vertex_map[x, y] = new Vector3((float) x / 2f, 0f, (float) y / 2f) - offset;
+			
+			// Generate vertex_map height values based on height map
+			// vertex heights are the average heights of all the tiles they touch
+			// e.g: the lower right vertex of a tile actually lies on the intersection of four tiles, so it is the average of their heights
+			for (int x = 1; x < width * 2 + 1; x+=2) {
+				for (int y = 1; y < height * 2 + 1; y+=2) {
+					
+					float center_tile, lower_tile, right_tile, lower_right_tile;
+					center_tile = height_map[(x - 1) / 2, (y - 1) / 2];
+					lower_tile = right_tile = lower_right_tile = center_tile;
+					
+					if (y < height * 2 - 1)
+						lower_tile = height_map[(x - 1) / 2, (y + 1) / 2];
+					if (x < width * 2 - 1)
+						right_tile = height_map[(x + 1) / 2, (y - 1) / 2];
+					if (y < height * 2 - 1 && x < width * 2 - 1)
+						lower_right_tile = height_map[(x + 1) / 2, (y + 1) / 2];
+					
+					vertex_map[x + 0, y + 0].y = (center_tile) / 1f;
+					vertex_map[x + 1, y + 0].y = (center_tile + right_tile) / 2f;
+					vertex_map[x + 0, y + 1].y = (center_tile + lower_tile) / 2f;
+					vertex_map[x + 1, y + 1].y = (center_tile + right_tile + lower_tile + lower_right_tile) / 4f;
+				}
+			}
+			
+			// finish up around the edges
+			vertex_map[0, 0].y = height_map[0, 0];
+			
+			for(int x = 1; x < width * 2 + 1; x+=2) {
 				
-				float center_tile, lower_tile, right_tile, lower_right_tile;
-				center_tile = height_map[(x - 1) / 2, (y - 1) / 2];
-				lower_tile = right_tile = lower_right_tile = center_tile;
+				float center_tile, right_tile;
+				right_tile = center_tile = height_map[(x - 1) / 2, 0];
+				
+				if (x < width * 2 - 1)
+					right_tile  = height_map[(x + 1) / 2, 0];
+				
+				vertex_map[x, 0].y		= (center_tile) / 1f;
+				vertex_map[x + 1, 0].y 	= (center_tile + right_tile) / 2f;
+			}
+			
+			for(int y = 1; y < height * 2 + 1; y+=2) {
+				
+				float center_tile, lower_tile;
+				lower_tile = center_tile = height_map[0, (y - 1) / 2];
 				
 				if (y < height * 2 - 1)
-					lower_tile = height_map[(x - 1) / 2, (y + 1) / 2];
-				if (x < width * 2 - 1)
-					right_tile = height_map[(x + 1) / 2, (y - 1) / 2];
-				if (y < height * 2 - 1 && x < width * 2 - 1)
-					lower_right_tile = height_map[(x + 1) / 2, (y + 1) / 2];
+					lower_tile  = height_map[0, (y + 1) / 2];
 				
-				vertex_map[x + 0, y + 0].y = (center_tile) / 1f;
-				vertex_map[x + 1, y + 0].y = (center_tile + right_tile) / 2f;
-				vertex_map[x + 0, y + 1].y = (center_tile + lower_tile) / 2f;
-				vertex_map[x + 1, y + 1].y = (center_tile + right_tile + lower_tile + lower_right_tile) / 4f;
+				vertex_map[0, y].y		= (center_tile) / 1f;
+				vertex_map[0, y + 1].y 	= (center_tile + lower_tile) / 2f;
 			}
-		}
-		
-		// finish up around the edges
-		vertex_map[0, 0].y = height_map[0, 0];
-		
-		for(int x = 1; x < width * 2 + 1; x+=2) {
 			
-			float center_tile, right_tile;
-			right_tile = center_tile = height_map[(x - 1) / 2, 0];
-			
-			if (x < width * 2 - 1)
-				right_tile  = height_map[(x + 1) / 2, 0];
-			
-			vertex_map[x, 0].y		= (center_tile) / 1f;
-			vertex_map[x + 1, 0].y 	= (center_tile + right_tile) / 2f;
-		}
-		
-		for(int y = 1; y < height * 2 + 1; y+=2) {
-			
-			float center_tile, lower_tile;
-			lower_tile = center_tile = height_map[0, (y - 1) / 2];
-			
-			if (y < height * 2 - 1)
-				lower_tile  = height_map[0, (y + 1) / 2];
-			
-			vertex_map[0, y].y		= (center_tile) / 1f;
-			vertex_map[0, y + 1].y 	= (center_tile + lower_tile) / 2f;
-		}
-		
-		// anchor all vertices that touch walkable tiles to height 0
-		for (int x = 1; x < width * 2 + 1; x+=2) {
-			for (int y = 1; y < height * 2 + 1; y+=2) {
-				if (traversable(map[(x - 1) / 2, (y - 1) / 2]) && map[(x - 1) / 2, (y - 1) / 2] != BRIDGE && map[(x - 1) / 2, (y - 1) / 2] != PLATFORM) {
-					vertex_map[x - 1, y - 1].y = 0;
-					vertex_map[x - 0, y - 1].y = 0;
-					vertex_map[x + 1, y - 1].y = 0;
-					
-					vertex_map[x - 1, y - 0].y = 0;
-					vertex_map[x - 0, y - 0].y = 0;
-					vertex_map[x + 1, y - 0].y = 0;
-					
-					vertex_map[x - 1, y + 1].y = 0;
-					vertex_map[x - 0, y + 1].y = 0;
-					vertex_map[x + 1, y + 1].y = 0;
-				}
-				// if the tile is an edge, just anchor the center vertex
-				else if (map[(x - 1) / 2, (y - 1) / 2] == EDGE) {
-					vertex_map[x + 0, y + 0].y = 0;
+			// anchor all vertices that touch walkable tiles to height 0
+			for (int x = 1; x < width * 2 + 1; x+=2) {
+				for (int y = 1; y < height * 2 + 1; y+=2) {
+					// exclude bridges and platforms in this calculation, they are not part of the terrain
+					if (traversable(map[(x - 1) / 2, (y - 1) / 2]) && map[(x - 1) / 2, (y - 1) / 2] != BRIDGE && map[(x - 1) / 2, (y - 1) / 2] != PLATFORM) {
+						vertex_map[x - 1, y - 1].y = 0;
+						vertex_map[x - 0, y - 1].y = 0;
+						vertex_map[x + 1, y - 1].y = 0;
+						
+						vertex_map[x - 1, y - 0].y = 0;
+						vertex_map[x - 0, y - 0].y = 0;
+						vertex_map[x + 1, y - 0].y = 0;
+						
+						vertex_map[x - 1, y + 1].y = 0;
+						vertex_map[x - 0, y + 1].y = 0;
+						vertex_map[x + 1, y + 1].y = 0;
+					}
+					// if the tile is an edge, just anchor the center vertex
+					else if (map[(x - 1) / 2, (y - 1) / 2] == EDGE) {
+						vertex_map[x + 0, y + 0].y = 0;
+					}
 				}
 			}
-		}
 		
 		/* STEP 4: CREATE TRIANGLES & FINALIZE MESH
-		 * Once the mesh nodes are created, an array of triangles, representing the map surface, is constructed from it */
+		 * Once the mesh nodes are created, an array of triangles, representing the map surface, is constructed from it 
+		 */
 
 		Vector3[] vertices = new Vector3[width * height * 4 * 2 * 3]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
 		Vector2[] uvs = new Vector2[width * height * 4 * 2 * 3];
@@ -201,28 +208,32 @@ public class MapMeshGenerator : MonoBehaviour
 				Vector3 v1 = vertex_map[x + 1, y + 0];
 				Vector3 v2 = vertex_map[x + 0, y + 1];
 				Vector3 v3 = vertex_map[x + 1, y + 1];
-				
-				Vector2 t0 = new Vector2(x + 0, y + 0);
-				Vector2 t1 = new Vector2(x + 1, y + 0);
-				Vector2 t2 = new Vector2(x + 0, y + 1);
-				Vector2 t3 = new Vector2(x + 1, y + 1);
-				
+
+				// orientation of triangles changes in a regular pattern according to which corner of each tile it occupies
+				// a final tile face will be triangulated something like this (excuse the bad text drawing):
+				/*
+				 * -----------
+				 * | \  |   /|  8 triangles, 4 faces per tile, 2 triangles per face
+				 * |  \ | /  |
+				 * |---------|  All hypotenuse aim towards the center of the tile
+				 * |  / | \  |
+				 * |/   |   \|
+				 * |-----------
+				 * 
+				 * This creates a repeating pattern in the tile geometry, so that it is not biased towards any particular orientation
+				 */   
+				 
 				if ((x % 2) == 1) {
 					SWAPv(ref v0, ref v1);
 					SWAPv(ref v2, ref v3);
-					
-					SWAPt(ref t0, ref t1);
-					SWAPt(ref t2, ref t3);
 				}
 				
 				if ((y % 2) == 1) {
 					SWAPv(ref v0, ref v2);
 					SWAPv(ref v1, ref v3);
-					
-					SWAPt(ref t0, ref t2);
-					SWAPt(ref t1, ref t3);
 				}
-				
+					// because of this re-ordering of vertices, the winding order of the triangles needs to be taken into account
+					// With an odd number of swaps, the winding order for the triangles is reversed
 					if (((x + y) % 2) == 1) {
 						vertices[i + 0] = v0;
 						vertices[i + 1] = v1;
@@ -232,21 +243,22 @@ public class MapMeshGenerator : MonoBehaviour
 						vertices[i + 4] = v0;
 						vertices[i + 5] = v3;
 						
-						uvs[i + 0] = t0;
-						uvs[i + 1] = t1;
-						uvs[i + 2] = t3;
+						uvs[i + 0] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
+						uvs[i + 1] = new Vector2(Mathf.Abs(v1.y / wall_height), 0);
+						uvs[i + 2] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
 						
-						uvs[i + 3] = t2;
-						uvs[i + 4] = t0;
-						uvs[i + 5] = t3;
+						uvs[i + 3] = new Vector2(Mathf.Abs(v2.y / wall_height), 0);
+						uvs[i + 4] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
+						uvs[i + 5] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
 						
+						/*
 						colors[i + 0] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
 						colors[i + 1] = gradient.Evaluate(Mathf.Abs(v1.y / wall_height));
 						colors[i + 2] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
 						
 						colors[i + 3] = gradient.Evaluate(Mathf.Abs(v2.y / wall_height));
 						colors[i + 4] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
-						colors[i + 5] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
+						colors[i + 5] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));*/
 					}
 					else {
 						vertices[i + 0] = v3;
@@ -257,21 +269,21 @@ public class MapMeshGenerator : MonoBehaviour
 						vertices[i + 4] = v0;
 						vertices[i + 5] = v2;
 						
-						uvs[i + 0] = t3;
-						uvs[i + 1] = t1;
-						uvs[i + 2] = t0;
+						uvs[i + 0] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
+						uvs[i + 1] = new Vector2(Mathf.Abs(v1.y / wall_height), 0);
+						uvs[i + 2] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
 						
-						uvs[i + 3] = t3;
-						uvs[i + 4] = t0;
-						uvs[i + 5] = t2;
+						uvs[i + 3] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
+						uvs[i + 4] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
+						uvs[i + 5] = new Vector2(Mathf.Abs(v2.y / wall_height), 0);
 						
-						colors[i + 0] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
+						/*colors[i + 0] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
 						colors[i + 1] = gradient.Evaluate(Mathf.Abs(v1.y / wall_height));
 						colors[i + 2] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
 						
 						colors[i + 3] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
 						colors[i + 4] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
-						colors[i + 5] = gradient.Evaluate(Mathf.Abs(v2.y / wall_height));
+						colors[i + 5] = gradient.Evaluate(Mathf.Abs(v2.y / wall_height));*/
 					}
 				
 					triangles[i + 0] = i;
@@ -288,6 +300,7 @@ public class MapMeshGenerator : MonoBehaviour
 		
 		MeshFilter mf = GetComponent<MeshFilter>();
 		
+		// unless indexFormat Uint32 is specified, mesh index goes up to only 65536 (16-bit)
 		mf.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 		mf.mesh.triangles = null;
 		
