@@ -124,4 +124,10 @@ public class MapManager : MonoBehaviour
 	{
 		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
 	}
+	
+	public Pos world_to_grid(Vector3 pos)
+	{
+		pos = pos + offset;
+		return new Pos((int) pos.x, (int) pos.z);
+	}
 }
