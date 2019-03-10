@@ -58,6 +58,7 @@ public class CharacterAnimator : MonoBehaviour
 
         // Size up particle effects.
         magicAura.transform.localScale = new Vector3(3f, 3f, 3f);
+        magicAura.transform.localPosition = new Vector3(0f, 0.05f, 0f);
         healAura.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         blood.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         sparks.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
@@ -149,7 +150,7 @@ public class CharacterAnimator : MonoBehaviour
     void SpawnMagicAura()
     {
         var magicAuraClone = Instantiate(magicAura, character.transform);
-        Destroy(magicAuraClone, particleDuration);
+        Destroy(magicAuraClone.gameObject, particleDuration);
     }
 
     void SpawnHealAura()
