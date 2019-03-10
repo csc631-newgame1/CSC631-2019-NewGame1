@@ -67,17 +67,20 @@ public class MapGenerator : MonoBehaviour
 		offset = new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
 		
 		// create meshes for all objects
-		SurfaceMeshGenerator surface_mesh_gen = transform.Find("Surfaces").GetComponent<SurfaceMeshGenerator>();
+		/*SurfaceMeshGenerator surface_mesh_gen = transform.Find("Surfaces").GetComponent<SurfaceMeshGenerator>();
 		surface_mesh_gen.generate_surface_mesh(map, cmds, offset);
 		
 		WallMeshGenerator wall_mesh_gen = transform.Find("Walls").GetComponent<WallMeshGenerator>();
-		wall_mesh_gen.generate_wall_mesh(cmds, offset);
+		wall_mesh_gen.generate_wall_mesh(cmds, offset);*/
+		
+		MapMeshGenerator surface_gen = transform.Find("Surface").GetComponent<MapMeshGenerator>();
+		surface_gen.generate_map_mesh(map);
 		
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
 		bridge_mesh_gen.generate_bridge_mesh(map, offset);
 		
-		Floor floor_gen = transform.Find("Floor").GetComponent<Floor>();
-		floor_gen.generate_floor();
+		//Floor floor_gen = transform.Find("Floor").GetComponent<Floor>();
+		//floor_gen.generate_floor();
 		
 		Water water_gen = transform.Find("Water").GetComponent<Water>();
 		water_gen.generate_water_mesh(offset);
