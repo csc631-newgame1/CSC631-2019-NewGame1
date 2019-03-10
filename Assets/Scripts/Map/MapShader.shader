@@ -42,7 +42,7 @@
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				
 				half3 world_normal = UnityObjectToWorldNormal(v.normal);
-				half intensity = max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz));
+				half intensity = 0.8 + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / 5.0;
                 o.color = float4(1, 1, 1, 1) * intensity;
 				
 				UNITY_TRANSFER_FOG(o, o.pos);
