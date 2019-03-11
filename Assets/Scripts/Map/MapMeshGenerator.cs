@@ -259,15 +259,6 @@ public class MapMeshGenerator : MonoBehaviour
 						uv2s[i + 3] = new Vector2(v2.x, v2.z);
 						uv2s[i + 4] = new Vector2(v0.x, v0.z);
 						uv2s[i + 5] = new Vector2(v3.x, v3.z);
-						
-						/*
-						colors[i + 0] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
-						colors[i + 1] = gradient.Evaluate(Mathf.Abs(v1.y / wall_height));
-						colors[i + 2] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
-						
-						colors[i + 3] = gradient.Evaluate(Mathf.Abs(v2.y / wall_height));
-						colors[i + 4] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
-						colors[i + 5] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));*/
 					}
 					else {
 						vertices[i + 0] = v3;
@@ -293,14 +284,6 @@ public class MapMeshGenerator : MonoBehaviour
 						uv2s[i + 3] = new Vector2(v3.x, v3.z);
 						uv2s[i + 4] = new Vector2(v0.x, v0.z);
 						uv2s[i + 5] = new Vector2(v2.x, v2.z);
-						
-						/*colors[i + 0] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
-						colors[i + 1] = gradient.Evaluate(Mathf.Abs(v1.y / wall_height));
-						colors[i + 2] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
-						
-						colors[i + 3] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
-						colors[i + 4] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
-						colors[i + 5] = gradient.Evaluate(Mathf.Abs(v2.y / wall_height));*/
 					}
 				
 					triangles[i + 0] = i;
@@ -314,6 +297,26 @@ public class MapMeshGenerator : MonoBehaviour
 				i += 6;
 			}
 		}
+		
+		/* STEP 6: GRADIENT TEXTURE CREATION
+		 * Applies gradient to main texture
+		 */
+		
+		Renderer rend = GetComponent<Renderer>();
+		Texture2D texture = Instantiate(rend.material.mainTexture) as Texture2D;
+		rend.material.mainTexture = texture;
+		
+		Color[] colors = new Color[512];
+		for (int x = 0; x < 512; x++) {
+			colors[x] = gradient.Evaluate((float) x / 512f);
+		}
+		
+		texture.SetPixels(colors);
+		texture.Apply(false);
+		
+		/* STEP 7: FINALISATION
+		 * Assigns vertices, triangles, and uvs to mesh
+		 */
 		
 		MeshFilter mf = GetComponent<MeshFilter>();
 		
