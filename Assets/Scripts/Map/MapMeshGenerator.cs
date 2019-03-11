@@ -194,7 +194,8 @@ public class MapMeshGenerator : MonoBehaviour
 
 		Vector3[] vertices = new Vector3[width * height * 4 * 2 * 3]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
 		Vector2[] uvs = new Vector2[width * height * 4 * 2 * 3];
-		Color[] colors = new Color[width * height * 4 * 2 * 3];
+		Vector2[] uv2s = new Vector2[width * height * 4 * 2 * 3];
+		//Color[] colors = new Color[width * height * 4 * 2 * 3];
 		int[] triangles = new int[width * height * 4 * 2 * 3];
 		
 		int i = 0; // keeps track of triangles index
@@ -251,6 +252,14 @@ public class MapMeshGenerator : MonoBehaviour
 						uvs[i + 4] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
 						uvs[i + 5] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
 						
+						uv2s[i + 0] = new Vector2(v0.x, v0.z);
+						uv2s[i + 1] = new Vector2(v1.x, v1.z);
+						uv2s[i + 2] = new Vector2(v3.x, v3.z);
+						
+						uv2s[i + 3] = new Vector2(v2.x, v2.z);
+						uv2s[i + 4] = new Vector2(v0.x, v0.z);
+						uv2s[i + 5] = new Vector2(v3.x, v3.z);
+						
 						/*
 						colors[i + 0] = gradient.Evaluate(Mathf.Abs(v0.y / wall_height));
 						colors[i + 1] = gradient.Evaluate(Mathf.Abs(v1.y / wall_height));
@@ -276,6 +285,14 @@ public class MapMeshGenerator : MonoBehaviour
 						uvs[i + 3] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
 						uvs[i + 4] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
 						uvs[i + 5] = new Vector2(Mathf.Abs(v2.y / wall_height), 0);
+						
+						uv2s[i + 0] = new Vector2(v3.x, v3.z);
+						uv2s[i + 1] = new Vector2(v1.x, v1.z);
+						uv2s[i + 2] = new Vector2(v0.x, v0.z);
+						
+						uv2s[i + 3] = new Vector2(v3.x, v3.z);
+						uv2s[i + 4] = new Vector2(v0.x, v0.z);
+						uv2s[i + 5] = new Vector2(v2.x, v2.z);
 						
 						/*colors[i + 0] = gradient.Evaluate(Mathf.Abs(v3.y / wall_height));
 						colors[i + 1] = gradient.Evaluate(Mathf.Abs(v1.y / wall_height));
@@ -306,7 +323,8 @@ public class MapMeshGenerator : MonoBehaviour
 		
 		mf.mesh.vertices = vertices;
 		mf.mesh.uv = uvs;
-		mf.mesh.colors = colors;
+		mf.mesh.uv2 = uv2s;
+		//mf.mesh.colors = colors;
 		mf.mesh.triangles = triangles;
 		mf.mesh.RecalculateNormals();
 	}
