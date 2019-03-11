@@ -70,9 +70,6 @@ public class MapGenerator : MonoBehaviour
 		
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
 		bridge_mesh_gen.generate_bridge_mesh(map);
-
-		Water water_gen = transform.Find("Water").GetComponent<Water>();
-		water_gen.generate_water_mesh();
 		
 		// init tile hover detector with map data
 		TileSelector tile_select = transform.Find("TileSelector").GetComponent<TileSelector>();

@@ -16,6 +16,8 @@ public class MapMeshGenerator : MonoBehaviour
 	private float cell_size;
 	private float wall_height;
 	private Vector3 offset;
+	
+	[Tooltip("The color gradient for the map, coloring based on height. Values towards 0 are closer to the map's surface, values towards 1 are closer to the map's floor")]
 	public Gradient gradient;
 	
 	void set_config_variables()
@@ -195,15 +197,12 @@ public class MapMeshGenerator : MonoBehaviour
 		Vector3[] vertices = new Vector3[width * height * 4 * 2 * 3]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
 		Vector2[] uvs = new Vector2[width * height * 4 * 2 * 3];
 		Vector2[] uv2s = new Vector2[width * height * 4 * 2 * 3];
-		//Color[] colors = new Color[width * height * 4 * 2 * 3];
 		int[] triangles = new int[width * height * 4 * 2 * 3];
 		
 		int i = 0; // keeps track of triangles index
 		
 		for (int x = 0; x < width * 2; x++) {
 			for (int y = 0; y < height * 2; y++) {
-				
-				Color col = gradient.Evaluate(Mathf.Clamp01(Mathf.Abs(height_map[x / 2, y / 2]) / wall_height));
 				
 				Vector3 v0 = vertex_map[x + 0, y + 0];
 				Vector3 v1 = vertex_map[x + 1, y + 0];
@@ -327,7 +326,6 @@ public class MapMeshGenerator : MonoBehaviour
 		mf.mesh.vertices = vertices;
 		mf.mesh.uv = uvs;
 		mf.mesh.uv2 = uv2s;
-		//mf.mesh.colors = colors;
 		mf.mesh.triangles = triangles;
 		mf.mesh.RecalculateNormals();
 	}
@@ -338,14 +336,7 @@ public class MapMeshGenerator : MonoBehaviour
 		a = b;
 		b = tmp;
 	}
-	
-	private void SWAPt(ref Vector2 a, ref Vector2 b)
-	{
-		Vector2 tmp = a;
-		a = b;
-		b = tmp;
-	}
-	
+
 	private float height_func(int hval, int x, int y)
 	{
 		return -wall_height * ((sigmoid(hval / 2f) - 0.5f) * 2);
