@@ -14,10 +14,10 @@
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
+			#include "UnityLightingCommon.cginc"
 
             struct appdata
             {
@@ -46,7 +46,7 @@
 				
 				half3 world_normal = UnityObjectToWorldNormal(v.normal);
 				half intensity = 0.5 + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / 2.0;
-                o.color = float4(1, 1, 1, 1) * intensity;
+                o.color = _LightColor0 * intensity;
 				
                 return o;
             }
