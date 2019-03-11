@@ -2,6 +2,7 @@
 
 	Properties {
 		_MainTex ("Texture", 2D) = "white" {}
+		_DetailTex ("Fluid Detail", 2D) = "white" {}
 	}
 
     SubShader {
@@ -19,31 +20,36 @@
 			#include "UnityLightingCommon.cginc"
 			
 			sampler2D _MainTex;
+			sampler2D _DetailTex;
 			
 			struct i2v {
 				float4 pos : POSITION;
-				float2 uv : TEXCOORD0;
+				float2 uv1 : TEXCOORD0;
+				float2 uv2 : TEXCOORD1;
 				half3 normal : NORMAL;
 			};
          
             struct v2f {
                 float4 pos : POSITION;
-                float2 uv : TEXCOORD0;
+                float2 uv1 : TEXCOORD0;
+				float2 uv2 : TEXCOORD1;
 				float4 color : COLOR;
-				UNITY_FOG_COORDS(1)
+				UNITY_FOG_COORDS(2)
             };
 			
 			float4 _MainTex_ST;
+			float4 _DetailTex_ST;
             
             v2f vert (i2v v)
             {
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.pos);
-				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+				o.uv1 = TRANSFORM_TEX(v.uv1, _MainTex);
+				o.uv2 = TRANSFORM_TEX(v.uv2, _DetailTex);
 				
 				half3 world_normal = UnityObjectToWorldNormal(v.normal);
 				half intensity = 0.8 + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / 5.0;
-                o.color = float4(1, 1, 1, 1) * intensity;
+                o.color = _LightColor0 * intensity;
 				
 				UNITY_TRANSFER_FOG(o, o.pos);
                 return o;
@@ -51,8 +57,12 @@
 
             float4 frag (v2f i) : SV_Target 
 			{
-				i.uv.x = clamp(i.uv.x + (_SinTime[2] / 3.0f), 0.01f, 0.99f);
-				float4 col = tex2D(_MainTex, i.uv) * i.color;
+				float detail = tex2D(_DetailTex, (_Time[0] * float2(1, 1)) + i.uv2).r / 3.0f;
+				
+				i.uv1.x = clamp(i.uv1.x + (_SinTime[2] / 3.0f) - detail, 0.01f, 0.99f);
+				
+				float4 col = tex2D(_MainTex, i.uv1) * i.color;
+				
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				col.a = 1;
 				return col;
