@@ -3696,6 +3696,7 @@ GameObject:
   - component: {fileID: 1012216744}
   - component: {fileID: 1012216743}
   - component: {fileID: 1012216742}
+  - component: {fileID: 1111223434817933391}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -3810,6 +3811,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 25
+  weapon: 1
+--- !u!114 &1111223434817933391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012216741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4904a3e654f834b449c405155b5b87f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magicAura: {fileID: 19895582, guid: 24e29d528f11acf42974643bee14a607, type: 3}
+  healAura: {fileID: 19831716, guid: 685c97d007af49549b239b56b6d2000a, type: 3}
+  blood: {fileID: 19845262, guid: fdac75e990da47649b31f10049c400b0, type: 3}
+  sparks: {fileID: 19872524, guid: 4889039938a567444827eafcfbc2b267, type: 3}
+  ghosts: {fileID: 19853646, guid: 737959db973360b43bdeb1a4874f1af8, type: 3}
 --- !u!1 &1037650490
 GameObject:
   m_ObjectHideFlags: 0
