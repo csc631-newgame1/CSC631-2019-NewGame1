@@ -291,7 +291,7 @@ public class NavigationHandler
 		Vertex target = insert_vertex_at(p_target);
 		
 		//display_vertices();
-		print_debug_info();
+		//print_debug_info();
 		
 		// create a temporary graph of vertices to be pulled from during pathfinding
 		List<Vertex> tmp_graph = new List<Vertex>(nav_graph);
