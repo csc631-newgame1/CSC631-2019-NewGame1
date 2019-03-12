@@ -85,6 +85,11 @@ public class MapManager : MonoBehaviour
 		}
 	}
 	
+	public List<Pos> get_path(Pos source, Pos dest)
+	{
+		return nav_map.find_shortest_path(source, dest);
+	}
+	
 	public bool move(Pos source, Pos dest)
 	{
 		if (!map[source.x, source.y].occupied 
@@ -92,7 +97,7 @@ public class MapManager : MonoBehaviour
 		 || !map[dest.x, dest.y].traversable)
 			return false;
 		
-		List<Pos> path = nav_map.find_shortest_path(source, dest);
+		List<Pos> path = get_path(source, dest);
 		GameAgent agent = map[source.x, source.y].resident;
 		
 		map[dest.x, dest.y].occupied = true;

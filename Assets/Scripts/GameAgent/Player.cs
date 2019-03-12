@@ -11,7 +11,7 @@ public class Player : GameAgent
 	private TileSelector tile_selector; // reference to map tile selector
 	
 	// private reference to position in map grid
-	private bool moving = false;
+	public bool moving = false;
 	
 	private int move_budget;
 	private int health = 100;
@@ -27,7 +27,8 @@ public class Player : GameAgent
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
 		grid_pos = position;
 		animator = GetComponent<Animator>();
-
+		
+		tile_selector.setPlayer(this);
         this.stats = stats;
     }
 
@@ -81,6 +82,7 @@ public class Player : GameAgent
 		animator.SetBool("Moving", false);
 
 		moving = false;
+		tile_selector.clear_path_line();
 	}
 	
 	public void FootR(){}
