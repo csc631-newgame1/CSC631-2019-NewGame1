@@ -37,7 +37,8 @@ public class GameManager : MonoBehaviour
         SpawnEnemies();
     }
 
-    void SpawnEnemies() {
+    void SpawnEnemies() 
+	{
         enemySpawner.Init(map_manager, mapConfiguration);
         enemySpawner.SpawnEnemies(enemy);
         enemySpawner.ShowEnemySpawnZones(showEnemySpawnZones);

@@ -3,6 +3,10 @@
 	Properties {
 		_MainTex ("Texture", 2D) = "white" {}
 		_FluidTex ("Fluid Detail", 2D) = "white" {}
+		_Oscillation ("Fluid Oscillation Level", Range(0, 1)) = 0
+		_Detail ("Fluid Detail Weight", Range(0, 1)) = 0
+		_Bias ("Fluid Level Bias", Range(-1, 1)) = 0
+		_BaseIntensity ("Base Light Intensity", Range(0, 1)) = 0
 	}
 
     SubShader {
@@ -21,6 +25,10 @@
 			
 			sampler2D _MainTex;
 			sampler2D _FluidTex;
+			float _Oscillation;
+			float _Detail;
+			float _Bias;
+			float _BaseIntensity;
 			
 			struct i2v {
 				float4 pos : POSITION;
@@ -48,7 +56,7 @@
 				o.uv2 = TRANSFORM_TEX(v.uv2, _FluidTex);
 				
 				half3 world_normal = UnityObjectToWorldNormal(v.normal);
-				half intensity = 0.8 + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / 5.0;
+				half intensity = _BaseIntensity + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / (1 / (1 - _BaseIntensity));
                 o.color = _LightColor0 * intensity;
 				
 				UNITY_TRANSFER_FOG(o, o.pos);
@@ -57,9 +65,10 @@
 
             float4 frag (v2f i) : SV_Target 
 			{
-				float detail = tex2D(_FluidTex, (_Time[0] * float2(1, 1)) + i.uv2).r / 3.0f;
+				float detail = (tex2D(_FluidTex, (_Time[0] * float2(1, 1)) + i.uv2).r - 0.5) * 2 * _Detail;
+				float time_osc = _SinTime[3] * _Oscillation;
 				
-				i.uv1.x = clamp(i.uv1.x + (_SinTime[2] / 3.0f) - detail, 0.01f, 0.99f);
+				i.uv1.x = clamp(i.uv1.x + time_osc + detail + _Bias, 0.01f, 0.99f);
 				
 				float4 col = tex2D(_MainTex, i.uv1) * i.color;
 				
