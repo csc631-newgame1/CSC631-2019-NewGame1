@@ -1,9 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using MapUtils;
 using static MapUtils.MapConstants;
+using static MapUtils.EnumUtils;
 
 public class Player : GameAgent
 {
@@ -11,12 +12,13 @@ public class Player : GameAgent
 	private TileSelector tile_selector; // reference to map tile selector
 	
 	// private reference to position in map grid
-	private Pos grid_pos;
-	private bool moving = false;
+	public Pos grid_pos;
+	public bool moving = false;
 	
 	private int move_budget;
 	private int health = 100;
 	private bool player_turn = false;
+	
 	public float speed;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
@@ -28,6 +30,8 @@ public class Player : GameAgent
     public override void init_agent(Pos position, GameAgentStats stats)
     {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
+		tile_selector.setPlayer(this);
+		
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
 		grid_pos = position;
 		animator = GetComponent<CharacterAnimator>();
@@ -66,30 +70,33 @@ public class Player : GameAgent
 	public override IEnumerator smooth_movement(List<Pos> path)
 	{
 		moving = true;
-
         StartCoroutine(animator.StartMovementAnimation());
 		
-		Vector3 origin, target;
-		foreach(Pos step in path) {
-			origin = transform.position;
-			target = map_manager.grid_to_world(step);
-			float dist = Vector3.Distance(origin, target);
-			float time = 0f;
-			
-			transform.LookAt(target);
-			
-			while(time < 1f && dist > 0f) {
-				time += (Time.deltaTime * speed) / dist;
-				transform.position = Vector3.Lerp(origin, target, time);
-				yield return null;
+			Vector3 origin, target;
+			foreach(Pos step in path) {
+				
+				origin = transform.position;
+				target = map_manager.grid_to_world(step);
+				float dist = Vector3.Distance(origin, target);
+				float time = 0f;
+				
+				transform.LookAt(target);
+				
+					while(time < 1f && dist > 0f) {
+						time += (Time.deltaTime * speed) / dist;
+						transform.position = Vector3.Lerp(origin, target, time);
+						yield return null;
+					}
+				
+				grid_pos = step;
 			}
-		}
-		transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
+		tile_selector.clear_path_line();
 	}
-
+	
     void spawnActionRadius()
     {
         var exp = GetComponent<ParticleSystem>();
@@ -109,5 +116,7 @@ public class Player : GameAgent
 
 	public void FootR(){}
 	public void FootL(){}
-	
+	public void Hit(){}
+	public void Shoot(){}
+	public void WeaponSwitch(){}
 }
