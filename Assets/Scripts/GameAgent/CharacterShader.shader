@@ -45,7 +45,7 @@
                 UNITY_TRANSFER_FOG(o,o.vertex);
 				
 				half3 world_normal = UnityObjectToWorldNormal(v.normal);
-				half intensity = 0.5 + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / 2.0;
+				half intensity = 0.8 + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / 5.0;
                 o.color = _LightColor0 * intensity;
 				
                 return o;
