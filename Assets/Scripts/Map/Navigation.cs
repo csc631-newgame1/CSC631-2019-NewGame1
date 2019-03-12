@@ -93,11 +93,8 @@ public class NavigationHandler
 	}
 	
 	bool is_vertex(int x, int y)
-	{
-		if (map[x, y] == PLATFORM)
-			return true;
-		
-		if (tile_traversable(x, y) == 0 || map[x, y] == BRIDGE)
+	{	
+		if (tile_traversable(x, y) == 0)
 			return false;
 		
 		int t_l	= tile_traversable(x - 1, y + 0);
@@ -141,32 +138,32 @@ public class NavigationHandler
 		for (int x = vpos.x + 1; x < width; x++) {
 			if (tile_traversable(x, vpos.y) == 0)
 				break;
-			else if (vertex_map[x, vpos.y] != null)
-				vertex.visible.Add(vertex_map[x, vpos.y]);
+			else if (vertex_map[x, vpos.y] != null) {
+				vertex.visible.Add(vertex_map[x, vpos.y]); break; }
 			max_x = x;
 		}
 		
 		for (int x = vpos.x - 1; x >= 0; x--) {
 			if (tile_traversable(x, vpos.y) == 0)
 				break;
-			else if (vertex_map[x, vpos.y] != null)
-				vertex.visible.Add(vertex_map[x, vpos.y]);
+			else if (vertex_map[x, vpos.y] != null) {
+				vertex.visible.Add(vertex_map[x, vpos.y]); break; }
 			min_x = x;
 		}
 		
 		for (int y = vpos.y + 1; y < height; y++) {
 			if (tile_traversable(vpos.x, y) == 0)
 				break;
-			else if (vertex_map[vpos.x, y] != null)
-				vertex.visible.Add(vertex_map[vpos.x, y]);
+			else if (vertex_map[vpos.x, y] != null) { 
+				vertex.visible.Add(vertex_map[vpos.x, y]); break; }
 			max_y = y;
 		}
 		
 		for (int y = vpos.y - 1; y >= 0; y--) {
 			if (tile_traversable(vpos.x, y) == 0)
 				break;
-			else if (vertex_map[vpos.x, y] != null)
-				vertex.visible.Add(vertex_map[vpos.x, y]);
+			else if (vertex_map[vpos.x, y] != null) {
+				vertex.visible.Add(vertex_map[vpos.x, y]); break; }
 			min_y = y;
 		}
 		
