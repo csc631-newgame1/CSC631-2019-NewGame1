@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,24 +11,27 @@ public class Player : GameAgent
 	private TileSelector tile_selector; // reference to map tile selector
 	
 	// private reference to position in map grid
-	public bool moving = false;
+	private Pos grid_pos;
+	private bool moving = false;
 	
 	private int move_budget;
 	private int health = 100;
 	private bool player_turn = false;
 	public float speed;
+
+    // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
+    public int weapon = 1;
 	
-	Animator animator;
+	CharacterAnimator animator;
 	
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
     {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
+        tile_selector.setPlayer(this);
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
 		grid_pos = position;
-		animator = GetComponent<Animator>();
-		
-		tile_selector.setPlayer(this);
+		animator = GetComponent<CharacterAnimator>();
         this.stats = stats;
     }
 
@@ -41,6 +44,14 @@ public class Player : GameAgent
 				grid_pos = tile_selector.grid_position;
 			}
 		}
+
+        // For testing animations.
+        if (Input.GetKeyDown("1")) StartCoroutine(animator.PlayRotateAnimation());
+        if (Input.GetKeyDown("2")) StartCoroutine(animator.PlayAttackAnimation());
+        if (Input.GetKeyDown("3")) StartCoroutine(animator.PlayUseItemAnimation());
+        if (Input.GetKeyDown("4")) StartCoroutine(animator.PlayHitAnimation());
+        if (Input.GetKeyDown("5")) StartCoroutine(animator.PlayBlockedAnimation());
+        if (Input.GetKeyDown("6")) StartCoroutine(animator.PlayKilledAimation());
     }
 	
 	public override void take_damage(int amount)
@@ -56,8 +67,8 @@ public class Player : GameAgent
 	public override IEnumerator smooth_movement(List<Pos> path)
 	{
 		moving = true;
-		
-		animator.SetBool("Moving", true);
+
+        StartCoroutine(animator.StartMovementAnimation());
 		
 		Vector3 origin, target;
 		foreach(Pos step in path) {
@@ -69,22 +80,35 @@ public class Player : GameAgent
 			transform.LookAt(target);
 			
 			while(time < 1f && dist > 0f) {
-				
-				animator.SetFloat("Velocity Z", speed);
-				
 				time += (Time.deltaTime * speed) / dist;
 				transform.position = Vector3.Lerp(origin, target, time);
 				yield return null;
 			}
 		}
 		transform.position = map_manager.grid_to_world(path[path.Count - 1]);
-		
-		animator.SetBool("Moving", false);
 
-		moving = false;
-		tile_selector.clear_path_line();
+        StartCoroutine(animator.StopMovementAnimation());
+        moving = false;
+        tile_selector.clear_path_line();
 	}
-	
+
+    void spawnActionRadius()
+    {
+        var exp = GetComponent<ParticleSystem>();
+        exp.Play();
+        Destroy(gameObject, exp.duration);
+    }
+
+    bool isWithinActionReadius()
+    {
+        return false;
+    }
+
+    void move()
+    {
+        
+    }
+
 	public void FootR(){}
 	public void FootL(){}
 	
