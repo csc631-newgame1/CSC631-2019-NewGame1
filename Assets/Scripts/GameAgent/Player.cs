@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,6 +28,7 @@ public class Player : GameAgent
     public override void init_agent(Pos position, GameAgentStats stats)
     {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
+        tile_selector.setPlayer(this);
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
 		grid_pos = position;
 		animator = GetComponent<CharacterAnimator>();
@@ -88,6 +89,7 @@ public class Player : GameAgent
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
+        tile_selector.clear_path_line();
 	}
 
     void spawnActionRadius()
