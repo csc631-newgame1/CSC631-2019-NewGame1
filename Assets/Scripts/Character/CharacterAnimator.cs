@@ -51,7 +51,7 @@ public class CharacterAnimator : MonoBehaviour
 
     void Update()
     {
-        
+
     }
 
     // StartMovementAnimation(), StopMovementAnimation(), PlayRotateAnimation()
@@ -147,7 +147,35 @@ public class CharacterAnimator : MonoBehaviour
 
     // SpawnParticleSystemAtCharacter(ParticleSystem particle)
     #region Character Particle Effects
+<<<<<<< HEAD
     void SpawnParticleSystemAtCharacter(ParticleSystem particle)
+=======
+    void SpawnMagicAura()
+    {
+        var magicAuraClone = Instantiate(magicAura, character.transform);
+        Destroy(magicAuraClone.gameObject, particleDuration);
+    }
+
+    void SpawnHealAura()
+    {
+        var healAuraClone = Instantiate(healAura, character.transform);
+        Destroy(healAuraClone.gameObject, particleDuration);
+    }
+
+    void SpawnBlood()
+    {
+        var bloodClone = Instantiate(blood, character.transform);
+        Destroy(bloodClone.gameObject, particleDuration);
+    }
+
+    void SpawnSparks()
+    {
+        var sparksClone = Instantiate(sparks, character.transform);
+        Destroy(sparksClone.gameObject, particleDuration);
+    }
+
+    void SpawnGhosts()
+>>>>>>> dev
     {
         var clone = Instantiate(particle, character.transform);
         Destroy(clone.gameObject, particleDuration);

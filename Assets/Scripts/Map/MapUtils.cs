@@ -8,7 +8,7 @@ using static MapUtils.Type;
 
 namespace MapUtils 
 {
-	public enum Dir  { LEFT = 0, UP, RIGHT, DOWN };
+	public enum Dir  { LEFT = 0, UP, RIGHT, DOWN, NONE };
 	
 	public enum Type { LINE = 1, CORNER, ALLEY, INVALID };
 	
@@ -28,6 +28,22 @@ namespace MapUtils
 			else {
 				return (Dir) ndir;
 			}
+		}
+		public static Dir relativeDir(Pos a, Pos b)
+		{
+			Pos diff = b - a;
+			if (Math.Abs(diff.y) > Math.Abs(diff.x)) {
+				if (diff.y < 0)
+					return UP;
+				else if (diff.y > 0)
+					return DOWN;
+			} else {
+				if (diff.x < 0)
+					return LEFT;
+				else if (diff.x > 0)
+					return RIGHT;
+			}
+			return NONE;
 		}
 		public static string GetString(this Dir dir)
 		{
