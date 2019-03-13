@@ -85,6 +85,11 @@ public class MapManager : MonoBehaviour
 		}
 	}
 	
+	public List<Pos> get_path(Pos source, Pos dest)
+	{
+		return nav_map.find_shortest_path(source, dest);
+	}
+	
 	public bool move(Pos source, Pos dest)
 	{
 		if (!map[source.x, source.y].occupied 
@@ -92,7 +97,7 @@ public class MapManager : MonoBehaviour
 		 || !map[dest.x, dest.y].traversable)
 			return false;
 		
-		List<Pos> path = nav_map.find_shortest_path(source, dest);
+		List<Pos> path = get_path(source, dest);
 		GameAgent agent = map[source.x, source.y].resident;
 		
 		map[dest.x, dest.y].occupied = true;
@@ -123,5 +128,11 @@ public class MapManager : MonoBehaviour
 	public Vector3 grid_to_world(Pos pos)
 	{
 		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
+	}
+	
+	public Pos world_to_grid(Vector3 pos)
+	{
+		pos = pos + offset;
+		return new Pos((int) pos.x, (int) pos.z);
 	}
 }
