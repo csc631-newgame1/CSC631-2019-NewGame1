@@ -18,6 +18,7 @@ public class TileSelector : MonoBehaviour
 	private LineRenderer path_render;
 	private Player player_main;
     private List<Pos> selectableTiles;
+    private List<Pos> rejectedTiles;
 	
 	private int[,] map;
 
@@ -44,6 +45,7 @@ public class TileSelector : MonoBehaviour
 		selection_collider.size = collider_size;
 		
 		select_square = transform.Find("Selector");
+        rejectedTiles = new List<Pos>();
 	}
 	
 	// called by the Player script
@@ -104,9 +106,15 @@ public class TileSelector : MonoBehaviour
 
     // Gets the distance of the shortest path to the tiles
     // nondestructive method that doesn't remove any points from the path finding system
-    private int PathDistance(Pos source, Pos dest) {
-        List<Pos> path = map_manager.get_path(source, dest, true);
-        return path.Count;
+    private List<Pos> PrunePath(Pos source, List<Pos> selectableTiles) {
+        foreach (Pos selectableTile in selectableTiles) {
+            List<Pos> path = map_manager.get_path(source, selectableTile, true);
+            foreach (Pos tile in path) {
+                // if mapmanager says its traversable, then keep it
+                // if not then remove it from selectable tiles
+            }
+        }
+        return selectableTiles;
     }
 	
 	public void clear_path_line()
@@ -130,28 +138,32 @@ public class TileSelector : MonoBehaviour
     // Consider turning this static for enemy AI if this is the only method they need from this class
     public List<Pos> CreateListOfSelectableTiles(Pos position, int radius, MapManager mapManager, GameAgentAction action) {
         List<Pos> selectableTiles = new List<Pos>();
+        rejectedTiles = new List<Pos>();
 
-        int cellX = (int)(position.x / cell_size);
-        int cellY = (int)(position.y / cell_size);
-        int numOfCellsToScan = (int)(radius / cell_size);
-
-        int searchStartX = Mathf.Max(0, cellX - numOfCellsToScan);
-        int searchEndX = Mathf.Min(cellX + numOfCellsToScan, width - 1);
-        int searchStartY = Mathf.Max(0, cellY - numOfCellsToScan);
-        int searchEndY = Mathf.Min(cellY + numOfCellsToScan, height - 1);
+        int cellX = position.x;
+        int cellY = position.y;
+     
+        int searchStartX = Mathf.Max(0, cellX - radius);
+        int searchEndX = Mathf.Min(cellX + radius, width - 1);
+        int searchStartY = Mathf.Max(0, cellY - radius);
+        int searchEndY = Mathf.Min(cellY + radius, height - 1);
 
         if (action == GameAgentAction.Move) {
             for (int x = searchStartX; x <= searchEndX; x++) {
                 for (int y = searchStartY; y <= searchEndY; y++) {
-                    if (mapManager.IsTraversable(new Pos(x, y))) {
+                    Pos temp = new Pos(x, y);
+                    if (mapManager.IsTraversable(temp) && !mapManager.IsOccupied(temp)) {
                         int a = cellX - x;
                         int b = cellY - y;
-                        int c = (int)Mathf.Sqrt(a * a + b * b);
+                        int c = (int)(Mathf.Sqrt(a * a + b * b));
                         // PathDistance is used to make sure that a selectable tile within the radius
                         // is also within traveling range
                         // example: Two nearby islands - second island might be close enough to contain a tile within the radius, but it would require traveling around the entire map to get there
-                        if (c <= radius && radius >= PathDistance(position, new Pos(x, y))) {
-                            selectableTiles.Add(new Pos(x, y));
+                        if (c <= radius) {
+                            selectableTiles.Add(temp);
+                        } else {
+                            Debug.Log("Rejected because C: " + c + " Radius: " + radius + " PathDistance: " + PrunePath(position, temp) + " \tX: " + x + " Y: " + y + " position.x: " + position.x + " position.y: " + position.y + " A: " + a + " B: " + b);
+                            rejectedTiles.Add(temp);
                         }
                     }
                 }
@@ -173,6 +185,8 @@ public class TileSelector : MonoBehaviour
             }
         }
 
+        selectableTiles = PrunePath(position, selectableTiles);
+
         return selectableTiles;
     }
 
@@ -183,5 +197,14 @@ public class TileSelector : MonoBehaviour
             }
         }
         return false;
+    }
+
+    void OnDrawGizmos() {
+            if (rejectedTiles.Count > 0) {
+                foreach (Pos tile in rejectedTiles) {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(cell_size, 0, cell_size));
+                }
+            }
     }
 }
