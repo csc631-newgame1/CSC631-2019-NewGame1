@@ -55,6 +55,8 @@ public class TileSelector : MonoBehaviour
 	void Update()
 	{
         if (showPathLine && selectableTiles != null) {
+            // TODO Consider showing selectable tiles to the user here
+
             if (player_main.grid_pos != null) {
                 RaycastHit hit;
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
