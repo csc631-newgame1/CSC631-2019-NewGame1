@@ -27,8 +27,6 @@ public class Player : GameAgent
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
 
-    public Button Move, Action, Wait, Potion;
-	
 	CharacterAnimator animator;
 	
     // Gets references to necessary game components
