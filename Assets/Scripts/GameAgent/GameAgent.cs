@@ -4,6 +4,8 @@ using UnityEngine;
 
 using MapUtils;
 
+public enum GameAgentAction {Move = 0, Wait, Potion, MeleeAttack, RangedAttack, MagicAttack};
+
 public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;
@@ -21,7 +23,7 @@ public abstract class GameAgent : MonoBehaviour
 
     // commands from the action menu
     public abstract void move();
-    public abstract void action();
+    public abstract void act();
     public abstract void wait();
     public abstract void potion();
 }
