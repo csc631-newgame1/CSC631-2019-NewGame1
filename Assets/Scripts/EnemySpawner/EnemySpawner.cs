@@ -190,7 +190,11 @@ public class EnemySpawner : MonoBehaviour {
         for (int x = searchStartX; x <= searchEndX; x++) {
             for (int y = searchStartY; y <= searchEndY; y++) {
                 if (mapManager.IsTraversable(new Pos(x, y))) {
-                    zoneTiles.Add(new Vector3(x, y));
+                    int a = cellX - x;
+                    int b = cellY - y;
+                    if (Mathf.Sqrt(a*a + b*b) <= spawnZoneRadius) {
+                        zoneTiles.Add(new Vector3(x, y));
+                    }
                 }
             }
         }
