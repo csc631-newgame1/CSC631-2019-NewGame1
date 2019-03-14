@@ -11,8 +11,9 @@ public class TileSelector : MonoBehaviour
 	private int height;
 	private float cell_size;
 	private Vector3 offset;
-	
-	private Transform select_square;
+    private bool showPathLine;
+
+    private Transform select_square;
 	private MapManager map_manager;
 	private LineRenderer path_render;
 	private Player player_main;
@@ -20,7 +21,7 @@ public class TileSelector : MonoBehaviour
 	
 	private int[,] map;
 
-    private bool showPathLine = false;
+    private bool showSelectableTiles = false;
 	
 	public Vector3 hover_position;
 	public Pos grid_position;
@@ -54,7 +55,7 @@ public class TileSelector : MonoBehaviour
 	
 	void Update()
 	{
-        if (showPathLine && selectableTiles != null) {
+        if (showSelectableTiles && selectableTiles != null) {
             // TODO Consider showing selectable tiles to the user here
 
             if (player_main.grid_pos != null) {
@@ -73,7 +74,7 @@ public class TileSelector : MonoBehaviour
                             if (grid_position != test_grid_position)
                                 grid_position = test_grid_position;
 
-                            if (grid_position != player_main.grid_pos && !player_main.moving)
+                            if (grid_position != player_main.grid_pos && !player_main.moving && showPathLine)
                                 render_path_line(player_main.grid_pos, grid_position);
 
                             hover_position = map_manager.grid_to_world(grid_position);
@@ -116,9 +117,13 @@ public class TileSelector : MonoBehaviour
 		path_render.SetPositions(blank);
 	}
 
-    public void ShowPathLine(bool option, List<Pos> selectableTiles = null) {
-        showPathLine = option;
+    public void ShowSelectableTiles(bool option, List<Pos> selectableTiles = null) {
+        showSelectableTiles = option;
         this.selectableTiles = selectableTiles;
+    }
+
+    public void ShowPathLine(bool showPathLine) {
+        this.showPathLine = showPathLine;
     }
 
     // Creates a list of all selectable tiles within a given radius of a position
