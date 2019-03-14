@@ -109,4 +109,35 @@ public class TileSelector : MonoBehaviour
     public void ShowPathLine(bool option) {
         showPathLine = option;
     }
+
+    // Creates a list of all selectable tiles within a given radius of a position
+    // Consider turning this static for enemy AI if this is the only method they need from this class
+    public List<Pos> CreateListOfSelectableTiles(Pos position, int radius, MapManager mapManager, GameAgentAction action) {
+        List<Pos> selectableTiles = new List<Pos>();
+
+        int cellX = (int)(position.x / cell_size);
+        int cellY = (int)(position.y / cell_size);
+        int numOfCellsToScan = (int)(radius / cell_size);
+
+        int searchStartX = Mathf.Max(0, cellX - numOfCellsToScan);
+        int searchEndX = Mathf.Min(cellX + numOfCellsToScan, width - 1);
+        int searchStartY = Mathf.Max(0, cellY - numOfCellsToScan);
+        int searchEndY = Mathf.Min(cellY + numOfCellsToScan, height - 1);
+
+        if (action == GameAgentAction.Move) {
+            for (int x = searchStartX; x <= searchEndX; x++) {
+                for (int y = searchStartY; y <= searchEndY; y++) {
+                    if (mapManager.IsTraversable(new Pos(x, y))) {
+                        int a = cellX - x;
+                        int b = cellY - y;
+                        if (Mathf.Sqrt(a * a + b * b) <= radius) {
+                            selectableTiles.Add(new Pos(x, y));
+                        }
+                    }
+                }
+            }
+        }
+
+        return selectableTiles;
+    }
 }

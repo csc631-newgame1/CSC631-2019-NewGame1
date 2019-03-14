@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void ActionPlayer() {
-        clone.GetComponent<Player>().action();
+        clone.GetComponent<Player>().act();
     }
 
     public void WaitPlayer() {

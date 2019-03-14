@@ -29,7 +29,7 @@ public class TestEnemy : GameAgent
 
         this.stats = stats;
         attack = stats.attack;
-        health = stats.health;
+        health = stats.maxHealth;
         range = stats.range;
         speed = stats.speed;
     }
@@ -47,7 +47,7 @@ public class TestEnemy : GameAgent
     public override void move() {
     }
 
-    public override void action() {
+    public override void act() {
     }
 
     public override void wait() {

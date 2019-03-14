@@ -1,26 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using MapUtils;
-using static MapUtils.MapConstants;
-using static MapUtils.EnumUtils;
-using UnityEngine.UI;
+
 
 public class Player : GameAgent
 {
 	private MapManager map_manager; // reference to MapManager instance with map data
 	private TileSelector tile_selector; // reference to map tile selector
-    private List<>
 	
 	// private reference to position in map grid
-	public Pos grid_pos;
     public bool hoveringMovementTileSelector = false;
 	public bool moving = false;
     public bool hoveringActionTileSelector = false;
 	
 	private int move_budget;
-	private int health = 100;
+	private int currentHealth;
 	private bool player_turn = false;
 	
 	public float speed;
@@ -64,7 +59,7 @@ public class Player : GameAgent
 	
 	public override void take_damage(int amount)
 	{
-		health -= amount;
+		currentHealth -= amount;
 	}
 	
 	public override void take_turn()
@@ -125,7 +120,7 @@ public class Player : GameAgent
         tile_selector.ShowPathLine(true);
     }
 
-    public override void action() {
+    public override void act() {
         Debug.Log("Attack Action");
     }
 
