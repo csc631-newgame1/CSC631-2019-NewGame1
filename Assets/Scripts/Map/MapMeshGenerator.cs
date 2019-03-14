@@ -302,8 +302,9 @@ public class MapMeshGenerator : MonoBehaviour
 		 */
 		
 		Renderer rend = GetComponent<Renderer>();
-		Texture2D texture = Instantiate(rend.material.mainTexture) as Texture2D;
-		rend.material.mainTexture = texture;
+		Texture2D texture = new Texture2D(512, 1);
+		texture.wrapMode = TextureWrapMode.Repeat;
+		rend.material.SetTexture("_FluidGradient", texture);
 		
 		Color[] colors = new Color[512];
 		for (int x = 0; x < 512; x++) {
@@ -311,7 +312,7 @@ public class MapMeshGenerator : MonoBehaviour
 		}
 		
 		texture.SetPixels(colors);
-		texture.Apply(false);
+		texture.Apply(true);
 		
 		/* STEP 7: FINALISATION
 		 * Assigns vertices, triangles, and uvs to mesh
