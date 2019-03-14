@@ -16,7 +16,7 @@ public class Player : GameAgent
 	public bool moving = false;
     public bool hoveringActionTileSelector = false;
 	
-	private int move_budget;
+	private int move_budget = 8;
 	private int currentHealth;
 	private bool player_turn = false;
 	
@@ -30,14 +30,15 @@ public class Player : GameAgent
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
     {
-        tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
-		tile_selector.setPlayer(this);
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
         config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         grid_pos = position;
 		animator = GetComponent<CharacterAnimator>();
         this.stats = stats;
         selectableTiles = new List<Pos>();
+		
+		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
+		tile_selector.setPlayer(this);
     }
 
 	// if right mouse button is pressed, move player model to hover position
@@ -45,7 +46,9 @@ public class Player : GameAgent
     void Update()
     {
 		if (Input.GetMouseButtonDown(1) && !moving && hoveringActionTileSelector) {
+			
 			if (map_manager.move(grid_pos, tile_selector.grid_position)) {
+
 				grid_pos = tile_selector.grid_position;
                 hoveringActionTileSelector = false;
                 tile_selector.ShowPathLine(false);
@@ -120,9 +123,9 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
-        selectableTiles = tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.speed, map_manager, GameAgentAction.Move);
         hoveringActionTileSelector = true;
-        tile_selector.ShowPathLine(true, selectableTiles);
+		tile_selector.CreateListOfSelectableTiles(grid_pos, move_budget);
+        tile_selector.showPathLine = true;
     }
 
     public override void act() {
@@ -135,17 +138,5 @@ public class Player : GameAgent
 
     public override void potion() {
         Debug.Log("Potion Action");
-    }
-
-    void OnDrawGizmos() {
-        if (hoveringActionTileSelector) {
-            List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
-
-            if (selectableTiles.Count > 0) {
-                foreach (Pos tile in selectableTiles) {
-                    Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(config.cell_size, 0, config.cell_size));
-                }
-            }
-        }
     }
 }

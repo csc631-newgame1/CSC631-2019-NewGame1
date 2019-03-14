@@ -80,6 +80,10 @@ namespace MapUtils
 			this.x = x;
 			this.y = y;
 		}
+		public static bool in_bounds(Pos p, int width, int height)
+		{
+			return p.x < width && p.x >= 0 && p.y < height && p.y >= 0;
+		}
 		public static int abs_dist(Pos a, Pos b)
 		{
 			return Math.Abs(a.x - b.x) + Math.Abs(a.y - b.y);
