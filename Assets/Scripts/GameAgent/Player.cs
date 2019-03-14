@@ -51,7 +51,7 @@ public class Player : GameAgent
 
 				grid_pos = tile_selector.grid_position;
                 hoveringActionTileSelector = false;
-                tile_selector.ShowPathLine(false);
+                tile_selector.showPathLine = false;
 			}
 		}
 
