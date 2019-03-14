@@ -285,7 +285,7 @@ public class NavigationHandler
 		return min;
 	}
 	
-	public List<Pos> find_shortest_path(Pos p_origin, Pos p_target)
+	public List<Pos> find_shortest_path(Pos p_origin, Pos p_target, bool nondestructive = false)
 	{
 		Vertex source = insert_vertex_at(p_origin);
 		Vertex target = insert_vertex_at(p_target);
@@ -319,11 +319,13 @@ public class NavigationHandler
 			curr_vert = curr_vert.prev;
 		}
 		path.Push(source.pos);
-		
-		// post path-finding cleanup
-		remove_vertex_at(p_origin);
-		remove_vertex_at(p_target);
-		clean_up_graph();
+
+        // post path-finding cleanup
+        if (!nondestructive) {
+            remove_vertex_at(p_origin);
+            remove_vertex_at(p_target);
+            clean_up_graph();
+        }
 		
 		return clean_up_path(path);
 	}
