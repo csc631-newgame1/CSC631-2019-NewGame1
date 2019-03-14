@@ -11,6 +11,7 @@ public class Player : GameAgent
 {
 	private MapManager map_manager; // reference to MapManager instance with map data
 	private TileSelector tile_selector; // reference to map tile selector
+    private List<>
 	
 	// private reference to position in map grid
 	public Pos grid_pos;
