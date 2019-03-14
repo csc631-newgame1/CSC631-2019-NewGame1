@@ -13,7 +13,9 @@ public class Player : GameAgent
 	
 	// private reference to position in map grid
 	public Pos grid_pos;
+    public bool hoveringMovementTileSelector = false;
 	public bool moving = false;
+    public bool hoveringActionTileSelector = false;
 	
 	private int move_budget;
 	private int health = 100;
@@ -109,14 +111,25 @@ public class Player : GameAgent
         return false;
     }
 
-    void move()
-    {
-        
-    }
-
 	public void FootR(){}
 	public void FootL(){}
 	public void Hit(){}
 	public void Shoot(){}
 	public void WeaponSwitch(){}
+
+    public override void move() {
+        Debug.Log("Move Action");
+    }
+
+    public override void action() {
+        Debug.Log("Attack Action");
+    }
+
+    public override void wait() {
+        Debug.Log("Wait Action");
+    }
+
+    public override void potion() {
+        Debug.Log("Potion Action");
+    }
 }

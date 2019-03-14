@@ -43,4 +43,16 @@ public class TestEnemy : GameAgent
 
     public override void take_turn() {
     }
+
+    public override void move() {
+    }
+
+    public override void action() {
+    }
+
+    public override void wait() {
+    }
+
+    public override void potion() {
+    }
 }

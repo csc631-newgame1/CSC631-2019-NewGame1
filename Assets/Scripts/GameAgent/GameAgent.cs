@@ -18,4 +18,10 @@ public abstract class GameAgent : MonoBehaviour
 	// for enemies, this will make them go through their AI motions
 	// for players, this will trigger the boolean value that allows them to take their turn
 	public abstract void take_turn();
+
+    // commands from the action menu
+    public abstract void move();
+    public abstract void action();
+    public abstract void wait();
+    public abstract void potion();
 }
