@@ -85,9 +85,9 @@ public class MapManager : MonoBehaviour
 		}
 	}
 	
-	public List<Pos> get_path(Pos source, Pos dest)
+	public List<Pos> get_path(Pos source, Pos dest, bool nondestructive = false)
 	{
-		return nav_map.find_shortest_path(source, dest);
+		return nav_map.find_shortest_path(source, dest, nondestructive);
 	}
 	
 	public bool move(Pos source, Pos dest)

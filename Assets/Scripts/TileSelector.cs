@@ -54,7 +54,7 @@ public class TileSelector : MonoBehaviour
 	
 	void Update()
 	{
-        if (showPathLine) {
+        if (showPathLine && selectableTiles != null) {
             if (player_main.grid_pos != null) {
                 RaycastHit hit;
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -64,7 +64,7 @@ public class TileSelector : MonoBehaviour
                     int hity = (int)(diff.z / cell_size);
                     // subtract one half of a cell's length so that the square will be centered
                     if (hitx >= 0 && hitx < width && hity >= 0 && hity < height) {
-                        if (map_manager.IsTraversable(new Pos(hitx, hity))) {
+                        if (IsContainedInSelectableTiles(new Pos(hitx, hity))) {
 
                             Pos test_grid_position = new Pos(hitx, hity);
 
@@ -98,6 +98,13 @@ public class TileSelector : MonoBehaviour
 		path_render.positionCount = path.Count;
 		path_render.SetPositions(path_verts);
 	}
+
+    // Gets the distance of the shortest path to the tiles
+    // nondestructive method that doesn't remove any points from the path finding system
+    private int PathDistance(Pos source, Pos dest) {
+        List<Pos> path = map_manager.get_path(source, dest, true);
+        return path.Count;
+    }
 	
 	public void clear_path_line()
 	{
@@ -132,7 +139,11 @@ public class TileSelector : MonoBehaviour
                     if (mapManager.IsTraversable(new Pos(x, y))) {
                         int a = cellX - x;
                         int b = cellY - y;
-                        if (Mathf.Sqrt(a * a + b * b) <= radius) {
+                        int c = (int)Mathf.Sqrt(a * a + b * b);
+                        // PathDistance is used to make sure that a selectable tile within the radius
+                        // is also within traveling range
+                        // example: Two nearby islands - second island might be close enough to contain a tile within the radius, but it would require traveling around the entire map to get there
+                        if (c <= radius && radius >= PathDistance(position, new Pos(x, y))) {
                             selectableTiles.Add(new Pos(x, y));
                         }
                     }
@@ -141,5 +152,14 @@ public class TileSelector : MonoBehaviour
         }
 
         return selectableTiles;
+    }
+
+    private bool IsContainedInSelectableTiles(Pos pos) {
+        foreach (Pos tile in selectableTiles) {
+            if (tile == pos) {
+                return true;
+            }
+        }
+        return false;
     }
 }

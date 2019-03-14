@@ -122,7 +122,7 @@ public class Player : GameAgent
     public override void move() {
         selectableTiles = tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.speed, map_manager, GameAgentAction.Move);
         hoveringActionTileSelector = true;
-        tile_selector.ShowPathLine(true);
+        tile_selector.ShowPathLine(true, selectableTiles);
     }
 
     public override void act() {
