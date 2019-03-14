@@ -53,7 +53,7 @@ public class Player : GameAgent
         if (Input.GetKeyDown("2")) StartCoroutine(animator.PlayAttackAnimation());
         if (Input.GetKeyDown("3")) StartCoroutine(animator.PlayUseItemAnimation());
         if (Input.GetKeyDown("4")) StartCoroutine(animator.PlayHitAnimation());
-        if (Input.GetKeyDown("5")) StartCoroutine(animator.PlayBlockedAnimation());
+        if (Input.GetKeyDown("5")) StartCoroutine(animator.PlayBlockAnimation());
         if (Input.GetKeyDown("6")) StartCoroutine(animator.PlayKilledAimation());
     }
 	
