@@ -48,6 +48,7 @@ public class Player : GameAgent
 			if (map_manager.move(grid_pos, tile_selector.grid_position)) {
 				grid_pos = tile_selector.grid_position;
                 hoveringActionTileSelector = false;
+                tile_selector.ShowSelectableTiles(false);
                 tile_selector.ShowPathLine(false);
 			}
 		}
@@ -122,10 +123,12 @@ public class Player : GameAgent
     public override void move() {
         selectableTiles = tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.speed, map_manager, GameAgentAction.Move);
         hoveringActionTileSelector = true;
-        tile_selector.ShowPathLine(true, selectableTiles);
+        tile_selector.ShowSelectableTiles(true, selectableTiles);
+        tile_selector.ShowPathLine(true);
     }
 
     public override void act() {
+        selectableTiles = tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.speed, map_manager, GameAgentAction.MeleeAttack);
         Debug.Log("Attack Action");
     }
 
