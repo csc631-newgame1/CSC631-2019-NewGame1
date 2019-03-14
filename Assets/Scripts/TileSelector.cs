@@ -18,6 +18,8 @@ public class TileSelector : MonoBehaviour
 	private Player player_main;
 	
 	private int[,] map;
+
+    private bool showPathLine = false;
 	
 	public Vector3 hover_position;
 	public Pos grid_position;
@@ -51,35 +53,36 @@ public class TileSelector : MonoBehaviour
 	
 	void Update()
 	{
-		if (player_main.grid_pos != null) {
-			RaycastHit hit;
-			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if (Physics.Raycast(ray, out hit)) {
-				Vector3 diff = hit.point + offset;
-				int hitx = (int) (diff.x / cell_size);
-				int hity = (int) (diff.z / cell_size);
-				// subtract one half of a cell's length so that the square will be centered
-				if (hitx >= 0 && hitx < width && hity >= 0 && hity < height) {
-					if (map_manager.IsTraversable(new Pos(hitx, hity))) {
-						
-						Pos test_grid_position = new Pos(hitx, hity);
-						
-						if (grid_position != test_grid_position)
-							grid_position = test_grid_position;
-							
-						if (grid_position != player_main.grid_pos && !player_main.moving)
-							render_path_line(player_main.grid_pos, grid_position);
-						
-						hover_position = map_manager.grid_to_world(grid_position);
-						select_square.gameObject.SetActive(true);
-						select_square.position = hover_position;
-					}
-					else {
-						select_square.gameObject.SetActive(false);
-					}
-				}
-			}
-		}
+        if (showPathLine) {
+            if (player_main.grid_pos != null) {
+                RaycastHit hit;
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit)) {
+                    Vector3 diff = hit.point + offset;
+                    int hitx = (int)(diff.x / cell_size);
+                    int hity = (int)(diff.z / cell_size);
+                    // subtract one half of a cell's length so that the square will be centered
+                    if (hitx >= 0 && hitx < width && hity >= 0 && hity < height) {
+                        if (map_manager.IsTraversable(new Pos(hitx, hity))) {
+
+                            Pos test_grid_position = new Pos(hitx, hity);
+
+                            if (grid_position != test_grid_position)
+                                grid_position = test_grid_position;
+
+                            if (grid_position != player_main.grid_pos && !player_main.moving)
+                                render_path_line(player_main.grid_pos, grid_position);
+
+                            hover_position = map_manager.grid_to_world(grid_position);
+                            select_square.gameObject.SetActive(true);
+                            select_square.position = hover_position;
+                        } else {
+                            select_square.gameObject.SetActive(false);
+                        }
+                    }
+                }
+            }
+        }
 	}
 	
 	void render_path_line(Pos source, Pos dest)
@@ -102,4 +105,8 @@ public class TileSelector : MonoBehaviour
 		Vector3[] blank = new Vector3[0];
 		path_render.SetPositions(blank);
 	}
+
+    public void ShowPathLine(bool option) {
+        showPathLine = option;
+    }
 }
