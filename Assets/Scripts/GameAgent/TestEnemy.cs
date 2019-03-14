@@ -16,11 +16,10 @@ public class TestEnemy : GameAgent
 
     [Header("Enemy Stats")]
     public float attack;
-    public float health;
+    public float maxHealth;
+    public float currentHealth;
     public float range;
     public float speed;
-
-    Animator animator;
 
     public override void init_agent(Pos position, GameAgentStats stats) {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
@@ -29,7 +28,8 @@ public class TestEnemy : GameAgent
 
         this.stats = stats;
         attack = stats.attack;
-        health = stats.maxHealth;
+        maxHealth = stats.maxHealth;
+        currentHealth = maxHealth;
         range = stats.range;
         speed = stats.speed;
     }
@@ -39,6 +39,8 @@ public class TestEnemy : GameAgent
     }
 
     public override void take_damage(int amount) {
+        stats.currentHealth -= amount;
+        currentHealth = stats.currentHealth;
     }
 
     public override void take_turn() {

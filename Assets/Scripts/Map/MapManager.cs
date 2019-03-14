@@ -115,6 +115,13 @@ public class MapManager : MonoBehaviour
         }
         return map[pos.x, pos.y].traversable;
     }
+
+    public bool IsOccupied(Pos pos) {
+        if (pos.x < 0 || pos.x >= map.GetLength(0) || pos.y < 0 || pos.y >= map.GetLength(1)) {
+            return false;
+        }
+        return map[pos.x, pos.y].occupied;
+    }
 	
 	public bool attack(Pos dest, int damage_amount)
 	{

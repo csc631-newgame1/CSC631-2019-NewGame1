@@ -10,6 +10,7 @@ public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;
     protected GameAgentStats stats;
+    protected GameAgentAction currentAction;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	

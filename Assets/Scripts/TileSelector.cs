@@ -158,6 +158,21 @@ public class TileSelector : MonoBehaviour
             }
         }
 
+        if (action == GameAgentAction.MeleeAttack) {
+            if (mapManager.IsOccupied(new Pos(cellX + 1, cellY))) {
+                selectableTiles.Add(new Pos(cellX + 1, cellY));
+            }
+            if (mapManager.IsOccupied(new Pos(cellX - 1, cellY))) {
+                selectableTiles.Add(new Pos(cellX - 1, cellY));
+            }
+            if (mapManager.IsOccupied(new Pos(cellX, cellY + 1))) {
+                selectableTiles.Add(new Pos(cellX, cellY + 1));
+            }
+            if (mapManager.IsOccupied(new Pos(cellX, cellY - 1))) {
+                selectableTiles.Add(new Pos(cellX, cellY - 1));
+            }
+        }
+
         return selectableTiles;
     }
 
