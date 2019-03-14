@@ -5,6 +5,7 @@ using UnityEngine;
 using MapUtils;
 using static MapUtils.MapConstants;
 using static MapUtils.EnumUtils;
+using UnityEngine.UI;
 
 public class Player : GameAgent
 {
@@ -25,6 +26,8 @@ public class Player : GameAgent
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
+
+    public Button Move, Action, Wait, Potion;
 	
 	CharacterAnimator animator;
 	
@@ -33,7 +36,6 @@ public class Player : GameAgent
     {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
 		tile_selector.setPlayer(this);
-		
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
 		grid_pos = position;
 		animator = GetComponent<CharacterAnimator>();
@@ -44,9 +46,11 @@ public class Player : GameAgent
 	// if hover position is on a bridge tile, change the player model
     void Update()
     {
-		if (Input.GetMouseButtonDown(1) && !moving) {
+		if (Input.GetMouseButtonDown(1) && !moving && hoveringActionTileSelector) {
 			if (map_manager.move(grid_pos, tile_selector.grid_position)) {
 				grid_pos = tile_selector.grid_position;
+                hoveringActionTileSelector = false;
+                tile_selector.ShowPathLine(false);
 			}
 		}
 
@@ -118,7 +122,8 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
-        Debug.Log("Move Action");
+        hoveringActionTileSelector = true;
+        tile_selector.ShowPathLine(true);
     }
 
     public override void action() {
