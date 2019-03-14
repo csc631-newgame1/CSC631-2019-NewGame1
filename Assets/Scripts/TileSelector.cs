@@ -16,6 +16,7 @@ public class TileSelector : MonoBehaviour
 	private MapManager map_manager;
 	private LineRenderer path_render;
 	private Player player_main;
+    private List<Pos> selectableTiles;
 	
 	private int[,] map;
 
@@ -106,8 +107,9 @@ public class TileSelector : MonoBehaviour
 		path_render.SetPositions(blank);
 	}
 
-    public void ShowPathLine(bool option) {
+    public void ShowPathLine(bool option, List<Pos> selectableTiles = null) {
         showPathLine = option;
+        this.selectableTiles = selectableTiles;
     }
 
     // Creates a list of all selectable tiles within a given radius of a position

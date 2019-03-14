@@ -7,7 +7,9 @@ using MapUtils;
 public class Player : GameAgent
 {
 	private MapManager map_manager; // reference to MapManager instance with map data
+    private MapConfiguration config;
 	private TileSelector tile_selector; // reference to map tile selector
+    private List<Pos> selectableTiles;
 	
 	// private reference to position in map grid
     public bool hoveringMovementTileSelector = false;
@@ -31,9 +33,11 @@ public class Player : GameAgent
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
 		tile_selector.setPlayer(this);
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
-		grid_pos = position;
+        config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
+        grid_pos = position;
 		animator = GetComponent<CharacterAnimator>();
         this.stats = stats;
+        selectableTiles = new List<Pos>();
     }
 
 	// if right mouse button is pressed, move player model to hover position
@@ -116,6 +120,7 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
+        selectableTiles = tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.speed, map_manager, GameAgentAction.Move);
         hoveringActionTileSelector = true;
         tile_selector.ShowPathLine(true);
     }
@@ -130,5 +135,17 @@ public class Player : GameAgent
 
     public override void potion() {
         Debug.Log("Potion Action");
+    }
+
+    void OnDrawGizmos() {
+        if (hoveringActionTileSelector) {
+            List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
+
+            if (selectableTiles.Count > 0) {
+                foreach (Pos tile in selectableTiles) {
+                    Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(config.cell_size, 0, config.cell_size));
+                }
+            }
+        }
     }
 }
