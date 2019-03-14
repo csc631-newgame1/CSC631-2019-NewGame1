@@ -161,6 +161,7 @@ public class Player : GameAgent
 
             if (selectableTiles.Count > 0) {
                 foreach (Pos tile in selectableTiles) {
+                    Gizmos.color = Color.green;
                     Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(config.cell_size, 0, config.cell_size));
                 }
             }
