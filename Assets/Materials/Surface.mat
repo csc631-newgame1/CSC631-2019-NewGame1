@@ -47,13 +47,17 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _FluidTex:
-        m_Texture: {fileID: 2800000, guid: 188986f6af92a334c8b22f1bb58d2b98, type: 3}
-        m_Scale: {x: 0.05, y: 0.05}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
+    - _FluidGradient:
         m_Texture: {fileID: 2800000, guid: 018989f0461e1dd48ac9d4470217bbdf, type: 3}
         m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FluidTex:
+        m_Texture: {fileID: 2800000, guid: 188986f6af92a334c8b22f1bb58d2b98, type: 3}
+        m_Scale: {x: 0.005, y: 0.005}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: ad6033380fee6904f812569dd899876f, type: 3}
+        m_Scale: {x: 0.25, y: 0.25}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
@@ -68,8 +72,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BaseIntensity: 0.584
-    - _Bias: 0
+    - _BaseIntensity: 0.676
+    - _Bias: -0.033
     - _BlendOp: 0
     - _BumpScale: 1
     - _CameraFadingEnabled: 0
@@ -77,7 +81,7 @@ Material:
     - _CameraNearFadeDistance: 1
     - _Cull: 2
     - _Cutoff: 0.5
-    - _Detail: 0.29
+    - _Detail: 0.122
     - _DetailNormalMapScale: 1
     - _DistortionBlend: 0.5
     - _DistortionEnabled: 0
@@ -95,7 +99,7 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _Oscillation: 0.214
+    - _Oscillation: 0.06
     - _Parallax: 0
     - _Shininess: 1
     - _SmoothnessTextureChannel: 0
