@@ -32,6 +32,8 @@ public class TestEnemy : GameAgent
         health = stats.maxHealth;
         range = stats.range;
         speed = stats.speed;
+
+        TurnManager.instance.AddEnemyToList(this);
     }
 
     public override IEnumerator smooth_movement(List<Pos> locations) {

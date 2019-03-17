@@ -18,7 +18,8 @@ public class Player : GameAgent
 	
 	private int move_budget = 8;
 	private int currentHealth;
-	private bool player_turn = false;
+	public bool player_turn = true;
+    private bool playerMovedThisTurn = false;
 	
 	public float speed;
 
@@ -39,6 +40,8 @@ public class Player : GameAgent
 		
 		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
 		tile_selector.setPlayer(this);
+
+        TurnManager.instance.AddPlayerToList(this); //add player to player list
     }
 
 	// if right mouse button is pressed, move player model to hover position
@@ -72,6 +75,7 @@ public class Player : GameAgent
 	public override void take_turn()
 	{
 		player_turn = true;
+        playerMovedThisTurn = false;
 	}
 	
 	public override IEnumerator smooth_movement(List<Pos> path)
@@ -102,6 +106,7 @@ public class Player : GameAgent
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
 		tile_selector.clear_path_line();
+        playerMovedThisTurn = true;
 	}
 	
     void spawnActionRadius()
@@ -123,6 +128,8 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
+        if (playerMovedThisTurn)
+            return;
         hoveringActionTileSelector = true;
 		tile_selector.CreateListOfSelectableTiles(grid_pos, move_budget);
         tile_selector.showPathLine = true;
@@ -130,13 +137,16 @@ public class Player : GameAgent
 
     public override void act() {
         Debug.Log("Attack Action");
+        player_turn = false;
     }
 
     public override void wait() {
         Debug.Log("Wait Action");
+        player_turn = false;
     }
 
     public override void potion() {
         Debug.Log("Potion Action");
+        player_turn = false;
     }
 }
