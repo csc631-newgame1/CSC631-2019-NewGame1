@@ -14,7 +14,7 @@ public class TurnManager : MonoBehaviour
     //list of all enemy units, used to issue them commands
     //NOTE: probably make another abstract class for enemies?
     private List<TestEnemy> enemies;
-    private bool enemiesMoving; //boolean to check if enemies are moving
+    private bool enemiesMoving = false; //boolean to check if enemies are moving
 
     public float turnDelay = 0.1f; //for setting a turn delay?
 
@@ -54,6 +54,21 @@ public class TurnManager : MonoBehaviour
     public void AddEnemyToList(TestEnemy enemy)
     {
         enemies.Add(enemy);
+    }
+
+    public void RemovePlayerFromList(Player player)
+    {
+        players.Remove(player);
+    }
+
+    public void RemoveEnemyFromList(TestEnemy enemy)
+    {
+        enemies.Remove(enemy);
+    }
+
+    public void ClearEnemyList()
+    {
+        enemies.Clear();
     }
 
     IEnumerator MoveEnemies()
