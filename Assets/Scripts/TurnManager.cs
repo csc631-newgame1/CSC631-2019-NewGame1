@@ -38,7 +38,7 @@ public class TurnManager : MonoBehaviour
 
     void Update()
     {
-        //CheckIfPlayersMoved();
+        CheckIfPlayersMoved();
 
         if (playersTurn || enemiesMoving)
             return;
@@ -60,6 +60,8 @@ public class TurnManager : MonoBehaviour
     {
         enemiesMoving = true;
 
+        Debug.Log("Enemy turn");
+
         //possibly set turn delay?
         yield return new WaitForSeconds(turnDelay);
 
@@ -70,25 +72,36 @@ public class TurnManager : MonoBehaviour
 
         for (int i = 0; i < enemies.Count; i++)
         {
-            //enemies.MoveEnemy();
+            enemies[i].take_turn(); //or whatever the action for enemies are
             //turn delay per enemy movement?
             //yield return new WaitForSeconds(enemies[i].moveTime);
         }
 
-        playersTurn = true;
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].take_turn(); //allow players to act again
+        }
+
+        Debug.Log("Player turn start");
+
+        playersTurn = true; //set player turn to true
 
         enemiesMoving = false;
     }
 
     void CheckIfPlayersMoved()
     {
-        //hypothetical; iterate through players to check a bool variable for if they've finished their actions for that turn
-        //if one hasn't, exit out of this function
-        //else, set playersTurn to false
-        for (int i = 0; i < players.Count; i++) {
-            //if (players[i].turnBool)
-            //  return;
+        if (!playersTurn)
+        {
+            return;
         }
+
+        for (int i = 0; i < players.Count; i++) {
+            if (players[i].player_turn)
+              return;
+        }
+
+        Debug.Log("Player turn over");
 
         playersTurn = false;
     }
