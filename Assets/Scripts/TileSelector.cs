@@ -49,6 +49,7 @@ public class TileSelector : MonoBehaviour
 	private Player player_main;
 
     private List<Path> selectableMovementTiles;
+    private List<Pos> selectableActTiles;
 
     private int[,] map;
 
@@ -57,6 +58,7 @@ public class TileSelector : MonoBehaviour
 
     public Vector3 hover_position;
 	public Pos grid_position;
+
 	
 	// called by the mapGenerator script
 	public void init_tile_selector(int[,] map)
@@ -144,7 +146,7 @@ public class TileSelector : MonoBehaviour
 	
     // Creates a list of all selectable tiles within a given radius of a position
     // Consider turning this static for enemy AI if this is the only method they need from this class
-    public void CreateListOfSelectableTiles(Pos position, int move_budget, GameAgentAction action) 
+    public void CreateListOfSelectableMovementTiles(Pos position, int move_budget, GameAgentAction action) 
 	{	
         selectableMovementTiles = new List<Path>();
 		
@@ -181,6 +183,31 @@ public class TileSelector : MonoBehaviour
                         if (path.distance() <= move_budget) {
                             selectableMovementTiles.Add(path);
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    // Creates a list of all selectable tiles within a given radius of a position
+    // Consider turning this static for enemy AI if this is the only method they need from this class
+    public void CreateListOfSelectableActTiles(Pos position, int move_budget, GameAgentAction action) {
+        selectableActTiles = new List<Pos>();
+
+        int startx = position.x - move_budget >= 0 ? position.x - move_budget : 0;
+        int endx = position.x + move_budget < width ? position.x + move_budget : width - 1;
+
+        int starty = position.y - move_budget >= 0 ? position.y - move_budget : 0;
+        int endy = position.y + move_budget < height ? position.y + move_budget : height - 1;
+
+        // TODO figure out if you are going to create a new method that doesn't fuck around with the List<Path>
+        if (action == GameAgentAction.MeleeAttack) {
+            for (int x = startx; x <= endx; x++) {
+                for (int y = starty; y <= endy; y++) {
+
+                    Pos candidate = new Pos(x, y);
+                    if (map_manager.IsOccupied(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+                        selectableActTiles.Add(candidate);
                     }
                 }
             }

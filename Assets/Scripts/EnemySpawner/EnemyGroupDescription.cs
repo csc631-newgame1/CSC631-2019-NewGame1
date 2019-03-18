@@ -37,19 +37,19 @@ public class EnemyGroupDescription
     }
 
     public float GetAttackWithVariance() {
-        return Mathf.Max(stats.attack / 2, (stats.attack + (Random.Range(-attackVariance, attackVariance) * stats.attack)));
+        return Mathf.RoundToInt(Mathf.Max(stats.attack / 2, (stats.attack + (Random.Range(-attackVariance, attackVariance) * stats.attack))));
     }
 
     public float GetHealthWithVariance() {
-        return Mathf.Max(stats.maxHealth / 2, (stats.maxHealth + (Random.Range(-healthVariance, healthVariance) * stats.maxHealth)));
+        return Mathf.RoundToInt(Mathf.Max(stats.maxHealth / 2, (stats.maxHealth + (Random.Range(-healthVariance, healthVariance) * stats.maxHealth))));
     }
 
     public float GetRangeWithVariance() {
-        return Mathf.Max(stats.range / 2, (stats.range + (Random.Range(-rangeVariance, rangeVariance) * stats.range)));
+        return Mathf.RoundToInt(Mathf.Max(stats.range / 2, (stats.range + (Random.Range(-rangeVariance, rangeVariance) * stats.range))));
     }
 
     public float GetSpeedWithVariance() {
-        return Mathf.Max(stats.speed / 2, (stats.speed + (Random.Range(-speedVariance, speedVariance) * stats.speed)));
+        return Mathf.RoundToInt(Mathf.Max(stats.speed / 2, (stats.speed + (Random.Range(-speedVariance, speedVariance) * stats.speed))));
     }
 
     public float GetPowerLevel() {
@@ -61,5 +61,6 @@ public class EnemyGroupDescription
         powerLevel += stats.maxHealth * stats.maxHealth;
         powerLevel *= Mathf.Sqrt(stats.range);
         powerLevel *= Mathf.Sqrt(stats.speed);
+        powerLevel = Mathf.RoundToInt(powerLevel);
     }
 }
