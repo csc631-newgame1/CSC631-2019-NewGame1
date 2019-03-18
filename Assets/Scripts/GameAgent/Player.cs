@@ -50,14 +50,14 @@ public class Player : GameAgent
                 if (map_manager.move(grid_pos, tile_selector.grid_position)) {
                     grid_pos = tile_selector.grid_position;
                     hoveringActionTileSelector = false;
-                    tile_selector.showSelectableTiles = false;
+                    tile_selector.showSelectableMoveTiles = false;
                     tile_selector.showPathLine = false;
                 }
             } else if (currentAction == GameAgentAction.MeleeAttack) {
                 if (map_manager.attack(tile_selector.grid_position, (int)stats.attack)) {
                     this.transform.LookAt(map_manager.GetUnitTransform(tile_selector.grid_position));
                     hoveringActionTileSelector = false;
-                    tile_selector.showSelectableTiles = false;
+                    tile_selector.showSelectableActTiles = false;
                     StartCoroutine(animator.PlayAttackAnimation());
                 }
             }
@@ -142,16 +142,15 @@ public class Player : GameAgent
 
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
-        tile_selector.showSelectableTiles = true;
+        tile_selector.showSelectableMoveTiles = true;
     }
 
     public override void act() {
         currentAction = GameAgentAction.MeleeAttack;
-        tile_selector.CreateListOfSelectableMovementTiles(grid_pos, (int)stats.range, currentAction);
+        tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
 
         hoveringActionTileSelector = true;
-        tile_selector.showPathLine = true;
-        tile_selector.showSelectableTiles = true;
+        tile_selector.showSelectableActTiles = true;
     }
 
     public override void wait() {
@@ -161,6 +160,8 @@ public class Player : GameAgent
 
     public override void potion() {
         currentAction = GameAgentAction.Potion;
+        StartCoroutine(animator.PlayUseItemAnimation());
+        stats.currentHealth += 10;
         Debug.Log("Potion Action");
     }
 }
