@@ -55,7 +55,6 @@ public class Player : GameAgent
                 }
             } else if (currentAction == GameAgentAction.MeleeAttack) {
                 if (map_manager.attack(tile_selector.grid_position, (int)stats.attack)) {
-                    // TODO change player facing here
                     this.transform.LookAt(map_manager.GetUnitTransform(tile_selector.grid_position));
                     hoveringActionTileSelector = false;
                     tile_selector.showSelectableTiles = false;
@@ -75,11 +74,16 @@ public class Player : GameAgent
 	
 	public override void take_damage(int amount)
 	{
-        StartCoroutine(animator.PlayHitAnimation());
         stats.currentHealth -= amount;
-	}
-	
-	public override void take_turn()
+        if (stats.currentHealth <= 0) {
+            stats.currentHealth = 0;
+            StartCoroutine(animator.PlayKilledAimation());
+        } else {
+            StartCoroutine(animator.PlayHitAnimation());
+        }
+    }
+
+    public override void take_turn()
 	{
 		player_turn = true;
 	}
@@ -134,7 +138,7 @@ public class Player : GameAgent
 
     public override void move() {
         currentAction = GameAgentAction.Move;
-		tile_selector.CreateListOfSelectableTiles(grid_pos, move_budget, currentAction);
+		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
 
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
@@ -143,7 +147,7 @@ public class Player : GameAgent
 
     public override void act() {
         currentAction = GameAgentAction.MeleeAttack;
-        tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.range, currentAction);
+        tile_selector.CreateListOfSelectableMovementTiles(grid_pos, (int)stats.range, currentAction);
 
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
