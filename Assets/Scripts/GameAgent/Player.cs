@@ -56,6 +56,7 @@ public class Player : GameAgent
             } else if (currentAction == GameAgentAction.MeleeAttack) {
                 if (map_manager.attack(tile_selector.grid_position, (int)stats.attack)) {
                     // TODO change player facing here
+                    this.transform.LookAt(map_manager.GetUnitTransform(tile_selector.grid_position));
                     hoveringActionTileSelector = false;
                     tile_selector.showSelectableTiles = false;
                     StartCoroutine(animator.PlayAttackAnimation());
@@ -132,15 +133,19 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
+        currentAction = GameAgentAction.Move;
+		tile_selector.CreateListOfSelectableTiles(grid_pos, move_budget, currentAction);
+
         hoveringActionTileSelector = true;
-		tile_selector.CreateListOfSelectableTiles(grid_pos, move_budget);
         tile_selector.showPathLine = true;
         tile_selector.showSelectableTiles = true;
     }
 
     public override void act() {
+        currentAction = GameAgentAction.MeleeAttack;
+        tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.range, currentAction);
+
         hoveringActionTileSelector = true;
-        tile_selector.CreateListOfSelectableTiles(grid_pos, (int)stats.range);
         tile_selector.showPathLine = true;
         tile_selector.showSelectableTiles = true;
     }
