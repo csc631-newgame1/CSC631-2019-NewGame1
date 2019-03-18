@@ -48,7 +48,7 @@ public class TileSelector : MonoBehaviour
 	private LineRenderer path_render;
 	private Player player_main;
 
-    private List<Path> selectableTiles;
+    private List<Path> selectableMovementTiles;
 
     private int[,] map;
 
@@ -144,9 +144,9 @@ public class TileSelector : MonoBehaviour
 	
     // Creates a list of all selectable tiles within a given radius of a position
     // Consider turning this static for enemy AI if this is the only method they need from this class
-    public void CreateListOfSelectableTiles(Pos position, int move_budget) 
+    public void CreateListOfSelectableTiles(Pos position, int move_budget, GameAgentAction action) 
 	{	
-        selectableTiles = new List<Path>();
+        selectableMovementTiles = new List<Path>();
 		
 		int startx 	= position.x - move_budget >= 0 ? position.x - move_budget : 0;
 		int endx	= position.x + move_budget < width ? position.x + move_budget : width - 1;
@@ -154,24 +154,42 @@ public class TileSelector : MonoBehaviour
 		int starty 	= position.y - move_budget >= 0 ? position.y - move_budget : 0;
 		int endy	= position.y + move_budget < height ? position.y + move_budget : height - 1;
 
-        for (int x = startx; x <= endx; x++) {
-			for (int y = starty; y <= endy; y++) {
+        if (action == GameAgentAction.Move) {
+            for (int x = startx; x <= endx; x++) {
+			    for (int y = starty; y <= endy; y++) {
 				
-				Pos candidate = new Pos(x, y);
-				if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
-					
-					Path path = new Path(map_manager.get_path(position, candidate));
-					if(path.distance() <= move_budget) {
-						selectableTiles.Add(path);
-					}
-				}
+				    Pos candidate = new Pos(x, y);
+                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+
+                        Path path = new Path(map_manager.get_path(position, candidate));
+                        if (path.distance() <= move_budget) {
+                            selectableMovementTiles.Add(path);
+                        }
+                    }
+                }
 			}
 		}
+        // TODO figure out if you are going to create a new method that doesn't fuck around with the List<Path>
+        if (action == GameAgentAction.MeleeAttack) {
+            for (int x = startx; x <= endx; x++) {
+                for (int y = starty; y <= endy; y++) {
+
+                    Pos candidate = new Pos(x, y);
+                    if (map_manager.IsOccupied(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+
+                        Path path = new Path(map_manager.get_path(position, candidate));
+                        if (path.distance() <= move_budget) {
+                            selectableMovementTiles.Add(path);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private Path getSelectableTilePath(Pos tile_pos) 
 	{
-        foreach(Path path in selectableTiles)
+        foreach(Path path in selectableMovementTiles)
 			if (path.endPos() == tile_pos)
 				return path;
 		return null;
@@ -179,8 +197,8 @@ public class TileSelector : MonoBehaviour
 	
 	void OnDrawGizmos() {
         if (showSelectableTiles) {
-            if (selectableTiles.Count > 0) {
-                foreach (Path path in selectableTiles) {
+            if (selectableMovementTiles.Count > 0) {
+                foreach (Path path in selectableMovementTiles) {
 					Pos tile = path.endPos();
                     Gizmos.color = Color.green;
                     Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos(tile.x, tile.y)), new Vector3(1f, 0, 1f));

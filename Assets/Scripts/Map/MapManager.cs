@@ -131,6 +131,12 @@ public class MapManager : MonoBehaviour
 		map[dest.x, dest.y].resident.take_damage(damage_amount);
 		return true;
 	}
+
+    public Transform GetUnitTransform(Pos pos) {
+        if (!map[pos.x, pos.y].occupied)
+            return null;
+        return map[pos.x, pos.y].resident.transform;
+    }
 	
 	public Vector3 grid_to_world(Pos pos)
 	{
