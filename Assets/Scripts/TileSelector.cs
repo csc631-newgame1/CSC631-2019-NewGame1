@@ -54,7 +54,8 @@ public class TileSelector : MonoBehaviour
     private int[,] map;
 
     public bool showPathLine = false;
-    public bool showSelectableTiles = false;
+    public bool showSelectableMoveTiles = false;
+    public bool showSelectableActTiles = false;
 
     public Vector3 hover_position;
 	public Pos grid_position;
@@ -89,7 +90,7 @@ public class TileSelector : MonoBehaviour
 	
 	void Update()
 	{
-        if (showSelectableTiles) {
+        if (showSelectableMoveTiles) {
             // TODO Consider showing selectable tiles to the user here
 			RaycastHit hit;
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -116,12 +117,38 @@ public class TileSelector : MonoBehaviour
 						grid_position = hitp;
 						
 					} else {
-						select_square.gameObject.SetActive(false);
+						//select_square.gameObject.SetActive(false);
 					}
 				}
             }
+        } else if (showSelectableActTiles) {
+            // TODO Consider showing selectable tiles to the user here
+            RaycastHit hit;
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit)) {
+
+                Vector3 diff = hit.point + offset;
+                int hitx = (int)(diff.x / cell_size);
+                int hity = (int)(diff.z / cell_size);
+                Pos hitp = new Pos(hitx, hity);
+
+                // subtract one half of a cell's length so that the square will be centered
+                if (Pos.in_bounds(hitp, width, height) && hitp != grid_position) {
+                    Pos hitTile = GetSelectableActTile(hitp);
+
+                    if (hitTile != null) {
+                        hover_position = map_manager.grid_to_world(hitp);
+                        select_square.gameObject.SetActive(true);
+                        select_square.position = hover_position;
+                        grid_position = hitp;
+
+                    } else {
+                        //select_square.gameObject.SetActive(false);
+                    }
+                }
+            }
         }
-	}
+    }
 	
 	void render_path_line(Path path)
 	{
@@ -171,22 +198,6 @@ public class TileSelector : MonoBehaviour
                 }
 			}
 		}
-        // TODO figure out if you are going to create a new method that doesn't fuck around with the List<Path>
-        if (action == GameAgentAction.MeleeAttack) {
-            for (int x = startx; x <= endx; x++) {
-                for (int y = starty; y <= endy; y++) {
-
-                    Pos candidate = new Pos(x, y);
-                    if (map_manager.IsOccupied(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
-
-                        Path path = new Path(map_manager.get_path(position, candidate));
-                        if (path.distance() <= move_budget) {
-                            selectableMovementTiles.Add(path);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     // Creates a list of all selectable tiles within a given radius of a position
@@ -221,13 +232,31 @@ public class TileSelector : MonoBehaviour
 				return path;
 		return null;
     }
+
+    private Pos GetSelectableActTile(Pos tilePos) {
+        foreach (Pos tile in selectableActTiles)
+            if (tile == tilePos)
+                return tile;
+        return null;
+    }
 	
 	void OnDrawGizmos() {
-        if (showSelectableTiles) {
+        if (showSelectableMoveTiles) {
             if (selectableMovementTiles.Count > 0) {
                 foreach (Path path in selectableMovementTiles) {
 					Pos tile = path.endPos();
                     Gizmos.color = Color.green;
+                    Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos(tile.x, tile.y)), new Vector3(1f, 0, 1f));
+                }
+            }
+
+            
+        }
+
+        if (showSelectableActTiles) {
+            if (selectableActTiles.Count > 0) {
+                foreach (Pos tile in selectableActTiles) {
+                    Gizmos.color = Color.red;
                     Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos(tile.x, tile.y)), new Vector3(1f, 0, 1f));
                 }
             }

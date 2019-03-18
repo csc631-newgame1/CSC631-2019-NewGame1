@@ -40,6 +40,10 @@ public class TestEnemy : GameAgent
 
     public override void take_damage(int amount) {
         stats.currentHealth -= amount;
+        if (stats.currentHealth <= 0) {
+            stats.currentHealth = 0;
+        }
+
         currentHealth = stats.currentHealth;
     }
 
