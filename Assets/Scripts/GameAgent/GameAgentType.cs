@@ -4,4 +4,6 @@
 public static class GameAgentType {
     public const string TestEnemy = "TestEnemy";
     public const string Player = "Player";
+    public const string Skeleton = "Skeleton";
+    public const string Orc = "Orc";
 };

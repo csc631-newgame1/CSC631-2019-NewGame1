@@ -14,6 +14,9 @@ public class TestEnemy : GameAgent
     private int move_budget;
     private bool player_turn;
 
+    private CharacterAnimator animator;
+    private CharacterClassDefiner classDefiner;
+
     [Header("Enemy Stats")]
     public float attack;
     public float maxHealth;
@@ -32,6 +35,11 @@ public class TestEnemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         speed = stats.speed;
+
+        animator = GetComponent<CharacterAnimator>();
+        classDefiner = GetComponent<CharacterClassDefiner>();
+
+        classDefiner.SetCharacterClass(stats.characterClass);
     }
 
     public override IEnumerator smooth_movement(List<Pos> locations) {
@@ -42,6 +50,9 @@ public class TestEnemy : GameAgent
         stats.currentHealth -= amount;
         if (stats.currentHealth <= 0) {
             stats.currentHealth = 0;
+            StartCoroutine(animator.PlayKilledAimation());
+        } else {
+            StartCoroutine(animator.PlayHitAnimation());
         }
 
         currentHealth = stats.currentHealth;
