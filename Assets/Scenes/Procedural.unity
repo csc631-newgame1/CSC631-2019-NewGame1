@@ -179,7 +179,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &906174481 stripped
 GameObject:
@@ -300,7 +300,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 759237793, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 759237793, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -617,7 +617,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerActionMenu: {fileID: 906174481}
   player: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
-  enemy: {fileID: 3884965020373106605, guid: 87a2d2919c9e09a4087411aa4bbd0239, type: 3}
+  enemy: {fileID: 1681421950760243006, guid: 3651dfd4c31c6524d80cdc6702182ed6, type: 3}
   showEnemySpawnZones: 1
 --- !u!4 &1591538337
 Transform:
@@ -732,7 +732,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1.0000002, z: 1.0000004}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 38, y: 45, z: 0}
 --- !u!114 &1867890179
 MonoBehaviour:

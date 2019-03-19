@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public static class CharacterClasses {
+    public const int Warrior = 1;
+    public const int Hunter = 2;
+    public const int Mage = 3;
+    public const int Orc = 4;
+    public const int Skeleton = 5;
+    public const int Boss = 6;
+};
+
 public class CharacterClassDefiner : MonoBehaviour
 {
     #region Variables
@@ -40,49 +49,49 @@ public class CharacterClassDefiner : MonoBehaviour
     void Update()
     {
         // For testing.
-        if (Input.GetKeyDown("a")) SetCharacterClass(1);
-        if (Input.GetKeyDown("s")) SetCharacterClass(2);
-        if (Input.GetKeyDown("d")) SetCharacterClass(3);
-        if (Input.GetKeyDown("f")) SetCharacterClass(4);
-        if (Input.GetKeyDown("g")) SetCharacterClass(5);
-        if (Input.GetKeyDown("h")) SetCharacterClass(6);
+        if (Input.GetKeyDown("a")) SetCharacterClass(CharacterClasses.Warrior);
+        if (Input.GetKeyDown("s")) SetCharacterClass(CharacterClasses.Hunter);
+        if (Input.GetKeyDown("d")) SetCharacterClass(CharacterClasses.Mage);
+        if (Input.GetKeyDown("f")) SetCharacterClass(CharacterClasses.Orc);
+        if (Input.GetKeyDown("g")) SetCharacterClass(CharacterClasses.Skeleton);
+        if (Input.GetKeyDown("h")) SetCharacterClass(CharacterClasses.Boss);
     }
 
     // SetCharacterClass(int characterID), SetCharacterModel(int modelID), SetCharacterWeapon(int weaponID)
     #region Main Methods
     public void SetCharacterClass(int characterID)
     {
-        if (characterID == 1) // Warrior
+        if (characterID == CharacterClasses.Warrior) // Warrior
         {
-            SetCharacterModel(1);
-            SetCharacterWeapon(1);
+            SetCharacterModel(CharacterClasses.Warrior);
+            SetCharacterWeapon(CharacterClasses.Warrior);
         }
-        else if (characterID == 2) // Hunter
+        else if (characterID == CharacterClasses.Hunter) // Hunter
         {
-            SetCharacterModel(2);
-            SetCharacterWeapon(2);
+            SetCharacterModel(CharacterClasses.Hunter);
+            SetCharacterWeapon(CharacterClasses.Hunter);
         }
-        else if (characterID == 3) // Mage
+        else if (characterID == CharacterClasses.Mage) // Mage
         {
-            SetCharacterModel(3);
-            SetCharacterWeapon(3);
+            SetCharacterModel(CharacterClasses.Mage);
+            SetCharacterWeapon(CharacterClasses.Mage);
         }
-        else if (characterID == 4) // Orc
+        else if (characterID == CharacterClasses.Orc) // Orc
         {
-            SetCharacterModel(4);
-            weaponNum = Random.Range(4, 6);
-            SetCharacterWeapon(weaponNum);
+            SetCharacterModel(CharacterClasses.Orc);
+            //weaponNum = Random.Range(4, 6);
+            //SetCharacterWeapon(weaponNum);
         }
-        else if (characterID == 5) // Skeleton
+        else if (characterID == CharacterClasses.Skeleton) // Skeleton
         {
-            SetCharacterModel(5);
-            weaponNum = Random.Range(4, 6);
-            SetCharacterWeapon(weaponNum);
+            SetCharacterModel(CharacterClasses.Skeleton);
+            //weaponNum = Random.Range(4, 6);
+            //SetCharacterWeapon(weaponNum);
         }
         else // Boss
         {
-            SetCharacterModel(6);
-            SetCharacterWeapon(6);
+            SetCharacterModel(CharacterClasses.Boss);
+            SetCharacterWeapon(CharacterClasses.Boss);
         }
     }
 
