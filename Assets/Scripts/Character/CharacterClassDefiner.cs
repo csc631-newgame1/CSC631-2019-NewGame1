@@ -9,6 +9,13 @@ public static class CharacterClasses {
     public const int Orc = 4;
     public const int Skeleton = 5;
     public const int Boss = 6;
+
+    public const int Sword = 1;
+    public const int Bow = 4;
+    public const int Staff = 6;
+    public const int Axe = 3;
+    public const int Club = 9;
+    public const int Unarmed = 0;
 };
 
 public class CharacterClassDefiner : MonoBehaviour
@@ -114,34 +121,34 @@ public class CharacterClassDefiner : MonoBehaviour
     {
         hideAllWeapons();
 
-        if (weaponID == 1) // Sword
+        if (weaponID == CharacterClasses.Warrior) // Sword
         {
-            animator.SetInteger("Weapon", 1);
+            animator.SetInteger("Weapon", CharacterClasses.Sword);
             sword.SetActive(true);
         }
-        else if (weaponID == 2) // Bow
+        else if (weaponID == CharacterClasses.Hunter) // Bow
         {
-            animator.SetInteger("Weapon", 4);
+            animator.SetInteger("Weapon", CharacterClasses.Bow);
             bow.SetActive(true);
         }
-        else if (weaponID == 3) // Staff
+        else if (weaponID == CharacterClasses.Mage) // Staff
         {
-            animator.SetInteger("Weapon", 6);
+            animator.SetInteger("Weapon", CharacterClasses.Staff);
             staff.SetActive(true);
         }
-        else if (weaponID == 4) // Axe
+        else if (weaponID == CharacterClasses.Orc) // Axe
         {
-            animator.SetInteger("Weapon", 3);
+            animator.SetInteger("Weapon", CharacterClasses.Axe);
             axe.SetActive(true);
         }
-        else if (weaponID == 5) // Club
+        else if (weaponID == CharacterClasses.Skeleton) // Club
         {
-            animator.SetInteger("Weapon", 9);
+            animator.SetInteger("Weapon", CharacterClasses.Club);
             club.SetActive(true);
         }
         else // Unarmed
         {
-            animator.SetInteger("Weapon", 0);
+            animator.SetInteger("Weapon", CharacterClasses.Unarmed);
         }
 
         animator.SetTrigger("InstantSwitchTrigger");
