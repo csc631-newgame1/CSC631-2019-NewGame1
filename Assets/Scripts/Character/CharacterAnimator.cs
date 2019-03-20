@@ -6,7 +6,7 @@ public class CharacterAnimator : MonoBehaviour
 {
     #region Variables
     // Referenced conponents.
-    GameAgent character;
+    Player character;
     Animator animator;
     bool isDead = false;
 
@@ -36,7 +36,7 @@ public class CharacterAnimator : MonoBehaviour
     void Start()
     {
         // Get required components.
-        character = GetComponent<GameAgent>();
+        character = GetComponent<Player>();
         animator = GetComponent<Animator>();
 
         // Size up particle effects.

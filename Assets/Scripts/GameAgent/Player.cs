@@ -20,6 +20,8 @@ public class Player : GameAgent
 	private int currentHealth;
 	private bool player_turn = false;
 	
+	public float speed;
+
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
 
