@@ -9,6 +9,7 @@ public enum GameAgentAction {Move = 0, Wait, Potion, MeleeAttack, RangedAttack, 
 public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;
+    public float speed;
     protected GameAgentStats stats;
     protected GameAgentAction currentAction;
 	
