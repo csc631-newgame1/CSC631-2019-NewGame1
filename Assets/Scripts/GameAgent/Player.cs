@@ -24,6 +24,7 @@ public class Player : GameAgent
     public int weapon = 1;
 
 	CharacterAnimator animator;
+    CharacterClassDefiner classDefiner;
 	
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
@@ -31,7 +32,12 @@ public class Player : GameAgent
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
         config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         grid_pos = position;
+
 		animator = GetComponent<CharacterAnimator>();
+        classDefiner = GetComponent<CharacterClassDefiner>();
+        animator.init();
+        classDefiner.init();
+
         this.stats = stats;
         selectableTiles = new List<Pos>();
 		
