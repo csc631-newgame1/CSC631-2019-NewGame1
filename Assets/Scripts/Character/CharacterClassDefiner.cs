@@ -15,7 +15,7 @@ public class CharacterClassDefiner : MonoBehaviour
 {
     #region Variables
     // Referenced conponents.    
-    Player character;
+    GameAgent character;
     Animator animator;
     Transform characterAvatar;
 
@@ -39,7 +39,7 @@ public class CharacterClassDefiner : MonoBehaviour
     void Start()
     {
         // Get required components.
-        character = GetComponent<Player>();
+        character = GetComponent<GameAgent>();
         animator = GetComponent<Animator>();
 
         // Hide all weapon objects.
