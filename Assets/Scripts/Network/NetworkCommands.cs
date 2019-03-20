@@ -14,11 +14,11 @@ using MapUtils;
 #pragma warning disable 169, 414
 
 public abstract class NetworkCommand
-{
-	protected enum Directive { START, END, DISCONNECT, ECHO, NONE }
-	
+{	
+	protected enum Directive { START=0, END, DISCONNECT, ECHO, NONE }
+
     public abstract string getString();
-	protected Directive directive = Directive.NONE;
+	protected Directive directive;
 	
 	public static byte[] assembleCommandBytes(NetworkCommand cmd)
 	{
@@ -36,7 +36,7 @@ public abstract class NetworkCommand
 }
 
 /* #############################
- * ## Directive.ECHO Directive commands ##
+ * ## ECHO Directive commands ##
  * #############################
  * Echo commands simply echo their message to every client currently connected to the server
  */
@@ -45,11 +45,11 @@ public abstract class NetworkCommand
 public class MoveCommand : NetworkCommand
 {
 	public const int ID = 0;
-	new protected Directive directive = Directive.ECHO;
 	
 	public Pos a, b;
 	public MoveCommand(Pos a, Pos b)
 	{
+		this.directive = Directive.ECHO;
 		this.a = a;
 		this.b = b;
 	}
@@ -66,11 +66,11 @@ public class MoveCommand : NetworkCommand
 public class ReadyCommand : NetworkCommand
 {
 	public const int ID = 1;
-	new protected Directive directive = Directive.ECHO;
 	
 	private int clientID;
 	public ReadyCommand(int clientID)
 	{
+		this.directive = Directive.ECHO;
 		this.clientID = clientID;
 	}
 	public override string getString() { return ID + "$" + clientID; }
@@ -85,12 +85,12 @@ public class ReadyCommand : NetworkCommand
 public class NicknameCommand : NetworkCommand
 {
 	public const int ID = 4;
-	new protected Directive directive = Directive.ECHO;
 	
 	public int clientID;
 	public string nickname;
 	public NicknameCommand(string nickname, int clientID)
 	{
+		this.directive = Directive.ECHO;
 		this.nickname = nickname;
 		this.clientID = clientID;
 	}
@@ -106,7 +106,7 @@ public class NicknameCommand : NetworkCommand
 }
 
 /* #######################
- * ## NON-Directive.ECHO Commands ##
+ * ## NON-ECHO Commands ##
  * #######################
  * Non-standard commands that modify the state of the server
  * e.g; adding/removing a client, or blocking/allowing new clients
@@ -117,12 +117,12 @@ public class NicknameCommand : NetworkCommand
 // the getString() method should not be invoked client-side, but is there for reference's sake
 public class JoinCommand : NetworkCommand
 {
-	new protected Directive directive = Directive.NONE;
 	public const int ID = -2;
 	
 	public int clientID;
 	public JoinCommand(int clientID) 
 	{
+		this.directive = Directive.NONE;
 		this.clientID = clientID;
 	}
 	public override string getString() { return ID + "$" + clientID; }
@@ -136,10 +136,12 @@ public class JoinCommand : NetworkCommand
 // In addition, they tell the server to stop accepting new clients
 public class StartCommand : NetworkCommand
 {
-	new protected Directive directive = Directive.START;
 	public const int ID = 2;
 	
-	public StartCommand() {}
+	public StartCommand() 
+	{
+		this.directive = Directive.START;
+	}
 	public override string getString() { return ID + "$Directive.START"; }
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
@@ -151,10 +153,12 @@ public class StartCommand : NetworkCommand
 // In addition, they tell the server to begin accepting new clients (provided there is room)
 public class EndCommand : NetworkCommand
 {
-	new protected Directive directive = Directive.END;
 	public const int ID = 3;
 	
-	public EndCommand() {}
+	public EndCommand() 
+	{
+		this.directive = Directive.END;
+	}
 	public override string getString() { return ID + "$Directive.END"; }
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
@@ -167,12 +171,12 @@ public class EndCommand : NetworkCommand
 // Only when the client is not responding should the server take responsibility for disconnecting them
 public class DisconnectCommand : NetworkCommand
 {
-	new protected Directive directive = Directive.DISCONNECT;
 	public const int ID = -1;
 	
 	public int clientID;
 	public DisconnectCommand(int clientID) 
 	{
+		this.directive = Directive.DISCONNECT;
 		this.clientID = clientID;
 	}
 	public override string getString() { return ID + "$" + clientID; }
