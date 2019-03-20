@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MapUtils;
 using UnityEngine;
 
-public class TestEnemy : GameAgent
+public class Enemy : GameAgent
 {
     private MapManager map_manager; // reference to MapManager instance with map data
     private TileSelector tile_selector; // reference to map tile selector
