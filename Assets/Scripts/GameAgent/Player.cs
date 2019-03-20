@@ -17,15 +17,20 @@ public class Player : GameAgent
     public bool hoveringActionTileSelector = false;
 	
 	private int move_budget = 8;
-	private int currentHealth;
 	private bool player_turn = false;
-	
-	public float speed;
+
+    [Header("Player Stats")]
+    public float attack;
+    public float maxHealth;
+    public float currentHealth;
+    public float range;
+    public float _speed;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
 
 	CharacterAnimator animator;
+    CharacterClassDefiner classDefiner;
 	
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
@@ -33,8 +38,19 @@ public class Player : GameAgent
 		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
         config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         grid_pos = position;
+
 		animator = GetComponent<CharacterAnimator>();
+        classDefiner = GetComponent<CharacterClassDefiner>();
+        animator.init();
+        classDefiner.init();
+
         this.stats = stats;
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = maxHealth;
+        range = stats.range;
+        _speed = stats.speed;
+
         selectableTiles = new List<Pos>();
 		
 		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
@@ -46,6 +62,7 @@ public class Player : GameAgent
     void Update()
     {
 		if (Input.GetMouseButtonDown(1) && !moving && hoveringActionTileSelector) {
+<<<<<<< HEAD
 			
 			if (map_manager.move(grid_pos, tile_selector.grid_position)) {
 
@@ -53,6 +70,21 @@ public class Player : GameAgent
                 hoveringActionTileSelector = false;
                 tile_selector.showPathLine = false;
 			}
+=======
+            if (currentAction == GameAgentAction.Move) {
+                if (map_manager.move(grid_pos, tile_selector.grid_position)) {
+                    grid_pos = tile_selector.grid_position;
+                    hoveringActionTileSelector = false;
+                    tile_selector.showSelectableMoveTiles = false;
+                    tile_selector.showPathLine = false;
+                }
+            } else if (currentAction == GameAgentAction.MeleeAttack) {
+                if (map_manager.IsOccupied(tile_selector.grid_position)) {
+                    this.transform.LookAt(map_manager.GetUnitTransform(tile_selector.grid_position));
+                    StartCoroutine(animator.PlayAttackAnimation());
+                }
+            }
+>>>>>>> 6abd8d65f21d2d1c542a4313f632a19e4f21a4a5
 		}
 
         // For testing animations.
@@ -66,10 +98,16 @@ public class Player : GameAgent
 	
 	public override void take_damage(int amount)
 	{
-		currentHealth -= amount;
-	}
-	
-	public override void take_turn()
+        stats.currentHealth -= amount;
+        if (stats.currentHealth <= 0) {
+            stats.currentHealth = 0;
+            StartCoroutine(animator.PlayKilledAimation());
+        } else {
+            StartCoroutine(animator.PlayHitAnimation());
+        }
+    }
+
+    public override void take_turn()
 	{
 		player_turn = true;
 	}
@@ -118,25 +156,47 @@ public class Player : GameAgent
 
 	public void FootR(){}
 	public void FootL(){}
-	public void Hit(){}
-	public void Shoot(){}
+
+    // Deal damage as soon as animation hits the target
+	public void Hit(){
+        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
+    }
+
+	public void Shoot(){
+        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
+    }
 	public void WeaponSwitch(){}
 
     public override void move() {
+        currentAction = GameAgentAction.Move;
+		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
+
         hoveringActionTileSelector = true;
-		tile_selector.CreateListOfSelectableTiles(grid_pos, move_budget);
         tile_selector.showPathLine = true;
+        tile_selector.showSelectableMoveTiles = true;
     }
 
     public override void act() {
-        Debug.Log("Attack Action");
+        currentAction = GameAgentAction.MeleeAttack;
+        tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
+
+        hoveringActionTileSelector = true;
+        tile_selector.showSelectableActTiles = true;
     }
 
     public override void wait() {
+        currentAction = GameAgentAction.Wait;
         Debug.Log("Wait Action");
     }
 
     public override void potion() {
+        currentAction = GameAgentAction.Potion;
+        StartCoroutine(animator.PlayUseItemAnimation());
+        stats.currentHealth += 10;
         Debug.Log("Potion Action");
     }
 }

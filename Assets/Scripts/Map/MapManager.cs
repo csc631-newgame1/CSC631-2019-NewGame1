@@ -64,7 +64,7 @@ public class MapManager : MonoBehaviour
 		GameAgent agent = clone.GetComponent<GameAgent>();
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(GameAgentType.Player));
+            agent.init_agent(pos, new GameAgentStats(CharacterClasses.Warrior));
         } else {
             agent.init_agent(pos, stats);
         }
@@ -115,15 +115,28 @@ public class MapManager : MonoBehaviour
         }
         return map[pos.x, pos.y].traversable;
     }
+
+    public bool IsOccupied(Pos pos) {
+        if (pos.x < 0 || pos.x >= map.GetLength(0) || pos.y < 0 || pos.y >= map.GetLength(1)) {
+            return false;
+        }
+        return map[pos.x, pos.y].occupied;
+    }
 	
 	public bool attack(Pos dest, int damage_amount)
 	{
-		if (!map[dest.x, dest.y].occupied)
+		if (!IsOccupied(dest))
 			return false;
 		
 		map[dest.x, dest.y].resident.take_damage(damage_amount);
 		return true;
 	}
+
+    public Transform GetUnitTransform(Pos pos) {
+        if (!map[pos.x, pos.y].occupied)
+            return null;
+        return map[pos.x, pos.y].resident.transform;
+    }
 	
 	public Vector3 grid_to_world(Pos pos)
 	{

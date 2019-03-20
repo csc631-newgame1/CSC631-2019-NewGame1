@@ -619,6 +619,8 @@ MonoBehaviour:
   player: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
   enemy: {fileID: 3884965020373106605, guid: 87a2d2919c9e09a4087411aa4bbd0239, type: 3}
   showEnemySpawnZones: 0
+  enemy: {fileID: 1681421950760243006, guid: 3651dfd4c31c6524d80cdc6702182ed6, type: 3}
+  showEnemySpawnZones: 1
 --- !u!4 &1591538337
 Transform:
   m_ObjectHideFlags: 0
