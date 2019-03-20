@@ -59,6 +59,10 @@ public class TileSelector : MonoBehaviour
 
     public Vector3 hover_position;
 	public Pos grid_position;
+	
+	public Mesh tileMesh;
+	public Material moveableTilesMaterial;
+	public Material selectableTilesMaterial;
 
 	
 	// called by the mapGenerator script
@@ -90,64 +94,47 @@ public class TileSelector : MonoBehaviour
 	
 	void Update()
 	{
-        if (showSelectableMoveTiles) {
-            // TODO Consider showing selectable tiles to the user here
-			RaycastHit hit;
-			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if (Physics.Raycast(ray, out hit)) {
+		DrawTiles();
+		
+		RaycastHit hit;
+		Pos hitp = new Pos(-1, -1);
+		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		
+		if (Physics.Raycast(ray, out hit)) {
+			
+			Vector3 diff = hit.point + offset;
+			hitp = new Pos((int)(diff.x / cell_size), (int)(diff.z / cell_size));
+			
+			if (map_manager.IsTraversable(hitp) && Pos.in_bounds(hitp, width, height) && hitp != grid_position) {
+				select_square.gameObject.SetActive(true);
+				select_square.position = hover_position;
 				
-				Vector3 diff = hit.point + offset;
-				int hitx = (int)(diff.x / cell_size);
-				int hity = (int)(diff.z / cell_size);
-				Pos hitp = new Pos(hitx, hity);
-				
-				// subtract one half of a cell's length so that the square will be centered
-				if (Pos.in_bounds(hitp, width, height) && hitp != grid_position) {
+				if (showSelectableMoveTiles) {
 					
 					Path hit_path = getSelectableTilePath(hitp);
 					
 					if (hit_path != null) {
-						
 						if (hitp != player_main.grid_pos && !player_main.moving && showPathLine)
 							render_path_line(hit_path);
 
 						hover_position = map_manager.grid_to_world(hitp);
-						select_square.gameObject.SetActive(true);
-						select_square.position = hover_position;
 						grid_position = hitp;
-						
-					} else {
-						//select_square.gameObject.SetActive(false);
+					}
+				} 
+				else if (showSelectableActTiles) {
+					
+					Pos hitTile = GetSelectableActTile(hitp);
+
+					if (hitTile != null) {
+						hover_position = map_manager.grid_to_world(hitp);
+						grid_position = hitp;
 					}
 				}
-            }
-        } else if (showSelectableActTiles) {
-            // TODO Consider showing selectable tiles to the user here
-            RaycastHit hit;
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit)) {
-
-                Vector3 diff = hit.point + offset;
-                int hitx = (int)(diff.x / cell_size);
-                int hity = (int)(diff.z / cell_size);
-                Pos hitp = new Pos(hitx, hity);
-
-                // subtract one half of a cell's length so that the square will be centered
-                if (Pos.in_bounds(hitp, width, height) && hitp != grid_position) {
-                    Pos hitTile = GetSelectableActTile(hitp);
-
-                    if (hitTile != null) {
-                        hover_position = map_manager.grid_to_world(hitp);
-                        select_square.gameObject.SetActive(true);
-                        select_square.position = hover_position;
-                        grid_position = hitp;
-
-                    } else {
-                        //select_square.gameObject.SetActive(false);
-                    }
-                }
-            }
-        }
+			}
+			else {
+				select_square.gameObject.SetActive(false);
+			}
+		}
     }
 	
 	void render_path_line(Path path)
@@ -240,26 +227,17 @@ public class TileSelector : MonoBehaviour
         return null;
     }
 	
-	void OnDrawGizmos() {
+	void DrawTiles() {
         if (showSelectableMoveTiles) {
-            if (selectableMovementTiles.Count > 0) {
-                foreach (Path path in selectableMovementTiles) {
-					Pos tile = path.endPos();
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos(tile.x, tile.y)), new Vector3(1f, 0, 1f));
-                }
-            }
-
-            
+			foreach (Path path in selectableMovementTiles) {
+				Pos tile = path.endPos();
+				Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), moveableTilesMaterial, 0);
+			}
         }
-
         if (showSelectableActTiles) {
-            if (selectableActTiles.Count > 0) {
-                foreach (Pos tile in selectableActTiles) {
-                    Gizmos.color = Color.red;
-                    Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos(tile.x, tile.y)), new Vector3(1f, 0, 1f));
-                }
-            }
+			foreach (Pos tile in selectableActTiles) {
+				Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), selectableTilesMaterial, 0);
+			}
         }
     }
 }

@@ -62,15 +62,6 @@ public class Player : GameAgent
     void Update()
     {
 		if (Input.GetMouseButtonDown(1) && !moving && hoveringActionTileSelector) {
-<<<<<<< HEAD
-			
-			if (map_manager.move(grid_pos, tile_selector.grid_position)) {
-
-				grid_pos = tile_selector.grid_position;
-                hoveringActionTileSelector = false;
-                tile_selector.showPathLine = false;
-			}
-=======
             if (currentAction == GameAgentAction.Move) {
                 if (map_manager.move(grid_pos, tile_selector.grid_position)) {
                     grid_pos = tile_selector.grid_position;
@@ -84,7 +75,6 @@ public class Player : GameAgent
                     StartCoroutine(animator.PlayAttackAnimation());
                 }
             }
->>>>>>> 6abd8d65f21d2d1c542a4313f632a19e4f21a4a5
 		}
 
         // For testing animations.
