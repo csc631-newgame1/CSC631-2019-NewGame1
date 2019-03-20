@@ -72,8 +72,7 @@ public class Player : GameAgent
             } else if (currentAction == GameAgentAction.MeleeAttack) {
                 if (map_manager.IsOccupied(tile_selector.grid_position)) {
                     this.transform.LookAt(map_manager.GetUnitTransform(tile_selector.grid_position));
-                    // Start player attack animation with a callback to deal damage when the animation is finished
-                    StartCoroutine(animator.PlayAttackAnimation(DealDamage));
+                    StartCoroutine(animator.PlayAttackAnimation());
                 }
             }
 		}
@@ -96,13 +95,6 @@ public class Player : GameAgent
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
-    }
-
-    // This is the callback function used when PlayAttackAnimation signals the player animation is finished
-    private void DealDamage() {
-        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableActTiles = false;
     }
 
     public override void take_turn()
@@ -154,8 +146,19 @@ public class Player : GameAgent
 
 	public void FootR(){}
 	public void FootL(){}
-	public void Hit(){}
-	public void Shoot(){}
+
+    // Deal damage as soon as animation hits the target
+	public void Hit(){
+        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
+    }
+
+	public void Shoot(){
+        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
+    }
 	public void WeaponSwitch(){}
 
     public override void move() {

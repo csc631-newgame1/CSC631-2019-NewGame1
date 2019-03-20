@@ -79,9 +79,8 @@ public class CharacterAnimator : MonoBehaviour
     #endregion
 
     // PlayAttackAnimation(), PlayUseItemAnimation()
-    // callback used to signal when play animation is finished to signal deal damage
     #region Character Action
-    public IEnumerator PlayAttackAnimation(Action callback = null)
+    public IEnumerator PlayAttackAnimation()
     {
         animationNumber = UnityEngine.Random.Range(1, maxAttackAnimations + 1);
 
@@ -98,16 +97,19 @@ public class CharacterAnimator : MonoBehaviour
         {
             animator.SetTrigger("Attack" + (animationNumber).ToString() + "Trigger");
             SpawnParticleSystemAtCharacter(focusSpark);
-            yield return new WaitForSeconds(actionDuration);
+            yield return null;
         }
         else
         {
             animator.SetTrigger("Attack" + (animationNumber).ToString() + "Trigger");
             SpawnParticleSystemAtCharacter(slashCharge);
-            yield return new WaitForSeconds(actionDuration);
+            yield return null;
         }
+    }
 
-        callback?.Invoke();
+    public bool AnimatorIsPlaying() {
+        return animator.GetCurrentAnimatorStateInfo(0).length >
+               animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
     }
 
     public IEnumerator PlayUseItemAnimation()
