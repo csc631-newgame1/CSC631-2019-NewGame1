@@ -7,7 +7,7 @@ public class TurnManager : MonoBehaviour
     //static instance of game manager which allows it to be accessed by any other script
     public static TurnManager instance = null;
     //boolean to check if it's player's turn
-    [HideInInspector] public bool playersTurn = true;
+    [HideInInspector] public bool playersTurn;
 
     //list of all player units, probably to determine if they've all finished their turns
     private List<Player> players;
@@ -15,6 +15,7 @@ public class TurnManager : MonoBehaviour
     //NOTE: probably make another abstract class for enemies?
     private List<TestEnemy> enemies;
     private bool enemiesMoving = false; //boolean to check if enemies are moving
+    private bool gameLoading = true;
 
     public float turnDelay = 0.1f; //for setting a turn delay?
 
@@ -34,6 +35,14 @@ public class TurnManager : MonoBehaviour
         //each individual player and enemy object should, upon creation, add themselves to these lists
         players = new List<Player>();
         enemies = new List<TestEnemy>();
+
+        Debug.Log("Player turn start");
+        playersTurn = true;
+    }
+
+    public void Load_Finished()
+    {
+        gameLoading = false;
     }
 
     void Update()
@@ -89,8 +98,10 @@ public class TurnManager : MonoBehaviour
         {
             enemies[i].take_turn(); //or whatever the action for enemies are
             //turn delay per enemy movement?
-            //yield return new WaitForSeconds(enemies[i].moveTime);
+            yield return new WaitForSeconds(enemies[i].moveTime);
         }
+
+        Debug.Log("Enemy turn end");
 
         for (int i = 0; i < players.Count; i++)
         {
@@ -106,7 +117,7 @@ public class TurnManager : MonoBehaviour
 
     void CheckIfPlayersMoved()
     {
-        if (!playersTurn)
+        if (!playersTurn || gameLoading)
         {
             return;
         }

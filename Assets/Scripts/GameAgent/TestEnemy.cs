@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MapUtils;
 using UnityEngine;
@@ -20,12 +21,15 @@ public class TestEnemy : GameAgent
     public float range;
     public float speed;
 
-    Animator animator;
+    CharacterAnimator animator;
+    public float moveTime = 0.1f;
 
     public override void init_agent(Pos position, GameAgentStats stats) {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
         map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
         grid_pos = position;
+
+        animator = GetComponent<CharacterAnimator>();
 
         this.stats = stats;
         attack = stats.attack;
@@ -44,7 +48,9 @@ public class TestEnemy : GameAgent
     }
 
     public override void take_turn() {
+        StartCoroutine(animator.PlayAttackAnimation());
     }
+
 
     public override void move() {
     }
@@ -57,4 +63,10 @@ public class TestEnemy : GameAgent
 
     public override void potion() {
     }
+
+    public void FootR() { }
+    public void FootL() { }
+    public void Hit() { }
+    public void Shoot() { }
+    public void WeaponSwitch() { }
 }

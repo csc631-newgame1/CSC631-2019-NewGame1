@@ -21,6 +21,7 @@ public abstract class GameAgent : MonoBehaviour
 	// for players, this will trigger the boolean value that allows them to take their turn
 	public abstract void take_turn();
 
+
     // commands from the action menu
     public abstract void move();
     public abstract void act();

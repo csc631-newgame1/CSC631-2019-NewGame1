@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     private EnemySpawner enemySpawner;
     private GameObject clone;
 
+    private TurnManager turn_manager;
+
     private List<SpawnZone> spawnZones;
     [SerializeField]
     // Consider moving this to a different location for better handling of turn based gameplay
@@ -39,6 +41,8 @@ public class GameManager : MonoBehaviour
 
         enemySpawner = GetComponent<EnemySpawner>();
         SpawnEnemies();
+
+        TurnManager.instance.Load_Finished();
     }
 
     void SpawnEnemies() 
