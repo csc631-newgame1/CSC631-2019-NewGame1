@@ -15,6 +15,7 @@ public class Player : GameAgent
     public bool hoveringMovementTileSelector = false;
 	public bool moving = false;
     public bool hoveringActionTileSelector = false;
+    public bool isAttacking = false;
 	
 	private int move_budget = 8;
 	private bool player_turn = false;
@@ -76,6 +77,12 @@ public class Player : GameAgent
                 }
             }
 		}
+
+        if (animator.AnimatorIsPlaying() && currentAction == GameAgentAction.MeleeAttack) {
+            isAttacking = true;
+        } else {
+            isAttacking = false;
+        }
 
         // For testing animations.
         if (Input.GetKeyDown("1")) StartCoroutine(animator.PlayRotateAnimation());
@@ -149,15 +156,19 @@ public class Player : GameAgent
 
     // Deal damage as soon as animation hits the target
 	public void Hit(){
-        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableActTiles = false;
+        if (isAttacking) {
+            map_manager.attack(tile_selector.grid_position, (int)stats.attack);
+            hoveringActionTileSelector = false;
+            tile_selector.showSelectableActTiles = false;
+        }
     }
 
 	public void Shoot(){
-        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableActTiles = false;
+        if (isAttacking) {
+            map_manager.attack(tile_selector.grid_position, (int)stats.attack);
+            hoveringActionTileSelector = false;
+            tile_selector.showSelectableActTiles = false;
+        }
     }
 	public void WeaponSwitch(){}
 
