@@ -38,6 +38,8 @@ public class Enemy : GameAgent
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
+        animator.init();
+        classDefiner.init();
 
         classDefiner.SetCharacterClass(stats.characterClass);
     }

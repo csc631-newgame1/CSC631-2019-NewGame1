@@ -43,8 +43,7 @@ public class CharacterClassDefiner : MonoBehaviour
     public GameObject club;
     #endregion
 
-    void Start()
-    {
+    public void init() {
         // Get required components.
         character = GetComponent<GameAgent>();
         animator = GetComponent<Animator>();
@@ -86,14 +85,14 @@ public class CharacterClassDefiner : MonoBehaviour
         else if (characterID == CharacterClasses.Orc) // Orc
         {
             SetCharacterModel(CharacterClasses.Orc);
-            //weaponNum = Random.Range(4, 6);
-            //SetCharacterWeapon(weaponNum);
+            weaponNum = Random.Range(4, 6);
+            SetCharacterWeapon(weaponNum);
         }
         else if (characterID == CharacterClasses.Skeleton) // Skeleton
         {
             SetCharacterModel(CharacterClasses.Skeleton);
-            //weaponNum = Random.Range(4, 6);
-            //SetCharacterWeapon(weaponNum);
+            weaponNum = Random.Range(4, 6);
+            SetCharacterWeapon(weaponNum);
         }
         else // Boss
         {

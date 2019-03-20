@@ -33,7 +33,7 @@ public class CharacterAnimator : MonoBehaviour
     public ParticleSystem ghosts;
     #endregion
 
-    void Start()
+    public void init()
     {
         // Get required components.
         character = GetComponent<GameAgent>();
