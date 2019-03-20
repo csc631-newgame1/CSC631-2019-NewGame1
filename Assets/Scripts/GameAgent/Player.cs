@@ -17,9 +17,15 @@ public class Player : GameAgent
     public bool hoveringActionTileSelector = false;
 	
 	private int move_budget = 8;
-	private int currentHealth;
 	private bool player_turn = false;
-	
+
+    [Header("Player Stats")]
+    public float attack;
+    public float maxHealth;
+    public float currentHealth;
+    public float range;
+    public float _speed;
+
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
 
@@ -39,6 +45,12 @@ public class Player : GameAgent
         classDefiner.init();
 
         this.stats = stats;
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = maxHealth;
+        range = stats.range;
+        _speed = stats.speed;
+
         selectableTiles = new List<Pos>();
 		
 		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
@@ -58,11 +70,9 @@ public class Player : GameAgent
                     tile_selector.showPathLine = false;
                 }
             } else if (currentAction == GameAgentAction.MeleeAttack) {
-                if (map_manager.attack(tile_selector.grid_position, (int)stats.attack)) {
+                if (map_manager.IsOccupied(tile_selector.grid_position)) {
                     this.transform.LookAt(map_manager.GetUnitTransform(tile_selector.grid_position));
-                    hoveringActionTileSelector = false;
-                    tile_selector.showSelectableActTiles = false;
-                    StartCoroutine(animator.PlayAttackAnimation());
+                    StartCoroutine(animator.PlayAttackAnimation(DealDamage));
                 }
             }
 		}
@@ -85,6 +95,13 @@ public class Player : GameAgent
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
+    }
+
+    private void DealDamage() {
+        Debug.Log("DealDamage called");
+        map_manager.attack(tile_selector.grid_position, (int)stats.attack);
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
     }
 
     public override void take_turn()

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ public class CharacterAnimator : MonoBehaviour
     const int maxBlockedAnimations = 2;
 
     // Animation duartion variables.
-    const float actionDuration = 0.5f;
+    const float actionDuration = 0.4f;
     const float particleDuration = 1.0f;
 
     // Particle System objects.
@@ -78,10 +79,11 @@ public class CharacterAnimator : MonoBehaviour
     #endregion
 
     // PlayAttackAnimation(), PlayUseItemAnimation()
+    // callback used to signal when play animation is finished to signal deal damage
     #region Character Action
-    public IEnumerator PlayAttackAnimation()
+    public IEnumerator PlayAttackAnimation(Action callback = null)
     {
-        animationNumber = Random.Range(1, maxAttackAnimations + 1);
+        animationNumber = UnityEngine.Random.Range(1, maxAttackAnimations + 1);
 
         if (animator.GetInteger("Weapon") == 6)
         {
@@ -90,19 +92,22 @@ public class CharacterAnimator : MonoBehaviour
             SpawnParticleSystemAtCharacter(magicSparks);
             yield return new WaitForSeconds(actionDuration);
             animator.SetTrigger("CastEndTrigger");
+   
         }
         else if (animator.GetInteger("Weapon") == 4)
         {
             animator.SetTrigger("Attack" + (animationNumber).ToString() + "Trigger");
             SpawnParticleSystemAtCharacter(focusSpark);
-            yield return null;
+            yield return new WaitForSeconds(actionDuration);
         }
         else
         {
             animator.SetTrigger("Attack" + (animationNumber).ToString() + "Trigger");
             SpawnParticleSystemAtCharacter(slashCharge);
-            yield return null;
+            yield return new WaitForSeconds(actionDuration);
         }
+
+        callback?.Invoke();
     }
 
     public IEnumerator PlayUseItemAnimation()
@@ -117,7 +122,7 @@ public class CharacterAnimator : MonoBehaviour
     #region Character Reaction
     public IEnumerator PlayHitAnimation()
     {
-        animationNumber = Random.Range(1, maxHitAnimations + 1);
+        animationNumber = UnityEngine.Random.Range(1, maxHitAnimations + 1);
         animator.SetTrigger("GetHit" + (animationNumber).ToString() + "Trigger");
         SpawnParticleSystemAtCharacter(blood);
         SpawnParticleSystemAtCharacter(hit);
@@ -128,7 +133,7 @@ public class CharacterAnimator : MonoBehaviour
     {
         animator.SetBool("Blocking", true);
         animator.SetTrigger("BlockTrigger");
-        animationNumber = Random.Range(1, maxBlockedAnimations + 1);
+        animationNumber = UnityEngine.Random.Range(1, maxBlockedAnimations + 1);
         animator.SetTrigger("BlockGetHit" + (animationNumber).ToString() + "Trigger");
         SpawnParticleSystemAtCharacter(sparks);
         SpawnParticleSystemAtCharacter(dust);

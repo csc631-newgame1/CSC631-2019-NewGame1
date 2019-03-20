@@ -125,7 +125,7 @@ public class MapManager : MonoBehaviour
 	
 	public bool attack(Pos dest, int damage_amount)
 	{
-		if (!map[dest.x, dest.y].occupied)
+		if (!IsOccupied(dest))
 			return false;
 		
 		map[dest.x, dest.y].resident.take_damage(damage_amount);
