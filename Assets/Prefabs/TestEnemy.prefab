@@ -4245,6 +4245,8 @@ GameObject:
   - component: {fileID: 2385977303482405250}
   - component: {fileID: 3774247821951125011}
   - component: {fileID: 8495416842594811172}
+  - component: {fileID: 3136897071142366414}
+  - component: {fileID: 327658918434417503}
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Enemy
@@ -4359,9 +4361,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attack: 0
-  health: 0
+  maxHealth: 0
+  currentHealth: 0
   range: 0
   speed: 0
+--- !u!114 &3136897071142366414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3884965020373106605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4904a3e654f834b449c405155b5b87f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magicAura: {fileID: 19895582, guid: 24e29d528f11acf42974643bee14a607, type: 3}
+  magicSparks: {fileID: 19898846, guid: f828b47b39be99849b37530c987975e5, type: 3}
+  focusSpark: {fileID: 19859158, guid: b043edfe6ed22be46b3d939fd3f3e5bb, type: 3}
+  slashCharge: {fileID: 19850302, guid: 125cbece63e40cf40a589e32859eda38, type: 3}
+  healAura: {fileID: 19831716, guid: 685c97d007af49549b239b56b6d2000a, type: 3}
+  blood: {fileID: 19845262, guid: fdac75e990da47649b31f10049c400b0, type: 3}
+  hit: {fileID: 19810148, guid: bd9cbf3a6ae77524788b4bbdb5422498, type: 3}
+  sparks: {fileID: 19872524, guid: 4889039938a567444827eafcfbc2b267, type: 3}
+  dust: {fileID: 19820956, guid: 56c3274d2f9ec214ab584a80b5ce2d6d, type: 3}
+  ghosts: {fileID: 19853646, guid: 737959db973360b43bdeb1a4874f1af8, type: 3}
+--- !u!114 &327658918434417503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3884965020373106605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10533dce209499149bb2504cdf87fd67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sword: {fileID: 0}
+  bow: {fileID: 0}
+  staff: {fileID: 0}
+  axe: {fileID: 0}
+  club: {fileID: 0}
 --- !u!1 &3909317439102541410
 GameObject:
   m_ObjectHideFlags: 0

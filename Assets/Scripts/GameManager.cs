@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Debug Settings")]
     [Tooltip("Shows wire spheres where the Spawn Zones are mapped, and the wire cubes for the tiles within the Spawn Zone.")]
-    public bool showEnemySpawnZones = true;
+    public bool showEnemySpawnZones = false;
 	
     void Start()
     {

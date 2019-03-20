@@ -1,7 +1,7 @@
 ﻿// Holds information regarding the GameAgents ingame stats
 public class GameAgentStats
 {
-    public string gameAgentType;
+    public int characterClass;
     // unit attack damage
     public float attack;
     // unit maxium health
@@ -13,8 +13,8 @@ public class GameAgentStats
     // unit move radius
     public float speed;
 
-    public GameAgentStats(string gameAgentType, float attack, float health, float range, float speed) {
-        this.gameAgentType = gameAgentType;
+    public GameAgentStats(int characterClass, float attack, float health, float range, float speed) {
+        this.characterClass = characterClass;
         this.attack = attack;
         this.maxHealth = health;
         this.currentHealth = health;
@@ -22,8 +22,8 @@ public class GameAgentStats
         this.speed = speed;
     }
 
-    public GameAgentStats(string gameAgentType) {
-        this.gameAgentType = gameAgentType;
+    public GameAgentStats(int characterClass) {
+        this.characterClass = characterClass;
         this.attack = 20;
         this.maxHealth = 50;
         this.currentHealth = maxHealth;
