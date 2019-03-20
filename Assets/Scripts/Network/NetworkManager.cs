@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,11 @@ public class NetworkManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Network.connectToServer("18.223.24.205", 1337);
+		Network.enable();
+        Network.connectToServer("18.223.24.205", 1337); // remote network
+        //Network.connectToServer("127.0.0.1", 1337); // local network
+		
+		Thread.Sleep(1000);
 		Network.submitCommand(new MoveCommand(new Pos(2, 2), new Pos(3, 3)));
 		Network.submitCommand(new StartCommand());
 		Network.submitCommand(new EndCommand());
@@ -24,6 +29,7 @@ public class NetworkManager : MonoBehaviour
         List<NetworkCommand> cmds = Network.getPendingCommands();
 		
 		if (cmds != null) {
+			Debug.Log("Received " + cmds.Count + " commands");
 			foreach (NetworkCommand cmd in cmds) {
 				
 				if (cmd is MoveCommand) {

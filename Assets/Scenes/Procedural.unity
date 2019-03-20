@@ -505,6 +505,10 @@ PrefabInstance:
       propertyPath: selectableTilesMaterial
       value: 
       objectReference: {fileID: 2100000, guid: 9f34070364e48d24297908866dd6762f, type: 2}
+    - target: {fileID: 1977688426, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
+      propertyPath: tileMesh
+      value: 
+      objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
 --- !u!1 &1473293914
@@ -617,6 +621,7 @@ GameObject:
   - component: {fileID: 1591538337}
   - component: {fileID: 1591538336}
   - component: {fileID: 1591538338}
+  - component: {fileID: 1591538339}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -672,6 +677,19 @@ MonoBehaviour:
   minimumNumberOfTilesInSpawnZone: 1
   maximumNumberOfTilesInSpawnZone: 50
   maxNumberOfSpawnZones: 50
+--- !u!114 &1591538339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1591538335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4a0fc5fa7b621e42ad3933f60d398ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clientID: 0
 --- !u!1 &1867890175
 GameObject:
   m_ObjectHideFlags: 0
