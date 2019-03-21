@@ -29,7 +29,6 @@ public class NetworkManager : MonoBehaviour
         List<NetworkCommand> cmds = Network.getPendingCommands();
 		
 		if (cmds != null) {
-			Debug.Log("Received " + cmds.Count + " commands");
 			foreach (NetworkCommand cmd in cmds) {
 				
 				if (cmd is MoveCommand) {

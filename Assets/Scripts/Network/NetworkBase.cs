@@ -62,7 +62,6 @@ public class NetworkBase
 		while (!threadShouldTerminate) {
 			if (streamIn.DataAvailable) {
 				
-				Debug.Log("Reading some data!");
 				byte[] lenBytes = new byte[2];
 				streamIn.Read(lenBytes, 0, 2);
 				short len = (short) (((short)lenBytes[0] << 8) | ((short)lenBytes[1] << 0));
@@ -78,25 +77,17 @@ public class NetworkBase
 	// infinite loop that sends messages to the server
 	static void clientSend()
 	{
-		Debug.Log("Opening send thread!");
 		NetworkStream streamOut = client.GetStream();
 		while (!threadShouldTerminate) {
 			if (toSend.Count > 0) {
-				Debug.Log("Sending " + toSend.Count + " messages!");
 				while (toSend.Count > 0) {
 					
 					byte[] messageBytes = toSend.Dequeue();
-					Debug.Log(messageBytes.Length);
-					string bytes = "";
-					foreach (byte b in messageBytes)
-						bytes += b + " ";
-					Debug.Log(bytes);
 					streamOut.Write(messageBytes, 0, messageBytes.Length);
 				}
 			}
 			Thread.Sleep(1);
 		}
-		Debug.Log("Closing send thread...");
 		byte[] disconnect = NetworkCommand.assembleCommandBytes(new DisconnectCommand(0));
 		streamOut.Write(disconnect, 0, disconnect.Length); // sends DC packet, signalling client disconnect from server
 	}
@@ -114,7 +105,6 @@ public class NetworkBase
 		}
 		else { // if network is disabled (i.e singleplayer) immediately receive submitted messages
 			// remove the directive & length bytes in the command
-			Debug.Log("Am here... for some reason");
 			byte[] moddedCmd = new byte[command.Length - 3];
 			Array.Copy(command, 3, moddedCmd, 0, command.Length - 3);
 			received.Enqueue(moddedCmd);
