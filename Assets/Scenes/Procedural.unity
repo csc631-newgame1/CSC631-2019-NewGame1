@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -221,8 +221,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 1077351063, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -240,8 +240,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -619905303, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
@@ -491,23 +491,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1977688426, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: moveableTilesMesh
-      value: 
+      value:
       objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     - target: {fileID: 1977688426, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: moveableTilesMaterial
-      value: 
+      value:
       objectReference: {fileID: 2100000, guid: 9c4bdd583bc376444a09f7eb6675cbab, type: 2}
     - target: {fileID: 1977688426, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: selectableTilesMesh
-      value: 
+      value:
       objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     - target: {fileID: 1977688426, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: selectableTilesMaterial
-      value: 
+      value:
       objectReference: {fileID: 2100000, guid: 9f34070364e48d24297908866dd6762f, type: 2}
     - target: {fileID: 1977688426, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: tileMesh
-      value: 
+      value:
       objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
@@ -540,8 +540,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_IgnoreReversedGraphics: 1
   m_BlockingObjects: 0
   m_BlockingMask:
@@ -557,8 +557,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
@@ -639,8 +639,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e64ed4f4fd8ebb408eef1be1f07d77e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   playerActionMenu: {fileID: 906174481}
   player: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
   enemy: {fileID: 1681421950760243006, guid: 3651dfd4c31c6524d80cdc6702182ed6, type: 3}
@@ -669,8 +669,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e7913fe360f8a049a458a0ee8989c0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   distanceBetweenZonesScale: 0.1
   lowerRadius: 2
   upperRadius: 4.06
@@ -686,10 +686,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1591538335}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4a0fc5fa7b621e42ad3933f60d398ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  clientID: 0
+  m_Script: {fileID: 11500000, guid: 8e62f91107bc241a7815bea04211dfc8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  playersTurn: 1
+  turnDelay: 0.1
 --- !u!1 &1867890175
 GameObject:
   m_ObjectHideFlags: 0
@@ -783,8 +784,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d546559bc8eed1d4883416b315e1fd35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   offset: {x: 2, y: -2, z: 2}
   pitch: 2
   currentZoom: 9
@@ -911,7 +912,7 @@ PrefabInstance:
     - target: {fileID: 554319256793409777, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
+      value:
       objectReference: {fileID: 1591538336}
     - target: {fileID: 554319256793409777, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}
@@ -946,7 +947,7 @@ PrefabInstance:
     - target: {fileID: 554319257310675154, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
+      value:
       objectReference: {fileID: 1591538336}
     - target: {fileID: 554319257310675154, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}
@@ -981,7 +982,7 @@ PrefabInstance:
     - target: {fileID: 554319255345560244, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
+      value:
       objectReference: {fileID: 1591538336}
     - target: {fileID: 554319255345560244, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}
@@ -1011,7 +1012,7 @@ PrefabInstance:
     - target: {fileID: 554319256456427195, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
+      value:
       objectReference: {fileID: 1591538336}
     - target: {fileID: 554319256456427195, guid: 607d0e13376e1a948a5bdc45282b48fa,
         type: 3}

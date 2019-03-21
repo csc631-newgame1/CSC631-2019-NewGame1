@@ -60,7 +60,7 @@ public class CharacterAnimator : MonoBehaviour
     public IEnumerator StartMovementAnimation()
     {
         animator.SetBool("Moving", true);
-        animator.SetFloat("Velocity Z", character.speed);
+        animator.SetFloat("Velocity Z", 1);
         yield return null;
     }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MapUtils;
 using UnityEngine;
@@ -23,11 +24,14 @@ public class Enemy : GameAgent
     public float currentHealth;
     public float range;
     public float _speed;
+    public float moveTime = 0.1f;
 
     public override void init_agent(Pos position, GameAgentStats stats) {
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
         map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
         grid_pos = position;
+
+        animator = GetComponent<CharacterAnimator>();
 
         this.stats = stats;
         attack = stats.attack;
@@ -35,6 +39,8 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+
+        TurnManager.instance.AddEnemyToList(this);
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -53,6 +59,7 @@ public class Enemy : GameAgent
         if (stats.currentHealth <= 0) {
             stats.currentHealth = 0;
             StartCoroutine(animator.PlayKilledAimation());
+            TurnManager.instance.RemoveEnemyFromList(this);
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
@@ -61,7 +68,9 @@ public class Enemy : GameAgent
     }
 
     public override void take_turn() {
+        StartCoroutine(animator.PlayAttackAnimation());
     }
+
 
     public override void move() {
     }
@@ -74,4 +83,10 @@ public class Enemy : GameAgent
 
     public override void potion() {
     }
+
+    public void FootR() { }
+    public void FootL() { }
+    public void Hit() { }
+    public void Shoot() { }
+    public void WeaponSwitch() { }
 }
