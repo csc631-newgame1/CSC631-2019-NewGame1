@@ -13,7 +13,7 @@ public class TurnManager : MonoBehaviour
     private List<Player> players;
     //list of all enemy units, used to issue them commands
     //NOTE: probably make another abstract class for enemies?
-    private List<TestEnemy> enemies;
+    private List<Enemy> enemies;
     private bool enemiesMoving = false; //boolean to check if enemies are moving
     private bool gameLoading = true;
 
@@ -34,7 +34,7 @@ public class TurnManager : MonoBehaviour
         //create new lists for players and enemies
         //each individual player and enemy object should, upon creation, add themselves to these lists
         players = new List<Player>();
-        enemies = new List<TestEnemy>();
+        enemies = new List<Enemy>();
 
         playersTurn = true;
     }
@@ -60,7 +60,7 @@ public class TurnManager : MonoBehaviour
         players.Add(player);
     }
 
-    public void AddEnemyToList(TestEnemy enemy)
+    public void AddEnemyToList(Enemy enemy)
     {
         enemies.Add(enemy);
     }
@@ -70,7 +70,7 @@ public class TurnManager : MonoBehaviour
         players.Remove(player);
     }
 
-    public void RemoveEnemyFromList(TestEnemy enemy)
+    public void RemoveEnemyFromList(Enemy enemy)
     {
         enemies.Remove(enemy);
     }

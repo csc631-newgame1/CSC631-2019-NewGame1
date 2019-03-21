@@ -4245,12 +4245,8 @@ GameObject:
   - component: {fileID: 2385977303482405250}
   - component: {fileID: 3774247821951125011}
   - component: {fileID: 8495416842594811172}
-<<<<<<< HEAD
-  - component: {fileID: 1059059505521920693}
-=======
   - component: {fileID: 3136897071142366414}
   - component: {fileID: 327658918434417503}
->>>>>>> dev
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Enemy
