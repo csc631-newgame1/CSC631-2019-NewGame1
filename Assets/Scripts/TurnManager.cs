@@ -42,7 +42,7 @@ public class TurnManager : MonoBehaviour
     public void Load_Finished()
     {
         gameLoading = false;
-        Debug.Log("Player turn start");
+        //Debug.Log("Player turn start");
     }
 
     void Update()
@@ -84,7 +84,7 @@ public class TurnManager : MonoBehaviour
     {
         enemiesMoving = true;
 
-        Debug.Log("Enemy turn");
+        //Debug.Log("Enemy turn");
 
         //possibly set turn delay?
         yield return new WaitForSeconds(turnDelay);
@@ -101,14 +101,14 @@ public class TurnManager : MonoBehaviour
             yield return new WaitForSeconds(enemies[i].moveTime);
         }
 
-        Debug.Log("Enemy turn end");
+        //Debug.Log("Enemy turn end");
 
         for (int i = 0; i < players.Count; i++)
         {
             players[i].take_turn(); //allow players to act again
         }
 
-        Debug.Log("Player turn start");
+        //Debug.Log("Player turn start");
 
         playersTurn = true; //set player turn to true
 
@@ -127,7 +127,7 @@ public class TurnManager : MonoBehaviour
               return;
         }
 
-        Debug.Log("Player turn over");
+        //Debug.Log("Player turn over");
 
         playersTurn = false;
     }

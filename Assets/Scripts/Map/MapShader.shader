@@ -8,6 +8,7 @@
 		_Detail ("Fluid Detail Weight", Range(0, 1)) = 0
 		_Bias ("Fluid Level Bias", Range(-1, 1)) = 0
 		_BaseIntensity ("Base Light Intensity", Range(0, 1)) = 0
+		_Flow ("Fluid Flowing Speed", Range(0, 10)) = 1
 	}
 
     SubShader {
@@ -31,6 +32,7 @@
 			half _Detail;
 			half _Bias;
 			half _BaseIntensity;
+			half _Flow;
 			
 			struct i2v {
 				float4 pos : POSITION;
@@ -71,7 +73,7 @@
 
             half4 frag (v2f i) : SV_Target 
 			{
-				half detail = (tex2D(_FluidTex, ((1 + _Time[0]) * i.uv2)).r - 0.5) * 2 * _Detail;
+				half detail = (tex2D(_FluidTex, (_Flow * (_Time[0] * half2(1, 1))) + i.uv2).r - 0.5) * 2 * _Detail;
 				half time_osc = _SinTime[3] * _Oscillation;
 				
 				i.uv1.x = clamp(i.uv1.x + time_osc + detail + _Bias, 0.01f, 0.99f);

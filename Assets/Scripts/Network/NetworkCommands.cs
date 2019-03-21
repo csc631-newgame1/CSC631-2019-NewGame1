@@ -10,9 +10,6 @@ using MapUtils;
  * Each network command MUST contain a character string describing it's command ID followed by a "$" character
  */
  
-// disables "field not used" warnings, specifically for "directive" field
-#pragma warning disable 169, 414
-
 public abstract class NetworkCommand
 {	
 	protected enum Directive { START=0, END, DISCONNECT, ECHO, NONE }
