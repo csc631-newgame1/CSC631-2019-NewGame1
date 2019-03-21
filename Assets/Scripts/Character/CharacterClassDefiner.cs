@@ -30,12 +30,12 @@ public class CharacterClassDefiner : MonoBehaviour
         character = GetComponent<GameAgent>();
         animator = GetComponent<Animator>();
 
+        // Hide all weapon objects.
+        hideAllWeapons();
+
         if (characterClass > 0) {
             SetCharacterClass(characterClass);
         }
-
-        // Hide all weapon objects.
-        hideAllWeapons();
     }
 
     void Update()
@@ -135,7 +135,8 @@ public class CharacterClassDefiner : MonoBehaviour
         }
         else // Unarmed
         {
-            animator.SetInteger("Weapon", CharacterClassOptions.Unarmed);
+            animator.SetInteger("Weapon", CharacterClassOptions.Staff);
+            staff.SetActive(true);
         }
 
         animator.SetTrigger("InstantSwitchTrigger");
