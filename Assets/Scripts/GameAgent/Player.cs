@@ -84,6 +84,10 @@ public class Player : GameAgent
         if (animator.AnimatorIsPlaying() && currentAction == GameAgentAction.MeleeAttack) {
             isAttacking = true;
         } else {
+            if (isAttacking == true) {
+                // quick fix, find a better spot for this
+                player_turn = false;
+            }
             isAttacking = false;
         }
 
@@ -180,15 +184,14 @@ public class Player : GameAgent
     public override void move() {
         if (playerMovedThisTurn)
             return;
-				currentAction = GameAgentAction.Move;
-				tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
+		currentAction = GameAgentAction.Move;
+		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
         tile_selector.showSelectableMoveTiles = true;
     }
 
     public override void act() {
-			  player_turn = false;
         currentAction = GameAgentAction.MeleeAttack;
         tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
 
