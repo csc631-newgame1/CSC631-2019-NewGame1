@@ -23,13 +23,13 @@ public class EnemySpawner : MonoBehaviour {
     [Tooltip("Smallest size a zone can be.")]
     public float lowerRadius = 2f;
     [Tooltip("Largest size a zone can be.")]
-    public float upperRadius = 4f;
+    public float upperRadius = 6f;
     [Tooltip("Smallest number of spawnable tiles a zone can contain.")]
     public int minimumNumberOfTilesInSpawnZone = 1;
     [Tooltip("Largest number of spawnable tiles a zone can contain.")]
-    public int maximumNumberOfTilesInSpawnZone = 50;
+    public int maximumNumberOfTilesInSpawnZone = 100;
 
-    public int maxNumberOfSpawnZones = 50;
+    public int maxNumberOfSpawnZones = 100;
 
     // Initializes map data
     public void Init(MapManager mapManager, MapConfiguration mapConfiguration)
@@ -93,6 +93,7 @@ public class EnemySpawner : MonoBehaviour {
             bool candidateAccepted = false;
 
             for (int i=0; i<numSamplesBeforeRejection; i++) {
+                
                 float angle = Random.value * Mathf.PI * 2;
                 float spawnZoneRadius = Random.Range(lowerRadius/cell_size, upperRadius/cell_size);
                 Vector3 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
@@ -103,7 +104,7 @@ public class EnemySpawner : MonoBehaviour {
 
                 if (IsValid(candidate, spawnZones, grid, spawnZoneRadius)) {
                     SpawnZone spawnZone = CreateSpawnZone(candidate, spawnZoneRadius);
-
+                    Debug.Log("Valid number = " + i);
                     // Checks if the number of zone tiles is acceptable
                     if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
                         && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
@@ -115,6 +116,8 @@ public class EnemySpawner : MonoBehaviour {
                         candidateAccepted = true;
                         break;
                     }
+                } else {
+                    Debug.Log("Rejection number = " + i);
                 }
             }
 
@@ -122,6 +125,7 @@ public class EnemySpawner : MonoBehaviour {
                 remainingSpawnZones.RemoveAt(spawnIndex);
             }
         }
+        Debug.Log("Number of spawnzones = " + spawnZones.Count);
     }
 
     // Randomly removes spawn zones until it is within the max number of spawn zones
