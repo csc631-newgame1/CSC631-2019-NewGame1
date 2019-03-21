@@ -59,6 +59,7 @@ public class Enemy : GameAgent
         if (stats.currentHealth <= 0) {
             stats.currentHealth = 0;
             StartCoroutine(animator.PlayKilledAimation());
+            TurnManager.instance.RemoveEnemyFromList(this);
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
