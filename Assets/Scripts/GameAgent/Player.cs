@@ -18,7 +18,6 @@ public class Player : GameAgent
     public bool isAttacking = false;
 
 	private int move_budget = 8;
-	private int currentHealth;
 	public bool player_turn = true;
     private bool playerMovedThisTurn = false;
 
