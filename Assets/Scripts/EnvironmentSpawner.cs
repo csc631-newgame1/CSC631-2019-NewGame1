@@ -15,13 +15,17 @@ public class EnvironmentSpawner : MonoBehaviour
     float cell_size;
     int width;
     int height;
+    enum environmentType {traversable, nonTraversable, particle};
 
     // Environment object variables.
     public int environmentDensity = 50;
     public float traversableEnvironmentDensity = 0.10f;
     public float nonTraversableEnvironmentDensity = 0.0f;
+    public float particleEnvironmentDensity = 0.0f;
     public GameObject[] traversableEnvironmentObject;
     public GameObject[] nonTraversableEnvironmentObject;
+    public GameObject[] particleEnvironmentObject;
+    List<GameObject> allEnvironmentObject = new List<GameObject>();
     #endregion
 
     public void Init(MapManager mapManager, MapConfiguration mapConfiguration)
@@ -55,23 +59,41 @@ public class EnvironmentSpawner : MonoBehaviour
         float random = Random.Range(0, environmentDensity);
         var clone = new GameObject();
         clone.transform.position = cellPosition;
-        if (random < environmentDensity * nonTraversableEnvironmentDensity) Instantiate(getRandomEnvironmentObject(false), clone.transform);
-        else if (random < environmentDensity * traversableEnvironmentDensity) Instantiate(getRandomEnvironmentObject(true), clone.transform);
+        if (random < environmentDensity * particleEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.particle), clone.transform) as GameObject);
+        else if (random < environmentDensity * nonTraversableEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversable), clone.transform) as GameObject);
+        else if (random < environmentDensity * traversableEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversable), clone.transform) as GameObject);
     }
 
-    GameObject getRandomEnvironmentObject(bool traversable)
+    public void clearEnvironment()
+    {
+        for (int i = 0; i < allEnvironmentObject.Count; i++)
+        {
+            Destroy(allEnvironmentObject[i]);
+        }
+        allEnvironmentObject.Clear();
+    }
+
+    GameObject getRandomEnvironmentObject(environmentType type)
     {
         int index;
-        if (traversable)
+        switch (type)
         {
-            index = Random.Range(0, traversableEnvironmentObject.Length);
-            return traversableEnvironmentObject[index];
-        } else
-        {
-            index = Random.Range(0, nonTraversableEnvironmentObject.Length);
-            return nonTraversableEnvironmentObject[index];
+            case environmentType.traversable:
+                index = Random.Range(0, traversableEnvironmentObject.Length);
+                return traversableEnvironmentObject[index];
+            case environmentType.nonTraversable:
+                index = Random.Range(0, nonTraversableEnvironmentObject.Length);
+                return nonTraversableEnvironmentObject[index];
+            case environmentType.particle:
+                index = Random.Range(0, particleEnvironmentObject.Length);
+                return particleEnvironmentObject[index];
+            default:
+                Debug.Log("getRandomEnvironmentObject() error.");
+                return null;
         }
     }
+
+    
     #endregion
 
 }

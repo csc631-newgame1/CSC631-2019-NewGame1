@@ -61,10 +61,11 @@ public class GameManager : MonoBehaviour
 	{
 		if (Input.GetKeyDown("r")) {
 			map_gen.generate_map();
-			
 			map_manager.clear_map();
-			map_manager.init(map_gen.map);
-			clone = map_manager.instantiate_randomly(player);
+            environmentSpawner.clearEnvironment();
+            map_manager.init(map_gen.map);
+            spawnEnvironment();
+            clone = map_manager.instantiate_randomly(player);
 			Camera.main.GetComponent<CameraControl>().SetTarget(clone);
 
             //SpawnEnemies();
