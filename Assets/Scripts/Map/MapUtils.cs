@@ -116,6 +116,31 @@ namespace MapUtils
 		{
 			return "(" + x.ToString() + "," + y.ToString() + ")";
 		}
+		public override bool Equals(object o)
+		{
+			if (o is Pos) {
+				Pos p = (Pos)o;
+				return p.x == x && p.y == y;
+			}
+			return false;
+		}
+		public override int GetHashCode()
+		{
+			return 0; // getting rid of annoying compile warning
+		}
+		public byte[] toBytes()
+		{
+			byte[] bytes = new byte[8];
+			byte[] xBytes = BitConverter.GetBytes(x);
+			byte[] yBytes = BitConverter.GetBytes(y);
+			if (BitConverter.IsLittleEndian) {
+				Array.Reverse(xBytes);
+				Array.Reverse(yBytes);
+			}
+			Array.Copy(xBytes, 0, bytes, 0, 4);
+			Array.Copy(yBytes, 0, bytes, 4, 4);
+			return bytes;
+		}
 	}
 	
 	public class Cmd
@@ -140,6 +165,18 @@ namespace MapUtils
 		public override string ToString()
 		{
 			return pos.ToString() + " | " + dir.GetString() + " | " + type.GetString();
+		}
+		public override bool Equals(object o)
+		{
+			if (o is Cmd) {
+				Cmd c = (Cmd)o;
+				return c.dir == dir && c.type == type && c.pos == pos;
+			}
+			return false;
+		}
+		public override int GetHashCode()
+		{
+			return 0; // getting rid of annoying compile warning
 		}
 	}
 	
