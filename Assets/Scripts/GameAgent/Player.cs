@@ -10,6 +10,7 @@ public class Player : GameAgent
     private MapConfiguration config;
 	private TileSelector tile_selector; // reference to map tile selector
     private List<Pos> selectableTiles;
+    private CharacterClass playerCharacterClass;
 
 	// private reference to position in map grid
     public bool hoveringMovementTileSelector = false;
@@ -42,17 +43,18 @@ public class Player : GameAgent
         config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         grid_pos = position;
 
-		animator = GetComponent<CharacterAnimator>();
-        classDefiner = GetComponent<CharacterClassDefiner>();
-        animator.init();
-        classDefiner.init();
-
         this.stats = stats;
         attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+
+        animator = GetComponent<CharacterAnimator>();
+        classDefiner = GetComponent<CharacterClassDefiner>();
+        animator.init();
+        classDefiner.init(stats.characterClass);
+        SetPlayerCharacterClass();
 
         selectableTiles = new List<Pos>();
 
@@ -160,6 +162,26 @@ public class Player : GameAgent
 		tile_selector.clear_path_line();
         playerMovedThisTurn = true;
 	}
+
+    private void SetPlayerCharacterClass() {
+        switch (stats.characterClass) {
+            case CharacterClassOptions.Knight:
+                playerCharacterClass = new Knight();
+                break;
+            case CharacterClassOptions.Hunter:
+                playerCharacterClass = new Hunter();
+                break;
+            case CharacterClassOptions.Mage:
+                playerCharacterClass = new Mage();
+                break;
+            case CharacterClassOptions.Healer:
+                playerCharacterClass = new Healer();
+                break;
+            default:
+                playerCharacterClass = new Knight();
+                break;
+        }
+    }
 
     void spawnActionRadius()
     {
