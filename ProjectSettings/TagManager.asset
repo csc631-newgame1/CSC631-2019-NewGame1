@@ -7,6 +7,7 @@ TagManager:
   - Map
   - Collide
   - Enemy
+  - Walkable Environment
   layers:
   - Default
   - TransparentFX

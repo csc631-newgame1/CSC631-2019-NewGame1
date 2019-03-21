@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 
     private MapConfiguration mapConfiguration;
     private EnemySpawner enemySpawner;
+    private EnvironmentSpawner environmentSpawner;
     private GameObject clone;
 
     private List<SpawnZone> spawnZones;
@@ -38,7 +39,15 @@ public class GameManager : MonoBehaviour
         mapConfiguration = map.GetComponent<MapConfiguration>();
 
         enemySpawner = GetComponent<EnemySpawner>();
+        environmentSpawner = GetComponent<EnvironmentSpawner>();
+        spawnEnvironment();
         SpawnEnemies();
+    }
+
+    void spawnEnvironment()
+    {
+        environmentSpawner.Init(map_manager, mapConfiguration);
+        environmentSpawner.spawnEnvironment();
     }
 
     void SpawnEnemies() 
