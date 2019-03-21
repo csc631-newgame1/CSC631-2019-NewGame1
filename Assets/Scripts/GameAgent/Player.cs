@@ -10,15 +10,16 @@ public class Player : GameAgent
     private MapConfiguration config;
 	private TileSelector tile_selector; // reference to map tile selector
     private List<Pos> selectableTiles;
-	
+
 	// private reference to position in map grid
     public bool hoveringMovementTileSelector = false;
 	public bool moving = false;
     public bool hoveringActionTileSelector = false;
     public bool isAttacking = false;
 	public bool godMode = true;
-	
-	private bool player_turn = false;
+
+	public bool player_turn = true;
+    private bool playerMovedThisTurn = false;
 
     [Header("Player Stats")]
     public float attack;
@@ -33,7 +34,7 @@ public class Player : GameAgent
 
 	CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
-	
+
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
     {
@@ -54,9 +55,11 @@ public class Player : GameAgent
         _speed = stats.speed;
 
         selectableTiles = new List<Pos>();
-		
+
 		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
 		tile_selector.setPlayer(this);
+
+        TurnManager.instance.AddPlayerToList(this); //add player to player list
     }
 
 	// if right mouse button is pressed, move player model to hover position
@@ -124,29 +127,30 @@ public class Player : GameAgent
     public override void take_turn()
 	{
 		player_turn = true;
+        playerMovedThisTurn = false;
 	}
-	
+
 	public override IEnumerator smooth_movement(List<Pos> path)
 	{
 		moving = true;
         StartCoroutine(animator.StartMovementAnimation());
-		
+
 			Vector3 origin, target;
 			foreach(Pos step in path) {
-				
+
 				origin = transform.position;
 				target = map_manager.grid_to_world(step);
 				float dist = Vector3.Distance(origin, target);
 				float time = 0f;
-				
+
 				transform.LookAt(target);
-				
+
 					while(time < 1f && dist > 0f) {
 						time += (Time.deltaTime * speed) / dist;
 						transform.position = Vector3.Lerp(origin, target, time);
 						yield return null;
 					}
-				
+
 				grid_pos = step;
 			}
 			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
@@ -154,8 +158,9 @@ public class Player : GameAgent
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
 		tile_selector.clear_path_line();
+        playerMovedThisTurn = true;
 	}
-	
+
     void spawnActionRadius()
     {
         var exp = GetComponent<ParticleSystem>();
@@ -186,15 +191,18 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
-        currentAction = GameAgentAction.Move;
+        if (playerMovedThisTurn || !player_turn)
+            return;
+		currentAction = GameAgentAction.Move;
 		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
-
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
         tile_selector.showSelectableMoveTiles = true;
     }
 
     public override void act() {
+        if (!player_turn)
+            return;
         currentAction = GameAgentAction.MeleeAttack;
         tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
 
@@ -203,14 +211,20 @@ public class Player : GameAgent
     }
 
     public override void wait() {
+        if (!player_turn)
+            return;
         currentAction = GameAgentAction.Wait;
         Debug.Log("Wait Action");
+        player_turn = false;
     }
 
     public override void potion() {
+        if (!player_turn)
+            return;
         currentAction = GameAgentAction.Potion;
         StartCoroutine(animator.PlayUseItemAnimation());
         stats.currentHealth += 10;
         Debug.Log("Potion Action");
+        player_turn = false;
     }
 }
