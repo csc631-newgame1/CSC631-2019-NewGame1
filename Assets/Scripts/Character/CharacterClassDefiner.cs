@@ -1,22 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public static class CharacterClasses {
-    public const int Warrior = 1;
-    public const int Hunter = 2;
-    public const int Mage = 3;
-    public const int Orc = 4;
-    public const int Skeleton = 5;
-    public const int Boss = 6;
-
-    public const int Sword = 1;
-    public const int Bow = 4;
-    public const int Staff = 6;
-    public const int Axe = 3;
-    public const int Club = 9;
-    public const int Unarmed = 0;
-};
+﻿using UnityEngine;
 
 public class CharacterClassDefiner : MonoBehaviour
 {
@@ -43,10 +25,14 @@ public class CharacterClassDefiner : MonoBehaviour
     public GameObject club;
     #endregion
 
-    public void init() {
+    public void init(int characterClass = 0) {
         // Get required components.
         character = GetComponent<GameAgent>();
         animator = GetComponent<Animator>();
+
+        if (characterClass > 0) {
+            SetCharacterClass(characterClass);
+        }
 
         // Hide all weapon objects.
         hideAllWeapons();
@@ -56,12 +42,12 @@ public class CharacterClassDefiner : MonoBehaviour
     {
         // For testing.
         if (character is Player) {
-            if (Input.GetKeyDown("a")) SetCharacterClass(CharacterClasses.Warrior);
-            if (Input.GetKeyDown("s")) SetCharacterClass(CharacterClasses.Hunter);
-            if (Input.GetKeyDown("d")) SetCharacterClass(CharacterClasses.Mage);
-            if (Input.GetKeyDown("f")) SetCharacterClass(CharacterClasses.Orc);
-            if (Input.GetKeyDown("g")) SetCharacterClass(CharacterClasses.Skeleton);
-            if (Input.GetKeyDown("h")) SetCharacterClass(CharacterClasses.Boss);
+            if (Input.GetKeyDown("a")) SetCharacterClass(CharacterClassOptions.Knight);
+            if (Input.GetKeyDown("s")) SetCharacterClass(CharacterClassOptions.Hunter);
+            if (Input.GetKeyDown("d")) SetCharacterClass(CharacterClassOptions.Mage);
+            if (Input.GetKeyDown("f")) SetCharacterClass(CharacterClassOptions.Orc);
+            if (Input.GetKeyDown("g")) SetCharacterClass(CharacterClassOptions.Skeleton);
+            if (Input.GetKeyDown("h")) SetCharacterClass(CharacterClassOptions.Healer);
         }
     }
 
@@ -69,37 +55,37 @@ public class CharacterClassDefiner : MonoBehaviour
     #region Main Methods
     public void SetCharacterClass(int characterID)
     {
-        if (characterID == CharacterClasses.Warrior) // Warrior
+        if (characterID == CharacterClassOptions.Knight) // Warrior
         {
-            SetCharacterModel(CharacterClasses.Warrior);
-            SetCharacterWeapon(CharacterClasses.Warrior);
+            SetCharacterModel(CharacterClassOptions.Knight);
+            SetCharacterWeapon(CharacterClassOptions.Knight);
         }
-        else if (characterID == CharacterClasses.Hunter) // Hunter
+        else if (characterID == CharacterClassOptions.Hunter) // Hunter
         {
-            SetCharacterModel(CharacterClasses.Hunter);
-            SetCharacterWeapon(CharacterClasses.Hunter);
+            SetCharacterModel(CharacterClassOptions.Hunter);
+            SetCharacterWeapon(CharacterClassOptions.Hunter);
         }
-        else if (characterID == CharacterClasses.Mage) // Mage
+        else if (characterID == CharacterClassOptions.Mage) // Mage
         {
-            SetCharacterModel(CharacterClasses.Mage);
-            SetCharacterWeapon(CharacterClasses.Mage);
+            SetCharacterModel(CharacterClassOptions.Mage);
+            SetCharacterWeapon(CharacterClassOptions.Mage);
         }
-        else if (characterID == CharacterClasses.Orc) // Orc
+        else if (characterID == CharacterClassOptions.Orc) // Orc
         {
-            SetCharacterModel(CharacterClasses.Orc);
+            SetCharacterModel(CharacterClassOptions.Orc);
             weaponNum = Random.Range(4, 6);
             SetCharacterWeapon(weaponNum);
         }
-        else if (characterID == CharacterClasses.Skeleton) // Skeleton
+        else if (characterID == CharacterClassOptions.Skeleton) // Skeleton
         {
-            SetCharacterModel(CharacterClasses.Skeleton);
+            SetCharacterModel(CharacterClassOptions.Skeleton);
             weaponNum = Random.Range(4, 6);
             SetCharacterWeapon(weaponNum);
         }
         else // Boss
         {
-            SetCharacterModel(CharacterClasses.Boss);
-            SetCharacterWeapon(CharacterClasses.Boss);
+            SetCharacterModel(CharacterClassOptions.Healer);
+            SetCharacterWeapon(CharacterClassOptions.Healer);
         }
     }
 
@@ -122,34 +108,34 @@ public class CharacterClassDefiner : MonoBehaviour
     {
         hideAllWeapons();
 
-        if (weaponID == CharacterClasses.Warrior) // Sword
+        if (weaponID == CharacterClassOptions.Knight) // Sword
         {
-            animator.SetInteger("Weapon", CharacterClasses.Sword);
+            animator.SetInteger("Weapon", CharacterClassOptions.Sword);
             sword.SetActive(true);
         }
-        else if (weaponID == CharacterClasses.Hunter) // Bow
+        else if (weaponID == CharacterClassOptions.Hunter) // Bow
         {
-            animator.SetInteger("Weapon", CharacterClasses.Bow);
+            animator.SetInteger("Weapon", CharacterClassOptions.Bow);
             bow.SetActive(true);
         }
-        else if (weaponID == CharacterClasses.Mage) // Staff
+        else if (weaponID == CharacterClassOptions.Mage) // Staff
         {
-            animator.SetInteger("Weapon", CharacterClasses.Staff);
+            animator.SetInteger("Weapon", CharacterClassOptions.Staff);
             staff.SetActive(true);
         }
-        else if (weaponID == CharacterClasses.Orc) // Axe
+        else if (weaponID == CharacterClassOptions.Orc) // Axe
         {
-            animator.SetInteger("Weapon", CharacterClasses.Axe);
+            animator.SetInteger("Weapon", CharacterClassOptions.Axe);
             axe.SetActive(true);
         }
-        else if (weaponID == CharacterClasses.Skeleton) // Club
+        else if (weaponID == CharacterClassOptions.Skeleton) // Club
         {
-            animator.SetInteger("Weapon", CharacterClasses.Club);
+            animator.SetInteger("Weapon", CharacterClassOptions.Club);
             club.SetActive(true);
         }
         else // Unarmed
         {
-            animator.SetInteger("Weapon", CharacterClasses.Unarmed);
+            animator.SetInteger("Weapon", CharacterClassOptions.Unarmed);
         }
 
         animator.SetTrigger("InstantSwitchTrigger");

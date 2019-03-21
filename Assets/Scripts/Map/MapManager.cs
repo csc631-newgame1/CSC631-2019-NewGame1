@@ -64,7 +64,7 @@ public class MapManager : MonoBehaviour
 		GameAgent agent = clone.GetComponent<GameAgent>();
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(CharacterClasses.Warrior));
+            agent.init_agent(pos, new GameAgentStats(CharacterClassOptions.Knight));
         } else {
             agent.init_agent(pos, stats);
         }
