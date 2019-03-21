@@ -42,19 +42,24 @@ public class TileSelector : MonoBehaviour
 	private int height;
 	private float cell_size;
 	private Vector3 offset;
-	
-	private Transform select_square;
+
+    private Transform select_square;
 	private MapManager map_manager;
 	private LineRenderer path_render;
 	private Player player_main;
-    private List<Path> selectableTiles;
-	
-	private int[,] map;
+
+    private List<Path> selectableMovementTiles;
+    private List<Pos> selectableActTiles;
+
+    private int[,] map;
 
     public bool showPathLine = false;
-	
-	public Vector3 hover_position;
+    public bool showSelectableMoveTiles = false;
+    public bool showSelectableActTiles = false;
+
+    public Vector3 hover_position;
 	public Pos grid_position;
+
 	
 	// called by the mapGenerator script
 	public void init_tile_selector(int[,] map)
@@ -85,7 +90,7 @@ public class TileSelector : MonoBehaviour
 	
 	void Update()
 	{
-        if (showPathLine) {
+        if (showSelectableMoveTiles) {
             // TODO Consider showing selectable tiles to the user here
 			RaycastHit hit;
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -103,7 +108,7 @@ public class TileSelector : MonoBehaviour
 					
 					if (hit_path != null) {
 						
-						if (hitp != player_main.grid_pos && !player_main.moving)
+						if (hitp != player_main.grid_pos && !player_main.moving && showPathLine)
 							render_path_line(hit_path);
 
 						hover_position = map_manager.grid_to_world(hitp);
@@ -112,12 +117,38 @@ public class TileSelector : MonoBehaviour
 						grid_position = hitp;
 						
 					} else {
-						select_square.gameObject.SetActive(false);
+						//select_square.gameObject.SetActive(false);
 					}
 				}
             }
+        } else if (showSelectableActTiles) {
+            // TODO Consider showing selectable tiles to the user here
+            RaycastHit hit;
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit)) {
+
+                Vector3 diff = hit.point + offset;
+                int hitx = (int)(diff.x / cell_size);
+                int hity = (int)(diff.z / cell_size);
+                Pos hitp = new Pos(hitx, hity);
+
+                // subtract one half of a cell's length so that the square will be centered
+                if (Pos.in_bounds(hitp, width, height) && hitp != grid_position) {
+                    Pos hitTile = GetSelectableActTile(hitp);
+
+                    if (hitTile != null) {
+                        hover_position = map_manager.grid_to_world(hitp);
+                        select_square.gameObject.SetActive(true);
+                        select_square.position = hover_position;
+                        grid_position = hitp;
+
+                    } else {
+                        //select_square.gameObject.SetActive(false);
+                    }
+                }
+            }
         }
-	}
+    }
 	
 	void render_path_line(Path path)
 	{
@@ -142,9 +173,9 @@ public class TileSelector : MonoBehaviour
 	
     // Creates a list of all selectable tiles within a given radius of a position
     // Consider turning this static for enemy AI if this is the only method they need from this class
-    public void CreateListOfSelectableTiles(Pos position, int move_budget) 
+    public void CreateListOfSelectableMovementTiles(Pos position, int move_budget, GameAgentAction action) 
 	{	
-        selectableTiles = new List<Path>();
+        selectableMovementTiles = new List<Path>();
 		
 		int startx 	= position.x - move_budget >= 0 ? position.x - move_budget : 0;
 		int endx	= position.x + move_budget < width ? position.x + move_budget : width - 1;
@@ -152,36 +183,80 @@ public class TileSelector : MonoBehaviour
 		int starty 	= position.y - move_budget >= 0 ? position.y - move_budget : 0;
 		int endy	= position.y + move_budget < height ? position.y + move_budget : height - 1;
 
-        for (int x = startx; x <= endx; x++) {
-			for (int y = starty; y <= endy; y++) {
+        if (action == GameAgentAction.Move) {
+            for (int x = startx; x <= endx; x++) {
+			    for (int y = starty; y <= endy; y++) {
 				
-				Pos candidate = new Pos(x, y);
-				if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
-					
-					Path path = new Path(map_manager.get_path(position, candidate));
-					if(path.distance() <= move_budget) {
-						selectableTiles.Add(path);
-					}
-				}
+				    Pos candidate = new Pos(x, y);
+                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+
+                        Path path = new Path(map_manager.get_path(position, candidate));
+                        if (path.distance() <= move_budget) {
+                            selectableMovementTiles.Add(path);
+                        }
+                    }
+                }
 			}
 		}
     }
 
+    // Creates a list of all selectable tiles within a given radius of a position
+    // Consider turning this static for enemy AI if this is the only method they need from this class
+    public void CreateListOfSelectableActTiles(Pos position, int move_budget, GameAgentAction action) {
+        selectableActTiles = new List<Pos>();
+
+        int startx = position.x - move_budget >= 0 ? position.x - move_budget : 0;
+        int endx = position.x + move_budget < width ? position.x + move_budget : width - 1;
+
+        int starty = position.y - move_budget >= 0 ? position.y - move_budget : 0;
+        int endy = position.y + move_budget < height ? position.y + move_budget : height - 1;
+
+        // TODO figure out if you are going to create a new method that doesn't fuck around with the List<Path>
+        if (action == GameAgentAction.MeleeAttack) {
+            for (int x = startx; x <= endx; x++) {
+                for (int y = starty; y <= endy; y++) {
+
+                    Pos candidate = new Pos(x, y);
+                    if (map_manager.IsOccupied(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+                        selectableActTiles.Add(candidate);
+                    }
+                }
+            }
+        }
+    }
+
     private Path getSelectableTilePath(Pos tile_pos) 
 	{
-        foreach(Path path in selectableTiles)
+        foreach(Path path in selectableMovementTiles)
 			if (path.endPos() == tile_pos)
 				return path;
 		return null;
     }
+
+    private Pos GetSelectableActTile(Pos tilePos) {
+        foreach (Pos tile in selectableActTiles)
+            if (tile == tilePos)
+                return tile;
+        return null;
+    }
 	
 	void OnDrawGizmos() {
-        if (showPathLine) {
-            List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
-
-            if (selectableTiles.Count > 0) {
-                foreach (Path path in selectableTiles) {
+        if (showSelectableMoveTiles) {
+            if (selectableMovementTiles.Count > 0) {
+                foreach (Path path in selectableMovementTiles) {
 					Pos tile = path.endPos();
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos(tile.x, tile.y)), new Vector3(1f, 0, 1f));
+                }
+            }
+
+            
+        }
+
+        if (showSelectableActTiles) {
+            if (selectableActTiles.Count > 0) {
+                foreach (Pos tile in selectableActTiles) {
+                    Gizmos.color = Color.red;
                     Gizmos.DrawWireCube(map_manager.grid_to_world(new Pos(tile.x, tile.y)), new Vector3(1f, 0, 1f));
                 }
             }
