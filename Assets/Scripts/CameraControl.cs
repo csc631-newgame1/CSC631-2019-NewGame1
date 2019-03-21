@@ -20,7 +20,7 @@ public class CameraControl : MonoBehaviour
 
     public void SetTarget(GameObject target)
     {
-		Debug.Log("set target");
+		//Debug.Log("set target");
 		
         target_transform = target.transform;
     }
