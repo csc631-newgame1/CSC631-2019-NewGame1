@@ -16,8 +16,8 @@ public class Player : GameAgent
 	public bool moving = false;
     public bool hoveringActionTileSelector = false;
     public bool isAttacking = false;
+	public bool godMode = true;
 	
-	private int move_budget = 8;
 	private bool player_turn = false;
 
     [Header("Player Stats")]
@@ -26,6 +26,7 @@ public class Player : GameAgent
     public float currentHealth;
     public float range;
     public float _speed;
+	public int move_budget = 8;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
@@ -63,26 +64,31 @@ public class Player : GameAgent
     void Update()
     {
 		if (Input.GetMouseButtonDown(1) && !moving && hoveringActionTileSelector) {
-            if (currentAction == GameAgentAction.Move) {
-                if (map_manager.move(grid_pos, tile_selector.grid_position)) {
+			
+			switch (currentAction) {
+				
+			case GameAgentAction.Move:
+			
+				if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
+					
                     grid_pos = tile_selector.grid_position;
                     hoveringActionTileSelector = false;
                     tile_selector.showSelectableMoveTiles = false;
                     tile_selector.showPathLine = false;
                 }
-            } else if (currentAction == GameAgentAction.MeleeAttack) {
-                if (map_manager.IsOccupied(tile_selector.grid_position)) {
-                    this.transform.LookAt(map_manager.GetUnitTransform(tile_selector.grid_position));
+				break;
+				
+			case GameAgentAction.MeleeAttack:
+			
+				if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position)) {
+					
+					Pos attackPos = tile_selector.grid_position;
                     StartCoroutine(animator.PlayAttackAnimation());
+					StartCoroutine(WaitForAttackEnd(attackPos));
                 }
+                break;
             }
 		}
-
-        if (animator.AnimatorIsPlaying() && currentAction == GameAgentAction.MeleeAttack) {
-            isAttacking = true;
-        } else {
-            isAttacking = false;
-        }
 
         // For testing animations.
         if (Input.GetKeyDown("1")) StartCoroutine(animator.PlayRotateAnimation());
@@ -93,9 +99,20 @@ public class Player : GameAgent
         if (Input.GetKeyDown("6")) StartCoroutine(animator.PlayKilledAimation());
     }
 	
-	public override void take_damage(int amount)
+	IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
-        stats.currentHealth -= amount;
+		isAttacking = true;
+		while (isAttacking) yield return null;
+		map_manager.attack(attackPos, (int)stats.attack);
+
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
+	}
+	
+	public override void take_damage(int amount)
+	{	
+        if (!godMode) stats.currentHealth -= amount;
+		
         if (stats.currentHealth <= 0) {
             stats.currentHealth = 0;
             StartCoroutine(animator.PlayKilledAimation());
@@ -154,13 +171,9 @@ public class Player : GameAgent
 	public void FootR(){}
 	public void FootL(){}
 
-    // Deal damage as soon as animation hits the target
+    // Signal end of attack once hit animation has completed
 	public void Hit(){
-        if (isAttacking) {
-            map_manager.attack(tile_selector.grid_position, (int)stats.attack);
-            hoveringActionTileSelector = false;
-            tile_selector.showSelectableActTiles = false;
-        }
+		if (isAttacking) isAttacking = false;
     }
 
 	public void Shoot(){

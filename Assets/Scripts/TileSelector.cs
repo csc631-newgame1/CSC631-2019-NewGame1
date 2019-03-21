@@ -105,30 +105,22 @@ public class TileSelector : MonoBehaviour
 			Vector3 diff = hit.point + offset;
 			hitp = new Pos((int)(diff.x / cell_size), (int)(diff.z / cell_size));
 			
-			if (map_manager.IsTraversable(hitp) && Pos.in_bounds(hitp, width, height) && hitp != grid_position) {
-				select_square.gameObject.SetActive(true);
-				select_square.position = hover_position;
+			if (map_manager.IsTraversable(hitp) && Pos.in_bounds(hitp, width, height)) {
 				
-				if (showSelectableMoveTiles) {
+				if (hitp != grid_position) {
 					
-					Path hit_path = getSelectableTilePath(hitp);
+					hover_position = map_manager.grid_to_world(hitp);
+					grid_position = hitp;
+					select_square.gameObject.SetActive(true);
+					select_square.position = hover_position;
 					
-					if (hit_path != null) {
-						if (hitp != player_main.grid_pos && !player_main.moving && showPathLine)
+					if (showSelectableMoveTiles) {
+						
+						Path hit_path = getSelectableTilePath(hitp);
+						
+						if (hit_path != null && hitp != player_main.grid_pos && !player_main.moving && showPathLine)
 							render_path_line(hit_path);
-
-						hover_position = map_manager.grid_to_world(hitp);
-						grid_position = hitp;
-					}
-				} 
-				else if (showSelectableActTiles) {
-					
-					Pos hitTile = GetSelectableActTile(hitp);
-
-					if (hitTile != null) {
-						hover_position = map_manager.grid_to_world(hitp);
-						grid_position = hitp;
-					}
+					} 
 				}
 			}
 			else {
@@ -186,6 +178,11 @@ public class TileSelector : MonoBehaviour
 			}
 		}
     }
+	
+	public bool hoveringValidMoveTile()
+	{
+		return getSelectableTilePath(grid_position) != null;
+	}
 
     // Creates a list of all selectable tiles within a given radius of a position
     // Consider turning this static for enemy AI if this is the only method they need from this class
@@ -211,6 +208,11 @@ public class TileSelector : MonoBehaviour
             }
         }
     }
+	
+	public bool hoveringValidSelectTile()
+	{
+		return GetSelectableActTile(grid_position) != null;
+	}
 
     private Path getSelectableTilePath(Pos tile_pos) 
 	{
