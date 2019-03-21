@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ public class CharacterAnimator : MonoBehaviour
     const int maxBlockedAnimations = 2;
 
     // Animation duartion variables.
-    const float actionDuration = 0.5f;
+    const float actionDuration = 0.4f;
     const float particleDuration = 1.0f;
 
     // Particle System objects.
@@ -33,7 +34,7 @@ public class CharacterAnimator : MonoBehaviour
     public ParticleSystem ghosts;
     #endregion
 
-    void Start()
+    public void init()
     {
         // Get required components.
         character = GetComponent<GameAgent>();
@@ -81,7 +82,7 @@ public class CharacterAnimator : MonoBehaviour
     #region Character Action
     public IEnumerator PlayAttackAnimation()
     {
-        animationNumber = Random.Range(1, maxAttackAnimations + 1);
+        animationNumber = UnityEngine.Random.Range(1, maxAttackAnimations + 1);
 
         if (animator.GetInteger("Weapon") == 6)
         {
@@ -90,6 +91,7 @@ public class CharacterAnimator : MonoBehaviour
             SpawnParticleSystemAtCharacter(magicSparks);
             yield return new WaitForSeconds(actionDuration);
             animator.SetTrigger("CastEndTrigger");
+   
         }
         else if (animator.GetInteger("Weapon") == 4)
         {
@@ -105,6 +107,11 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
+    public bool AnimatorIsPlaying() {
+        return animator.GetCurrentAnimatorStateInfo(0).length >
+               animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+    }
+
     public IEnumerator PlayUseItemAnimation()
     {
         animator.SetTrigger("ActivateTrigger");
@@ -117,7 +124,7 @@ public class CharacterAnimator : MonoBehaviour
     #region Character Reaction
     public IEnumerator PlayHitAnimation()
     {
-        animationNumber = Random.Range(1, maxHitAnimations + 1);
+        animationNumber = UnityEngine.Random.Range(1, maxHitAnimations + 1);
         animator.SetTrigger("GetHit" + (animationNumber).ToString() + "Trigger");
         SpawnParticleSystemAtCharacter(blood);
         SpawnParticleSystemAtCharacter(hit);
@@ -128,7 +135,7 @@ public class CharacterAnimator : MonoBehaviour
     {
         animator.SetBool("Blocking", true);
         animator.SetTrigger("BlockTrigger");
-        animationNumber = Random.Range(1, maxBlockedAnimations + 1);
+        animationNumber = UnityEngine.Random.Range(1, maxBlockedAnimations + 1);
         animator.SetTrigger("BlockGetHit" + (animationNumber).ToString() + "Trigger");
         SpawnParticleSystemAtCharacter(sparks);
         SpawnParticleSystemAtCharacter(dust);
