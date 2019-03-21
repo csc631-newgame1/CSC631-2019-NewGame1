@@ -104,7 +104,6 @@ public class EnemySpawner : MonoBehaviour {
 
                 if (IsValid(candidate, spawnZones, grid, spawnZoneRadius)) {
                     SpawnZone spawnZone = CreateSpawnZone(candidate, spawnZoneRadius);
-                    Debug.Log("Valid number = " + i);
                     // Checks if the number of zone tiles is acceptable
                     if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
                         && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
@@ -116,8 +115,6 @@ public class EnemySpawner : MonoBehaviour {
                         candidateAccepted = true;
                         break;
                     }
-                } else {
-                    Debug.Log("Rejection number = " + i);
                 }
             }
 
@@ -125,7 +122,6 @@ public class EnemySpawner : MonoBehaviour {
                 remainingSpawnZones.RemoveAt(spawnIndex);
             }
         }
-        Debug.Log("Number of spawnzones = " + spawnZones.Count);
     }
 
     // Randomly removes spawn zones until it is within the max number of spawn zones
