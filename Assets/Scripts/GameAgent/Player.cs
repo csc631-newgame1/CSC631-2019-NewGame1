@@ -182,7 +182,7 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
-        if (playerMovedThisTurn)
+        if (playerMovedThisTurn || !player_turn)
             return;
 		currentAction = GameAgentAction.Move;
 		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
@@ -192,6 +192,8 @@ public class Player : GameAgent
     }
 
     public override void act() {
+        if (!player_turn)
+            return;
         currentAction = GameAgentAction.MeleeAttack;
         tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
 
@@ -200,12 +202,16 @@ public class Player : GameAgent
     }
 
     public override void wait() {
+        if (!player_turn)
+            return;
         currentAction = GameAgentAction.Wait;
         Debug.Log("Wait Action");
         player_turn = false;
     }
 
     public override void potion() {
+        if (!player_turn)
+            return;
         currentAction = GameAgentAction.Potion;
         StartCoroutine(animator.PlayUseItemAnimation());
         stats.currentHealth += 10;
