@@ -36,13 +36,13 @@ public class TurnManager : MonoBehaviour
         players = new List<Player>();
         enemies = new List<TestEnemy>();
 
-        Debug.Log("Player turn start");
         playersTurn = true;
     }
 
     public void Load_Finished()
     {
         gameLoading = false;
+        Debug.Log("Player turn start");
     }
 
     void Update()
