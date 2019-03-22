@@ -3,7 +3,7 @@
 public class Hunter : CharacterClass
 {
     public Hunter() {
-        baseStats = new GameAgentStats(18, 35, 9, 9);
+        baseStats = new GameAgentStats(18, 35, 9, 9, true);
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
@@ -42,5 +42,17 @@ public class Hunter : CharacterClass
     }
 
     public override void LevelUp() {
+    }
+
+    public override void SetWeapon(int weapon) {
+        if (weapon == CharacterClassOptions.RandomClassWeapon) {
+            GenerateRandomClassWeapon();
+        } else {
+            this.weapon = weapon;
+        }
+    }
+
+    protected override void GenerateRandomClassWeapon() {
+        weapon = CharacterClassOptions.Bow;
     }
 }

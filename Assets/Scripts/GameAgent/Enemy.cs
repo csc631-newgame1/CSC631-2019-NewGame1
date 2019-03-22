@@ -46,9 +46,7 @@ public class Enemy : GameAgent
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
-        classDefiner.init();
-
-        classDefiner.SetCharacterClass(stats.characterClassOption);
+        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
     }
 
     public override IEnumerator smooth_movement(List<Pos> locations) {
