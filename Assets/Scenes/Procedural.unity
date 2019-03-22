@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -509,6 +509,10 @@ PrefabInstance:
       propertyPath: tileMesh
       value: 
       objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 1977688426, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
+      propertyPath: nonselectableTilesMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: b0345d6b496b88744a4fe169db3b58c0, type: 2}
     - target: {fileID: 759237791, guid: b2c9801dc5e38b84fa19b23bc71ec1a2, type: 3}
       propertyPath: seed
       value: asdfasdfasdf
@@ -690,10 +694,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   distanceBetweenZonesScale: 0.1
   lowerRadius: 2
-  upperRadius: 4
+  upperRadius: 6
   minimumNumberOfTilesInSpawnZone: 1
-  maximumNumberOfTilesInSpawnZone: 10
-  maxNumberOfSpawnZones: 5
+  maximumNumberOfTilesInSpawnZone: 100
+  maxNumberOfSpawnZones: 100
 --- !u!114 &1591538339
 MonoBehaviour:
   m_ObjectHideFlags: 0

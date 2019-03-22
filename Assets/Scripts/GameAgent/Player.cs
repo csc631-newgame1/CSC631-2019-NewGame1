@@ -105,7 +105,10 @@ public class Player : GameAgent
 	IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
 		isAttacking = true;
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
         this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
+
         while (isAttacking) yield return null;
 		map_manager.attack(attackPos, (int)stats.attack);
 
@@ -199,6 +202,7 @@ public class Player : GameAgent
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
         tile_selector.showSelectableMoveTiles = true;
+        tile_selector.showSelectableActTiles = false;
     }
 
     public override void act() {
@@ -208,6 +212,7 @@ public class Player : GameAgent
         tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
 
         hoveringActionTileSelector = true;
+        tile_selector.showSelectableMoveTiles = false;
         tile_selector.showSelectableActTiles = true;
     }
 
@@ -215,6 +220,9 @@ public class Player : GameAgent
         if (!player_turn)
             return;
         currentAction = GameAgentAction.Wait;
+        tile_selector.showPathLine = false;
+        tile_selector.showSelectableMoveTiles = false;
+        tile_selector.showSelectableActTiles = false;
         Debug.Log("Wait Action");
         player_turn = false;
     }
