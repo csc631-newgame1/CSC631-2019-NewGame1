@@ -62,6 +62,7 @@ public class EnemyGroupDescription
         return powerLevel;
     }
 
+    // Consider removing this - or implementing it
     private void CalculatePowerLevel() {
         powerLevel += stats.attack * stats.attack;
         powerLevel += stats.maxHealth * stats.maxHealth;

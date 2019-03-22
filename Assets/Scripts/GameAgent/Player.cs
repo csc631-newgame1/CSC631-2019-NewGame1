@@ -105,7 +105,8 @@ public class Player : GameAgent
 	IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
 		isAttacking = true;
-		while (isAttacking) yield return null;
+        this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
+        while (isAttacking) yield return null;
 		map_manager.attack(attackPos, (int)stats.attack);
 
         hoveringActionTileSelector = false;
