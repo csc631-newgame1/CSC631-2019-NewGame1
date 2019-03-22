@@ -2,10 +2,13 @@
 using System;
 using UnityEngine;
 
+public enum GameAgentState { Alive, Unconscious, Dead };
+
 public class GameAgentStats
 {
     public int characterClassOption;
     public int characterRace;
+    public GameAgentState currentState;
     public CharacterClass playerCharacterClass;
     // unit attack damage
     public float attack;
@@ -37,6 +40,7 @@ public class GameAgentStats
         currentHealth = health;
         this.range = range;
         this.speed = speed;
+        currentState = GameAgentState.Alive;
 
         LevelUpToDesiredLevel(desiredLevel);
     }
@@ -58,6 +62,7 @@ public class GameAgentStats
         SetGameAgentCharacterClass(characterWeapon);
         GetBaseCharacterClassStats();
         LevelUpToDesiredLevel(desiredLevel);
+        currentState = GameAgentState.Alive;
     }
 
     private void GetBaseCharacterClassStats() {
