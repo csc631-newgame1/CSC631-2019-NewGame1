@@ -30,9 +30,6 @@ public class MapGenerator : MonoBehaviour
 	
 	private List<Connection> debug_connections;
 	
-	[HideInInspector]
-	public int iteration = -1;
-	
 	void set_variables()
 	{
 		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
@@ -47,10 +44,12 @@ public class MapGenerator : MonoBehaviour
 		this.offset = config.GetOffset();
 	}
 
-    public void generate_map()
+    public int[,] generate_map()
 	{
 		set_variables();
 		map = new int[width,height];
+		
+		Debug.Log("Generating map data...");
 		
 		// binary map generation, using cellular automata method
 		random_fill();
@@ -61,9 +60,8 @@ public class MapGenerator : MonoBehaviour
 		extract_regions();
 		create_adjacency_lists();
 		bridge_all_regions();
-		
-		iteration++;
-		Debug.Log("done generating map!");
+
+		Debug.Log("Done generating map! Creating meshes...");
 
 		MapMeshGenerator surface_gen = transform.Find("Surface").GetComponent<MapMeshGenerator>();
 		surface_gen.generate_map_mesh(map);
@@ -71,12 +69,9 @@ public class MapGenerator : MonoBehaviour
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
 		bridge_mesh_gen.generate_bridge_mesh(map);
 		
-		// init tile hover detector with map data
-		TileSelector tile_select = transform.Find("TileSelector").GetComponent<TileSelector>();
-		tile_select.init_tile_selector(map);
+		Debug.Log("Mesh generation complete!");
 
-        //RockGenerator rockGenerator = transform.Find("Surfaces").GetComponent<RockGenerator>();
-        //rockGenerator.generateRocks(map, offset, object_size_scale);
+        return map;
 	}
 	
 	/*****************/
@@ -85,7 +80,6 @@ public class MapGenerator : MonoBehaviour
 	
 	void random_fill()
 	{
-		//qwerwthr
 		int seed = 0;
 		if (this.seed == string.Empty) {
 			seed = Time.time.ToString().GetHashCode();

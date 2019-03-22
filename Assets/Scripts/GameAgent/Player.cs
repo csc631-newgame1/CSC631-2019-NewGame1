@@ -39,8 +39,7 @@ public class Player : GameAgent
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
     {
-		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
-        config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
+		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 
         this.stats = stats;
@@ -68,29 +67,28 @@ public class Player : GameAgent
     }
 
 	// if right mouse button is pressed, move player model to hover position
-	// if hover position is on a bridge tile, change the player model
-    void Update()
+    public void RespondToMouseClick()
     {
-		if (Input.GetMouseButtonDown(1) && !moving && !isAttacking && hoveringActionTileSelector) {
-			
+		if (!moving && !isAttacking && hoveringActionTileSelector) {
+
 			switch (currentAction) {
-				
+
 			    case GameAgentAction.Move:
 				    if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
-					
+
                         grid_pos = tile_selector.grid_position;
                         hoveringActionTileSelector = false;
                         tile_selector.showSelectableMoveTiles = false;
                         tile_selector.showPathLine = false;
                     }
 				    break;
-				
+
 			    case GameAgentAction.MeleeAttack:
                 case GameAgentAction.MagicAttackSingleTarget:
                 case GameAgentAction.RangedAttack:
                 case GameAgentAction.RangedAttackMultiShot:
 				    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position)) {
-					
+
 					    Pos attackPos = tile_selector.grid_position;
                         StartCoroutine(animator.PlayAttackAnimation());
 					    StartCoroutine(WaitForAttackEnd(attackPos));
@@ -98,16 +96,20 @@ public class Player : GameAgent
                     break;
             }
 		}
+	}
 
-        // For testing animations.
-        if (Input.GetKeyDown("1")) StartCoroutine(animator.PlayRotateAnimation());
-        if (Input.GetKeyDown("2")) StartCoroutine(animator.PlayAttackAnimation());
-        if (Input.GetKeyDown("3")) StartCoroutine(animator.PlayUseItemAnimation());
-        if (Input.GetKeyDown("4")) StartCoroutine(animator.PlayHitAnimation());
-        if (Input.GetKeyDown("5")) StartCoroutine(animator.PlayBlockAnimation());
-        if (Input.GetKeyDown("6")) StartCoroutine(animator.PlayKilledAimation());
-    }
-	
+	public void RespondToKeyboardInput(char key)
+	{
+		switch (key) {
+		case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
+		case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
+		case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
+		case '4': StartCoroutine(animator.PlayHitAnimation()); break;
+		case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
+		case '6': StartCoroutine(animator.PlayKilledAimation()); break;
+		}
+	}
+
 	IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
 		isAttacking = true;
@@ -122,11 +124,11 @@ public class Player : GameAgent
         tile_selector.showSelectableActTiles = false;
         actMenu.SetPlayerActMenuActive(false);
     }
-	
+
 	public override void take_damage(int amount)
-	{	
+	{
         if (!godMode) stats.currentHealth -= amount;
-		
+
         if (stats.currentHealth <= 0) {
             stats.currentHealth = 0;
             StartCoroutine(animator.PlayKilledAimation());
@@ -171,7 +173,7 @@ public class Player : GameAgent
 		tile_selector.clear_path_line();
         playerMovedThisTurn = true;
 	}
-    
+
     void spawnActionRadius()
     {
         var exp = GetComponent<ParticleSystem>();

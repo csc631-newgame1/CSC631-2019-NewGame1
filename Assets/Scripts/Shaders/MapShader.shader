@@ -64,7 +64,7 @@
 				o.uv3 = TRANSFORM_TEX(v.uv2, _MainTex);
 				
 				half3 world_normal = UnityObjectToWorldNormal(v.normal);
-				half intensity = _BaseIntensity + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / (1 / (1 - _BaseIntensity));
+				half intensity = _BaseIntensity + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) * (1 - _BaseIntensity);
                 o.light = _LightColor0 * intensity;
 				
 				UNITY_TRANSFER_FOG(o, o.pos);

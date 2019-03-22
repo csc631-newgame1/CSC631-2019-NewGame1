@@ -77,7 +77,7 @@ public class TileSelector : MonoBehaviour
 		offset = config.GetOffset();
 		
 		this.map = map;
-		this.map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
+		this.map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 		this.path_render = GetComponent<LineRenderer>();
 		
 		Vector3 collider_size = new Vector3(width * cell_size, 0.1f, height * cell_size);
@@ -164,20 +164,24 @@ public class TileSelector : MonoBehaviour
 		int starty 	= position.y - move_budget >= 0 ? position.y - move_budget : 0;
 		int endy	= position.y + move_budget < height ? position.y + move_budget : height - 1;
 
+		List<Pos> candidates = new List<Pos>();
         if (action == GameAgentAction.Move) {
             for (int x = startx; x <= endx; x++) {
 			    for (int y = starty; y <= endy; y++) {
 				
 				    Pos candidate = new Pos(x, y);
                     if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
-
-                        Path path = new Path(map_manager.get_path(position, candidate));
-                        if (path.distance() <= move_budget) {
-                            selectableMovementTiles.Add(path);
-                        }
+						candidates.Add(candidate);
                     }
                 }
 			}
+		}
+		
+		List<List<Pos>> paths = map_manager.get_paths(position, candidates);
+		foreach (List<Pos> rawPath in paths) {
+			Path path = new Path(rawPath);
+			if (path.distance() <= move_budget)
+				selectableMovementTiles.Add(path);
 		}
     }
 	

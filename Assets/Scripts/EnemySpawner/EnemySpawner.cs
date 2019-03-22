@@ -14,8 +14,10 @@ public class EnemySpawner : MonoBehaviour {
     private MapManager mapManager;
     // A list of all accepted Spawn Zones
     private List<SpawnZone> spawnZones;
-    private bool showEnemySpawnZones;
+    public bool showEnemySpawnZones;
     private MapConfiguration mapConfiguration;
+	
+	public GameObject enemyPrefab;
 
     [Header("Enemy Spawn Zone Settings")]
     [Tooltip("Increase slightly to increase distance between zones.")]
@@ -32,7 +34,7 @@ public class EnemySpawner : MonoBehaviour {
     public int maxNumberOfSpawnZones = 100;
 
     // Initializes map data
-    public void Init(MapManager mapManager, MapConfiguration mapConfiguration)
+    public void Init(MapManager mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         this.width = config.width;
@@ -45,10 +47,11 @@ public class EnemySpawner : MonoBehaviour {
         this.mapConfiguration = mapConfiguration;
 
         spawnZones = new List<SpawnZone>();
+		SpawnEnemies();
     }
 
     // Call this to spawn enemies on the Map Manager
-    public void SpawnEnemies(GameObject enemyPrefab) {
+    public void SpawnEnemies() {
 		
         GenerateSpawnZones();
         TrimSpawnZones();
@@ -207,10 +210,6 @@ public class EnemySpawner : MonoBehaviour {
 
     public List<SpawnZone> GetSpawnZones() {
         return spawnZones;
-    }
-
-    public void ShowEnemySpawnZones(bool showEnemySpawnZones) {
-        this.showEnemySpawnZones = showEnemySpawnZones;
     }
 
     void OnDrawGizmos() {
