@@ -71,30 +71,31 @@ public class Player : GameAgent
 	// if hover position is on a bridge tile, change the player model
     void Update()
     {
-		if (Input.GetMouseButtonDown(1) && !moving && hoveringActionTileSelector) {
+		if (Input.GetMouseButtonDown(1) && !moving && !isAttacking && hoveringActionTileSelector) {
 			
 			switch (currentAction) {
 				
-			case GameAgentAction.Move:
-			
-				if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
+			    case GameAgentAction.Move:
+				    if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
 					
-                    grid_pos = tile_selector.grid_position;
-                    hoveringActionTileSelector = false;
-                    tile_selector.showSelectableMoveTiles = false;
-                    tile_selector.showPathLine = false;
-                }
-				break;
+                        grid_pos = tile_selector.grid_position;
+                        hoveringActionTileSelector = false;
+                        tile_selector.showSelectableMoveTiles = false;
+                        tile_selector.showPathLine = false;
+                    }
+				    break;
 				
-			case GameAgentAction.MeleeAttack:
-			
-				if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position)) {
+			    case GameAgentAction.MeleeAttack:
+                case GameAgentAction.MagicAttackSingleTarget:
+                case GameAgentAction.RangedAttack:
+                case GameAgentAction.RangedAttackMultiShot:
+				    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position)) {
 					
-					Pos attackPos = tile_selector.grid_position;
-                    StartCoroutine(animator.PlayAttackAnimation());
-					StartCoroutine(WaitForAttackEnd(attackPos));
-                }
-                break;
+					    Pos attackPos = tile_selector.grid_position;
+                        StartCoroutine(animator.PlayAttackAnimation());
+					    StartCoroutine(WaitForAttackEnd(attackPos));
+                    }
+                    break;
             }
 		}
 
@@ -119,7 +120,8 @@ public class Player : GameAgent
 
         hoveringActionTileSelector = false;
         tile_selector.showSelectableActTiles = false;
-	}
+        actMenu.SetPlayerActMenuActive(false);
+    }
 	
 	public override void take_damage(int amount)
 	{	
@@ -214,25 +216,73 @@ public class Player : GameAgent
     public override void act() {
         if (!player_turn)
             return;
-        actMenu.SetPlayerActMenuActive(true);
-        actMenu.SetButtons(stats.playerCharacterClass.GetAvailableActs());
-        currentAction = GameAgentAction.MeleeAttack;
-        tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
-
-        hoveringActionTileSelector = true;
         tile_selector.showSelectableMoveTiles = false;
-        tile_selector.showSelectableActTiles = true;
+        hoveringActionTileSelector = false;
+        tile_selector.showPathLine = false;
+        tile_selector.clear_path_line();
+
+
+        if (actMenu.IsPlayerActMenuActive()) {
+            actMenu.SetPlayerActMenuActive(false);
+            tile_selector.showSelectableActTiles = false;
+        } else {
+            actMenu.SetPlayerActMenuActive(true);
+            actMenu.SetButtons(stats.playerCharacterClass.GetAvailableActs());
+        }
+    }
+
+    public void action1() {
+        if (stats.playerCharacterClass.GetAvailableActs().Length >= 1) {
+            currentAction = (stats.playerCharacterClass.GetAvailableActs())[0];
+        }
+
+        if (currentAction == GameAgentAction.MeleeAttack || currentAction == GameAgentAction.MagicAttackSingleTarget
+            || currentAction == GameAgentAction.RangedAttack) {
+            tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
+
+            hoveringActionTileSelector = true;
+            tile_selector.showSelectableMoveTiles = false;
+            tile_selector.showSelectableActTiles = true;
+        }
+    }
+
+    public void action2() {
+        if (stats.playerCharacterClass.GetAvailableActs().Length >= 2) {
+            currentAction = (stats.playerCharacterClass.GetAvailableActs())[1];
+        }
+
+        if (currentAction == GameAgentAction.Heal || currentAction == GameAgentAction.MagicAttackAOE
+            || currentAction == GameAgentAction.Taunt || currentAction == GameAgentAction.RangedAttackMultiShot) {
+            tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
+
+            hoveringActionTileSelector = true;
+            tile_selector.showSelectableMoveTiles = false;
+            tile_selector.showSelectableActTiles = true;
+        }
+    }
+
+    public void action3() {
+        if (stats.playerCharacterClass.GetAvailableActs().Length >= 3) {
+            currentAction = (stats.playerCharacterClass.GetAvailableActs())[2];
+        }
+    }
+
+    public void action4() {
+        if (stats.playerCharacterClass.GetAvailableActs().Length >= 4) {
+            currentAction = (stats.playerCharacterClass.GetAvailableActs())[3];
+        }
     }
 
     public override void wait() {
         if (!player_turn)
             return;
         currentAction = GameAgentAction.Wait;
+
         actMenu.SetPlayerActMenuActive(false);
         tile_selector.showPathLine = false;
         tile_selector.showSelectableMoveTiles = false;
         tile_selector.showSelectableActTiles = false;
-        Debug.Log("Wait Action");
+
         player_turn = false;
     }
 
@@ -240,6 +290,11 @@ public class Player : GameAgent
         if (!player_turn)
             return;
         actMenu.SetPlayerActMenuActive(false);
+        hoveringActionTileSelector = false;
+        tile_selector.showPathLine = false;
+        tile_selector.showSelectableMoveTiles = false;
+        tile_selector.showSelectableActTiles = false;
+
         currentAction = GameAgentAction.Potion;
         StartCoroutine(animator.PlayUseItemAnimation());
         stats.currentHealth += 10;
