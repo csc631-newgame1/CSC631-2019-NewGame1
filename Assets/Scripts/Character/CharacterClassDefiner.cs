@@ -40,15 +40,7 @@ public class CharacterClassDefiner : MonoBehaviour
 
     void Update()
     {
-        // For testing.
-        if (character is Player) {
-            if (Input.GetKeyDown("a")) SetCharacterClass(CharacterClassOptions.Knight);
-            if (Input.GetKeyDown("s")) SetCharacterClass(CharacterClassOptions.Hunter);
-            if (Input.GetKeyDown("d")) SetCharacterClass(CharacterClassOptions.Mage);
-            if (Input.GetKeyDown("f")) SetCharacterClass(CharacterClassOptions.Orc);
-            if (Input.GetKeyDown("g")) SetCharacterClass(CharacterClassOptions.Skeleton);
-            if (Input.GetKeyDown("h")) SetCharacterClass(CharacterClassOptions.Healer);
-        }
+        
     }
 
     // SetCharacterClass(int characterID), SetCharacterModel(int modelID), SetCharacterWeapon(int weaponID)

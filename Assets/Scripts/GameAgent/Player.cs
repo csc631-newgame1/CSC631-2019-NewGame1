@@ -102,14 +102,18 @@ public class Player : GameAgent
 	public void RespondToKeyboardInput(char key)
 	{
 		switch (key) {
-		case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
-		case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
-		case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
-		case '4': StartCoroutine(animator.PlayHitAnimation()); break;
-		case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
-		case '6': StartCoroutine(animator.PlayKilledAimation()); break;
-		}
-	}
+		    case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
+		    case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
+		    case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
+		    case '4': StartCoroutine(animator.PlayHitAnimation()); break;
+		    case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
+		    case '6': StartCoroutine(animator.PlayKilledAimation()); break;
+            case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
+            case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
+            case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
+            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;
+        }
+    }
 
     public void DeactivatePlayerActionMenu() {
         if (tile_selector.showSelectableMoveTiles) {
@@ -242,7 +246,7 @@ public class Player : GameAgent
             return;
 
         currentAction = GameAgentAction.Move;
-		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
+		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, (int)stats.speed, currentAction);
         
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
@@ -366,5 +370,17 @@ public class Player : GameAgent
         currentHealth = stats.currentHealth;
         range = stats.range;
         _speed = stats.speed;
+    }
+
+    public void TestCharacterClass(int characterClassToTest) {
+        stats = new GameAgentStats(characterClassToTest, 1);
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = maxHealth;
+        range = stats.range;
+        _speed = stats.speed;
+
+        classDefiner.init(stats.characterClassOption);
+        DeactivatePlayerActionMenu();
     }
 }
