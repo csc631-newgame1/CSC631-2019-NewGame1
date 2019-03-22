@@ -33,6 +33,7 @@ public class EnemyGroupDescription
         this.randomNumberOfEnemies = randomNumberOfEnemies;
         this.minNumberOfEnemiesInGroup = minNumberOfEnemiesInGroup;
         this.maxNumberOfEnemiesInGroup = maxNumberOfEnemiesInGroup;
+        this.levelVariance = levelVariance;
 
         CalculatePowerLevel();
     }
