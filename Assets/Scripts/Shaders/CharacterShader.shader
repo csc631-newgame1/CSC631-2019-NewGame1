@@ -3,6 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+		_BaseIntensity ("Base Light Intensity", Range(0, 1)) = 0
     }
     SubShader
     {
@@ -18,6 +19,8 @@
 
             #include "UnityCG.cginc"
 			#include "UnityLightingCommon.cginc"
+			
+			half _BaseIntensity;
 
             struct appdata
             {
@@ -42,12 +45,12 @@
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
 				
 				half3 world_normal = UnityObjectToWorldNormal(v.normal);
-				half intensity = 0.8 + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) / 5.0;
+				half intensity = _BaseIntensity + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) * (1 - _BaseIntensity);
                 o.color = _LightColor0 * intensity;
 				
+				UNITY_TRANSFER_FOG(o, o.vertex);
                 return o;
             }
 

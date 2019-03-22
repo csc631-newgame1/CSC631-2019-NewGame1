@@ -79,6 +79,11 @@ public class TurnManager : MonoBehaviour
     {
         enemies.Clear();
     }
+	
+	public void ClearPlayerList()
+    {
+        players.Clear();
+    }
 
     IEnumerator MoveEnemies()
     {

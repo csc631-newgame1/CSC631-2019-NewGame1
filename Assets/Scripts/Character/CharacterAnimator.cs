@@ -50,10 +50,10 @@ public class CharacterAnimator : MonoBehaviour
         ghosts.transform.localScale = new Vector3(3f, 3f, 3f);
     }
 
-    void Update()
+    /*void Update()
     {
 
-    }
+    }*/
 
     // StartMovementAnimation(), StopMovementAnimation(), PlayRotateAnimation()
     #region Character Movement
