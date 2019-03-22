@@ -43,8 +43,13 @@ public class MapManager : MonoBehaviour
 		this.offset = config.GetOffset();
 	}
 
-	// called by gamemanager
-	public void Init(GameManager parent)
+    private void Start() {
+        Debug.Log("MapManager called");
+
+    }
+
+    // called by gamemanager
+    public void Init(GameManager parent)
 	{
 		parentManager = parent;
 

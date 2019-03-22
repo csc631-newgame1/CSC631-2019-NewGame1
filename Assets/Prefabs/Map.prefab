@@ -4576,7 +4576,7 @@ ParticleSystem:
 --- !u!199 &3944264686104388572
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -4881,6 +4881,8 @@ MonoBehaviour:
   moveableTilesMaterial: {fileID: 2100000, guid: 9c4bdd583bc376444a09f7eb6675cbab,
     type: 2}
   selectableTilesMaterial: {fileID: 2100000, guid: 9f34070364e48d24297908866dd6762f,
+    type: 2}
+  nonselectableTilesMaterial: {fileID: 2100000, guid: b0345d6b496b88744a4fe169db3b58c0,
     type: 2}
 --- !u!65 &3944264686745319689
 BoxCollider:
@@ -9638,7 +9640,7 @@ ParticleSystem:
 --- !u!199 &3944264687405353572
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -14266,7 +14268,7 @@ ParticleSystem:
 --- !u!199 &3944264687542908889
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}

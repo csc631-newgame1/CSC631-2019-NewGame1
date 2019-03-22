@@ -66,7 +66,9 @@ public class TileSelector : MonoBehaviour
 	public Material selectableTilesMaterial;
     public Material nonselectableTilesMaterial;
 
-
+    private void Start() {
+        Debug.Log("TileSelector called");
+    }
     // called by the mapGenerator script
     public void init_tile_selector(int[,] map)
 	{
