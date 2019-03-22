@@ -7,6 +7,7 @@ public class EnemyGroupDescription
     public float healthVariance;
     public float rangeVariance;
     public float speedVariance;
+    public int levelVariance;
 
     public int quantityOfEnemyInGroup;
 
@@ -22,7 +23,7 @@ public class EnemyGroupDescription
                                 float attackVariance = 0f,  float healthVariance = 0f,
                                 float rangeVariance = 0f, float speedVariance = 0f,
                                 bool randomNumberOfEnemies = false, 
-                                int minNumberOfEnemiesInGroup = -1, int maxNumberOfEnemiesInGroup = -1) {
+                                int minNumberOfEnemiesInGroup = -1, int maxNumberOfEnemiesInGroup = -1, int levelVariance = 0) {
         this.stats = stats;
         this.attackVariance = attackVariance;
         this.healthVariance = healthVariance;
@@ -50,6 +51,10 @@ public class EnemyGroupDescription
 
     public float GetSpeedWithVariance() {
         return Mathf.RoundToInt(Mathf.Max(stats.speed / 2, (stats.speed + (Random.Range(-speedVariance, speedVariance) * stats.speed))));
+    }
+
+    public int GetLevelWithVariance() {
+        return Mathf.RoundToInt(Mathf.Max(stats.level / 2, (stats.level + Random.Range(-levelVariance, levelVariance))));
     }
 
     public float GetPowerLevel() {
