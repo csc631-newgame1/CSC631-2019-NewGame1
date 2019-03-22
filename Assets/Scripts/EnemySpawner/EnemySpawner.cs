@@ -61,7 +61,7 @@ public class EnemySpawner : MonoBehaviour {
 
             // Create Enemies inside of the Enemy Group
             for (int enemyPropertyIndex = 0; enemyPropertyIndex < Random.Range(1, 3); enemyPropertyIndex++) {
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(Random.Range(CharacterClassOptions.Orc, CharacterClassOptions.Skeleton), 7f, 35f, 1f, 6f),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(Random.Range(CharacterClassOptions.Orc, CharacterClassOptions.Skeleton), 7f, 35f, 1f, 6f, 1),
                                                                  Random.Range(1, 2), 0.1f, 0.1f, 0f, 0f));
             }
 

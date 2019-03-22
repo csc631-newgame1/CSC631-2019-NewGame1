@@ -4,7 +4,7 @@ using UnityEngine;
 
 using MapUtils;
 
-public enum GameAgentAction {Move = 0, Wait, Potion, MeleeAttack, RangedAttack, MagicAttack};
+public enum GameAgentAction {Move = 0, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal};
 
 public abstract class GameAgent : MonoBehaviour
 {

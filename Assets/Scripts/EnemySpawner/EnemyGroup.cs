@@ -42,9 +42,9 @@ public class EnemyGroup
     void CreateEnemyStatsInGroup() {
         foreach (EnemyGroupDescription enemy in typesOfEnemies) {
             for (int i=0; i<enemy.quantityOfEnemyInGroup; i++) {
-                GameAgentStats stats = new GameAgentStats(enemy.stats.characterClass, enemy.GetAttackWithVariance(),
+                GameAgentStats stats = new GameAgentStats(enemy.stats.characterClassOption, enemy.GetAttackWithVariance(),
                                                             enemy.GetHealthWithVariance(), enemy.GetRangeWithVariance(),
-                                                            enemy.GetSpeedWithVariance());
+                                                            enemy.GetSpeedWithVariance(), enemy.GetLevelWithVariance());
                 enemies.Add(stats);
             }
         }

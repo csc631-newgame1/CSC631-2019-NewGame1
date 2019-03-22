@@ -16,9 +16,19 @@
 
 public abstract class CharacterClass
 {
+    public GameAgentStats baseStats;
+
     public abstract void LevelUp();
 
-    public abstract void GetAvailableActs();
+    public abstract GameAgentAction[] GetAvailableActs();
 
     public abstract void HandleAct(GameAgentAction action);
+
+    public abstract int GetAttackStatIncreaseFromLevelUp(int level = -1);
+
+    public abstract int GetHealthStatIncreaseFromLevelUp(int level = -1);
+
+    public abstract int GetRangeStatIncreaseFromLevelUp(int level = -1);
+
+    public abstract int GetSpeedStatIncreaseFromLevelUp(int level = -1);
 }

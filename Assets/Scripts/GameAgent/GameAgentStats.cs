@@ -1,9 +1,11 @@
 ﻿// Holds information regarding the GameAgents ingame stats
+using System;
 using UnityEngine;
 
 public class GameAgentStats
 {
-    public int characterClass;
+    public int characterClassOption;
+    private CharacterClass playerCharacterClass;
     // unit attack damage
     public float attack;
     // unit maxium health
@@ -14,8 +16,8 @@ public class GameAgentStats
     public float range;
     // unit move radius
     public float speed;
-    // player level
-    public float level;
+    // game agent level
+    public int level = 1;
     // experience points
     public int xp;
 
@@ -25,27 +27,58 @@ public class GameAgentStats
     // the player will receive 1000xp * scaleFactor worth of xp
     private float scaleFactor = 0.25f;
 
-    public GameAgentStats(int characterClass, float attack, float health, float range, float speed) {
-        this.characterClass = characterClass;
+    public GameAgentStats(int characterClass, float attack, float health, float range, float speed, int desiredLevel) {
+        characterClassOption = characterClass;
+        SetGameAgentCharacterClass();
         this.attack = attack;
-        this.maxHealth = health;
-        this.currentHealth = health;
+        maxHealth = health;
+        currentHealth = health;
+        this.range = range;
+        this.speed = speed;
+
+        LevelUpToDesiredLevel(desiredLevel);
+    }
+
+    // Only used for creating base stats
+    public GameAgentStats(float attack, float health, float range, float speed) {
+        this.attack = attack;
+        maxHealth = health;
+        currentHealth = health;
         this.range = range;
         this.speed = speed;
     }
 
-    public GameAgentStats(int characterClass) {
-        this.characterClass = characterClass;
-        this.attack = 20;
-        this.maxHealth = 50;
-        this.currentHealth = maxHealth;
-        this.range = 1;
-        this.speed = 7;
+    public GameAgentStats(int characterClass, int desiredLevel) {
+        characterClassOption = characterClass;
+        SetGameAgentCharacterClass();
+        GetBaseCharacterClassStats();
+        LevelUpToDesiredLevel(desiredLevel);
+    }
+
+    private void GetBaseCharacterClassStats() {
+        attack = playerCharacterClass.baseStats.attack;
+        maxHealth = playerCharacterClass.baseStats.maxHealth;
+        currentHealth = maxHealth;
+        range = playerCharacterClass.baseStats.range;
+        speed = playerCharacterClass.baseStats.speed;
     }
 
     public void LevelUp() {
-        switch (characterClass) {
+        level++;
+        attack += playerCharacterClass.GetAttackStatIncreaseFromLevelUp();
+        range += playerCharacterClass.GetRangeStatIncreaseFromLevelUp();
+        speed += playerCharacterClass.GetSpeedStatIncreaseFromLevelUp(level);
+        int healthIncrease = playerCharacterClass.GetHealthStatIncreaseFromLevelUp();
 
+        maxHealth += healthIncrease;
+        if (currentHealth > 0) {
+            currentHealth += healthIncrease;
+        }
+    }
+
+    public void LevelUpToDesiredLevel(int desiredLevel) {
+        while (level < desiredLevel) {
+            LevelUp();
         }
     }
 
@@ -58,6 +91,7 @@ public class GameAgentStats
         // This formula is used for a linearly rising level gap
         float progressionTowardsLevel = (Mathf.Sqrt(100f * (2 * xp + 25f))+50f)/ 100f;
 
+        // Level Up multiple times if needed
         if (progressionTowardsLevel >= level + 1) {
             while(progressionTowardsLevel > 1) {
                 LevelUp();
@@ -68,5 +102,25 @@ public class GameAgentStats
     
     public int RewardXPFromDeath() {
         return Mathf.RoundToInt((level * level + level) / 2 * 100 - (level * 100) * scaleFactor);
+    }
+
+    private void SetGameAgentCharacterClass() {
+        switch (characterClassOption) {
+            case CharacterClassOptions.Knight:
+                playerCharacterClass = new Knight();
+                break;
+            case CharacterClassOptions.Hunter:
+                playerCharacterClass = new Hunter();
+                break;
+            case CharacterClassOptions.Mage:
+                playerCharacterClass = new Mage();
+                break;
+            case CharacterClassOptions.Healer:
+                playerCharacterClass = new Healer();
+                break;
+            default:
+                playerCharacterClass = new Knight();
+                break;
+        }
     }
 }
