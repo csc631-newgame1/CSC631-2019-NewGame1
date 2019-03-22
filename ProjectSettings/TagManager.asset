@@ -8,6 +8,8 @@ TagManager:
   - Collide
   - Enemy
   - PlayerActMenu
+  - PlayerBattleMenu
+  - PlayerStatsMenu
   layers:
   - Default
   - TransparentFX
