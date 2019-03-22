@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
 				ShowPlayerActionMenu();
 				break;
 			}
-		}
+        }
 
 		if (Input.GetMouseButtonDown(1)) {
 			localPlayer.RespondToMouseClick();
