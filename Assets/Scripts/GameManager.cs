@@ -62,6 +62,9 @@ public class GameManager : MonoBehaviour
 			
 			map_manager.clear_map();
 			map_manager.init(map_gen.map);
+			
+			TurnManager.instance.ClearPlayerList();
+			
 			clone = map_manager.instantiate_randomly(player);
 			Camera.main.GetComponent<CameraControl>().SetTarget(clone);
 

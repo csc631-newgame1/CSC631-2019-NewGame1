@@ -87,7 +87,12 @@ public class MapManager : MonoBehaviour
 	
 	public List<Pos> get_path(Pos source, Pos dest)
 	{
-		return nav_map.find_shortest_path(source, dest);
+		return nav_map.shortestPath(source, dest);
+	}
+	
+	public List<List<Pos>> get_paths(Pos source, List<Pos> targetPositions)
+	{
+		return nav_map.shortestPathBatched(source, targetPositions);
 	}
 	
 	public bool move(Pos source, Pos dest)

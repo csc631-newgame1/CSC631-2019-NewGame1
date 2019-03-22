@@ -340,7 +340,7 @@ public class MapMeshGenerator : MonoBehaviour
 
 	private float height_func(int hval, int x, int y)
 	{
-		return -wall_height * ((sigmoid(hval / 2f) - 0.5f) * 2);
+		return -wall_height * ((sigmoid(hval) - 0.5f) * 2);
 	}
 	
 	private float sigmoid(float x)

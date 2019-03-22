@@ -3817,6 +3817,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  hoveringMovementTileSelector: 0
+  moving: 0
+  hoveringActionTileSelector: 0
+  isAttacking: 0
+  godMode: 1
+  player_turn: 1
+  attack: 0
+  maxHealth: 0
+  currentHealth: 0
+  range: 0
+  _speed: 0
+  move_budget: 6
   weapon: 1
 --- !u!114 &1111223434817933391
 MonoBehaviour:

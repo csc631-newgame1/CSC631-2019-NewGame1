@@ -26,7 +26,8 @@ public class Enemy : GameAgent
     public float _speed;
     public float moveTime = 0.1f;
 
-    public override void init_agent(Pos position, GameAgentStats stats) {
+    public override void init_agent(Pos position, GameAgentStats stats) 
+	{
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
         map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
         grid_pos = position;
