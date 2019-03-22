@@ -243,12 +243,7 @@ public class Player : GameAgent
             return;
         }
 
-        // Hide act menu if open
-        if (actMenu.IsPlayerActMenuActive()) {
-            actMenu.SetPlayerActMenuActive(false);
-            tile_selector.showSelectableActTiles = false;
-            hoveringActionTileSelector = false;
-        }
+        
 
         if (playerMovedThisTurn || !player_turn)
             return;
@@ -275,14 +270,14 @@ public class Player : GameAgent
             return;
 
         // If act menu is already open, hide it
-        if (actMenu.IsPlayerActMenuActive()) {
-            actMenu.SetPlayerActMenuActive(false);
-            tile_selector.showSelectableActTiles = false;
-            hoveringActionTileSelector = false;
-        } else {
-            actMenu.SetPlayerActMenuActive(true);
-            actMenu.SetButtons(stats.playerCharacterClass.GetAvailableActs());
-        }
+        //if (actMenu.IsPlayerActMenuActive()) {
+        //    actMenu.SetPlayerActMenuActive(false);
+        //    tile_selector.showSelectableActTiles = false;
+        //    hoveringActionTileSelector = false;
+        //} else {
+            
+        //}
+        actMenu.SetPlayerActMenuActive(true, stats.playerCharacterClass.GetAvailableActs());
     }
 
     public void action1() {
@@ -332,14 +327,20 @@ public class Player : GameAgent
     }
 
     public void action3() {
-        if (stats.playerCharacterClass.GetAvailableActs().Length >= 3) {
-            currentAction = (stats.playerCharacterClass.GetAvailableActs())[2];
-        }
+        //if (stats.playerCharacterClass.GetAvailableActs().Length >= 3) {
+        //    currentAction = (stats.playerCharacterClass.GetAvailableActs())[2];
+        //}
     }
 
     public void action4() {
-        if (stats.playerCharacterClass.GetAvailableActs().Length >= 4) {
-            currentAction = (stats.playerCharacterClass.GetAvailableActs())[3];
+        //if (stats.playerCharacterClass.GetAvailableActs().Length >= 4) {
+        //    currentAction = (stats.playerCharacterClass.GetAvailableActs())[3];
+        //}
+        // Return to the battle menu
+        if (actMenu.IsPlayerActMenuActive()) {
+                actMenu.SetPlayerActMenuActive(false);
+                tile_selector.showSelectableActTiles = false;
+                hoveringActionTileSelector = false;
         }
     }
 
