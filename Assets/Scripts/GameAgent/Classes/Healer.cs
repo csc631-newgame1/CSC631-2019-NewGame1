@@ -7,11 +7,17 @@ public class Healer : CharacterClass
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
-        return Random.Range(1, 3);
+        int min = 1;
+        int max = 3;
+        int mean = (min + max) / 2;
+        return Utility.NextGaussian(mean, 1, min, max);
     }
 
     public override int GetHealthStatIncreaseFromLevelUp(int level = -1) {
-        return Random.Range(1, 2);
+        int min = 1;
+        int max = 2;
+        int mean = (min + max) / 2;
+        return Utility.NextGaussian(mean, 1, min, max);
     }
 
     public override int GetRangeStatIncreaseFromLevelUp(int level = -1) {

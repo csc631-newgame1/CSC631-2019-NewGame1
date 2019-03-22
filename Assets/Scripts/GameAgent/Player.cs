@@ -236,4 +236,12 @@ public class Player : GameAgent
         Debug.Log("Potion Action");
         player_turn = false;
     }
+
+    public void UpdateViewablePlayerStats() {
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = stats.currentHealth;
+        range = stats.range;
+        _speed = stats.speed;
+    }
 }
