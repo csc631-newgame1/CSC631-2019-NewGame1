@@ -204,29 +204,52 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
+        // Hide move selection if open
+        if (tile_selector.showSelectableMoveTiles) {
+            hoveringActionTileSelector = false;
+            tile_selector.showSelectableMoveTiles = false;
+            tile_selector.showSelectableActTiles = false;
+            tile_selector.showPathLine = false;
+            tile_selector.clear_path_line();
+            return;
+        }
+
+        // Hide act menu if open
+        if (actMenu.IsPlayerActMenuActive()) {
+            actMenu.SetPlayerActMenuActive(false);
+            tile_selector.showSelectableActTiles = false;
+            hoveringActionTileSelector = false;
+        }
+
         if (playerMovedThisTurn || !player_turn)
             return;
-		currentAction = GameAgentAction.Move;
+
+        currentAction = GameAgentAction.Move;
 		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
-        actMenu.SetPlayerActMenuActive(false);
+        
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
         tile_selector.showSelectableMoveTiles = true;
-        tile_selector.showSelectableActTiles = false;
     }
 
     public override void act() {
         if (!player_turn)
             return;
-        tile_selector.showSelectableMoveTiles = false;
-        hoveringActionTileSelector = false;
-        tile_selector.showPathLine = false;
-        tile_selector.clear_path_line();
 
+        // Hide move selection if open
+        if (tile_selector.showSelectableMoveTiles) {
+            hoveringActionTileSelector = false;
+            tile_selector.showSelectableMoveTiles = false;
+            tile_selector.showSelectableActTiles = false;
+            tile_selector.showPathLine = false;
+            tile_selector.clear_path_line();
+        }
 
+        // If act menu is already open, hide it
         if (actMenu.IsPlayerActMenuActive()) {
             actMenu.SetPlayerActMenuActive(false);
             tile_selector.showSelectableActTiles = false;
+            hoveringActionTileSelector = false;
         } else {
             actMenu.SetPlayerActMenuActive(true);
             actMenu.SetButtons(stats.playerCharacterClass.GetAvailableActs());
@@ -236,6 +259,14 @@ public class Player : GameAgent
     public void action1() {
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 1) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[0];
+        }
+
+        // If other action is shown, hide it
+        if (tile_selector.showSelectableActTiles) {
+            hoveringActionTileSelector = false;
+            tile_selector.showSelectableMoveTiles = false;
+            tile_selector.showSelectableActTiles = false;
+            return;
         }
 
         if (currentAction == GameAgentAction.MeleeAttack || currentAction == GameAgentAction.MagicAttackSingleTarget
@@ -251,6 +282,14 @@ public class Player : GameAgent
     public void action2() {
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 2) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[1];
+        }
+
+        // If other action is shown, hide it
+        if (tile_selector.showSelectableActTiles) {
+            hoveringActionTileSelector = false;
+            tile_selector.showSelectableMoveTiles = false;
+            tile_selector.showSelectableActTiles = false;
+            return;
         }
 
         if (currentAction == GameAgentAction.Heal || currentAction == GameAgentAction.MagicAttackAOE

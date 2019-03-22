@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
 	void Start()
 	{
 		Init();
-	}
+    }
 
     void Init()
     {
@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
         localPlayer.move();
     }
 
-		public void ActPlayer() {
+	public void ActPlayer() {
         localPlayer.act();
     }
 
