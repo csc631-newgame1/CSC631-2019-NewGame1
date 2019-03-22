@@ -4,14 +4,17 @@ using UnityEngine;
 
 using MapUtils;
 
-public enum GameAgentAction {Move = 0, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal};
+public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
+
+public enum GameAgentState { Alive, Unconscious, Dead };
 
 public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;
     public float speed;
     protected GameAgentStats stats;
-    protected GameAgentAction currentAction;
+    public GameAgentAction currentAction;
+    public GameAgentState currentState;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	

@@ -34,6 +34,7 @@ public class Player : GameAgent
 
 	CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
+    PlayerActMenu actMenu;
 
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
@@ -51,8 +52,10 @@ public class Player : GameAgent
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
+        actMenu = GetComponent<PlayerActMenu>();
         animator.init();
         classDefiner.init(stats.characterClassOption);
+        actMenu.init();
 
         selectableTiles = new List<Pos>();
 
@@ -60,6 +63,8 @@ public class Player : GameAgent
 		tile_selector.setPlayer(this);
 
         TurnManager.instance.AddPlayerToList(this); //add player to player list
+
+        currentState = GameAgentState.Alive;
     }
 
 	// if right mouse button is pressed, move player model to hover position
@@ -199,6 +204,7 @@ public class Player : GameAgent
             return;
 		currentAction = GameAgentAction.Move;
 		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
+        actMenu.SetPlayerActMenuActive(false);
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
         tile_selector.showSelectableMoveTiles = true;
@@ -208,6 +214,8 @@ public class Player : GameAgent
     public override void act() {
         if (!player_turn)
             return;
+        actMenu.SetPlayerActMenuActive(true);
+        actMenu.SetButtons(stats.playerCharacterClass.GetAvailableActs());
         currentAction = GameAgentAction.MeleeAttack;
         tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
 
@@ -220,6 +228,7 @@ public class Player : GameAgent
         if (!player_turn)
             return;
         currentAction = GameAgentAction.Wait;
+        actMenu.SetPlayerActMenuActive(false);
         tile_selector.showPathLine = false;
         tile_selector.showSelectableMoveTiles = false;
         tile_selector.showSelectableActTiles = false;
@@ -230,6 +239,7 @@ public class Player : GameAgent
     public override void potion() {
         if (!player_turn)
             return;
+        actMenu.SetPlayerActMenuActive(false);
         currentAction = GameAgentAction.Potion;
         StartCoroutine(animator.PlayUseItemAnimation());
         stats.currentHealth += 10;
