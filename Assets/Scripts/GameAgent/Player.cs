@@ -344,6 +344,7 @@ public class Player : GameAgent
         tile_selector.showPathLine = false;
         tile_selector.showSelectableMoveTiles = false;
         tile_selector.showSelectableActTiles = false;
+        tile_selector.clear_path_line();
 
         player_turn = false;
     }
@@ -356,6 +357,7 @@ public class Player : GameAgent
         tile_selector.showPathLine = false;
         tile_selector.showSelectableMoveTiles = false;
         tile_selector.showSelectableActTiles = false;
+        tile_selector.clear_path_line();
 
         currentAction = GameAgentAction.Potion;
         StartCoroutine(animator.PlayUseItemAnimation());
