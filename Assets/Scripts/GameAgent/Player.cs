@@ -54,7 +54,7 @@ public class Player : GameAgent
         classDefiner = GetComponent<CharacterClassDefiner>();
         actMenu = GetComponent<PlayerActMenu>();
         animator.init();
-        classDefiner.init(stats.characterClassOption);
+        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
         actMenu.init();
 
         selectableTiles = new List<Pos>();
@@ -373,14 +373,19 @@ public class Player : GameAgent
     }
 
     public void TestCharacterClass(int characterClassToTest) {
-        stats = new GameAgentStats(characterClassToTest, 1);
+        int weapon = CharacterClassOptions.RandomClassWeapon;
+        if (characterClassToTest == CharacterClassOptions.Knight) {
+            weapon = CharacterClassOptions.Sword;
+        }
+
+        stats = new GameAgentStats(CharacterRaceOptions.Human, characterClassToTest, 1, weapon);
         attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
 
-        classDefiner.init(stats.characterClassOption);
+        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
         DeactivatePlayerActionMenu();
     }
 }
