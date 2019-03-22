@@ -50,6 +50,7 @@ public class TileSelector : MonoBehaviour
 
     private List<Path> selectableMovementTiles;
     private List<Pos> selectableActTiles;
+    private List<Pos> nonselectableActTiles;
 
     private int[,] map;
 
@@ -63,10 +64,11 @@ public class TileSelector : MonoBehaviour
 	public Mesh tileMesh;
 	public Material moveableTilesMaterial;
 	public Material selectableTilesMaterial;
+    public Material nonselectableTilesMaterial;
 
-	
-	// called by the mapGenerator script
-	public void init_tile_selector(int[,] map)
+
+    // called by the mapGenerator script
+    public void init_tile_selector(int[,] map)
 	{
 		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
 		cell_size = config.cell_size;
@@ -188,6 +190,7 @@ public class TileSelector : MonoBehaviour
     // Consider turning this static for enemy AI if this is the only method they need from this class
     public void CreateListOfSelectableActTiles(Pos position, int move_budget, GameAgentAction action) {
         selectableActTiles = new List<Pos>();
+        nonselectableActTiles = new List<Pos>();
 
         int startx = position.x - move_budget >= 0 ? position.x - move_budget : 0;
         int endx = position.x + move_budget < width ? position.x + move_budget : width - 1;
@@ -196,13 +199,18 @@ public class TileSelector : MonoBehaviour
         int endy = position.y + move_budget < height ? position.y + move_budget : height - 1;
 
         // TODO figure out if you are going to create a new method that doesn't fuck around with the List<Path>
-        if (action == GameAgentAction.MeleeAttack) {
+        if (action == GameAgentAction.MeleeAttack || action == GameAgentAction.MagicAttackSingleTarget
+            || action == GameAgentAction.RangedAttack || action == GameAgentAction.RangedAttackMultiShot) {
+
             for (int x = startx; x <= endx; x++) {
                 for (int y = starty; y <= endy; y++) {
 
                     Pos candidate = new Pos(x, y);
                     if (map_manager.IsOccupied(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
                         selectableActTiles.Add(candidate);
+                    } else if (!map_manager.IsOccupied(candidate) && map_manager.IsTraversable(candidate) 
+                                && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+                        nonselectableActTiles.Add(candidate);
                     }
                 }
             }
@@ -240,6 +248,10 @@ public class TileSelector : MonoBehaviour
 			foreach (Pos tile in selectableActTiles) {
 				Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), selectableTilesMaterial, 0);
 			}
+
+            foreach (Pos tile in nonselectableActTiles) {
+                Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), nonselectableTilesMaterial, 0);
+            }
         }
     }
 }
