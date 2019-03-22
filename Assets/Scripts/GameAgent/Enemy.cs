@@ -11,9 +11,8 @@ public class Enemy : GameAgent
 
     // private reference to position in map grid
     private bool moving;
-
-    private int move_budget;
-    private bool player_turn;
+	
+	public bool enemy_turn = false;
 
     private CharacterAnimator animator;
     private CharacterClassDefiner classDefiner;
@@ -25,11 +24,12 @@ public class Enemy : GameAgent
     public float range;
     public float _speed;
     public float moveTime = 0.1f;
+	public int moveBudget;
 
     public override void init_agent(Pos position, GameAgentStats stats) 
 	{
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
-        map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
+        map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 
         animator = GetComponent<CharacterAnimator>();
@@ -69,7 +69,9 @@ public class Enemy : GameAgent
     }
 
     public override void take_turn() {
+		enemy_turn = true;
         StartCoroutine(animator.PlayAttackAnimation());
+		enemy_turn = false;
     }
 
 

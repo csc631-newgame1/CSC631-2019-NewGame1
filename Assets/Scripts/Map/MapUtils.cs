@@ -197,15 +197,4 @@ namespace MapUtils
 			return false;
 		}
 	}
-
-    public class MapCell {
-        public bool traversable;
-        public bool occupied;
-        public GameAgent resident;
-        public MapCell(bool traversable) {
-            this.traversable = traversable;
-            occupied = false;
-            resident = null;
-        }
-    }
 }

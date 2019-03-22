@@ -38,8 +38,7 @@ public class Player : GameAgent
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
     {
-		map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
-        config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
+		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 
 		animator = GetComponent<CharacterAnimator>();
@@ -63,10 +62,9 @@ public class Player : GameAgent
     }
 
 	// if right mouse button is pressed, move player model to hover position
-	// if hover position is on a bridge tile, change the player model
-    void Update()
+    public void RespondToMouseClick()
     {
-		if (Input.GetMouseButtonDown(1) && !moving && hoveringActionTileSelector) {
+		if (!moving && hoveringActionTileSelector) {
 			
 			switch (currentAction) {
 				
@@ -92,15 +90,19 @@ public class Player : GameAgent
                 break;
             }
 		}
-
-        // For testing animations.
-        if (Input.GetKeyDown("1")) StartCoroutine(animator.PlayRotateAnimation());
-        if (Input.GetKeyDown("2")) StartCoroutine(animator.PlayAttackAnimation());
-        if (Input.GetKeyDown("3")) StartCoroutine(animator.PlayUseItemAnimation());
-        if (Input.GetKeyDown("4")) StartCoroutine(animator.PlayHitAnimation());
-        if (Input.GetKeyDown("5")) StartCoroutine(animator.PlayBlockAnimation());
-        if (Input.GetKeyDown("6")) StartCoroutine(animator.PlayKilledAimation());
-    }
+	}
+	
+	public void RespondToKeyboardInput(char key)
+	{
+		switch (key) {
+		case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
+		case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
+		case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
+		case '4': StartCoroutine(animator.PlayHitAnimation()); break;
+		case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
+		case '6': StartCoroutine(animator.PlayKilledAimation()); break;
+		}
+	}
 	
 	IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
