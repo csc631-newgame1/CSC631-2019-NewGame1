@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameAgentStats
 {
     public int characterClassOption;
-    private CharacterClass playerCharacterClass;
+    public CharacterClass playerCharacterClass;
     // unit attack damage
     public float attack;
     // unit maxium health
