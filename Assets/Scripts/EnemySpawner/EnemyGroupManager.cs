@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MapUtils;
+using System.Collections.Generic;
 using UnityEngine;
 
 // Responsible for taking a List of enemy groups and spawn zones
@@ -26,8 +27,8 @@ public class EnemyGroupManager
     // within the spawn zone of where to spawn them
     private void PopulateSpawnZone(EnemyGroup group, SpawnZone spawnZone) {
         List<GameAgentStats> enemyStats = group.GetEnemiesStatsForSpawn();
-        List<Vector3> zoneTiles = spawnZone.GetUnpopulatedZoneTiles();
-        List<Vector3> populatedZoneTiles = new List<Vector3>();
+        List<Pos> zoneTiles = spawnZone.GetUnpopulatedZoneTiles();
+        List<Pos> populatedZoneTiles = new List<Pos>();
         // Enter distribution of enemies here
 
         // Random distribution in zone
@@ -35,7 +36,7 @@ public class EnemyGroupManager
 
         foreach(GameAgentStats stats in enemyStats) {
             int randomIndex = GetRandomIntWithExclusion(0, zoneTiles.Count - 1, exclusion);
-            MapUtils.Pos enemyPos = new MapUtils.Pos((int)zoneTiles[randomIndex].x, (int)zoneTiles[randomIndex].y);
+            Pos enemyPos = new Pos((int)zoneTiles[randomIndex].x, (int)zoneTiles[randomIndex].y);
             populatedZoneTiles.Add(zoneTiles[randomIndex]);
             EnemyToSpawn enemy = new EnemyToSpawn(enemyPos, stats);
 
