@@ -18,8 +18,12 @@ public class Player : GameAgent
     public bool isAttacking = false;
 	public bool godMode = true;
 
+    // player turn options
 	public bool player_turn = true;
     private bool playerMovedThisTurn = false;
+    private bool playerActedThisTurn = false;
+    private bool playerUsedPotionThisTurn = false;
+    private bool playerWaitingThisTurn = false;
 
     [Header("Player Stats")]
     public float attack;
@@ -144,6 +148,7 @@ public class Player : GameAgent
         hoveringActionTileSelector = false;
         tile_selector.showSelectableActTiles = false;
         actMenu.SetPlayerActMenuActive(false);
+        playerActedThisTurn = true;
     }
 
 	public override void take_damage(int amount)
@@ -162,7 +167,10 @@ public class Player : GameAgent
 	{
 		player_turn = true;
         playerMovedThisTurn = false;
-	}
+        playerActedThisTurn = false;
+        playerUsedPotionThisTurn = false;
+        playerWaitingThisTurn = false;
+    }
 
 	public override IEnumerator smooth_movement(List<Pos> path)
 	{
@@ -254,9 +262,6 @@ public class Player : GameAgent
     }
 
     public override void act() {
-        if (!player_turn)
-            return;
-
         // Hide move selection if open
         if (tile_selector.showSelectableMoveTiles) {
             hoveringActionTileSelector = false;
@@ -265,6 +270,9 @@ public class Player : GameAgent
             tile_selector.showPathLine = false;
             tile_selector.clear_path_line();
         }
+
+        if (!player_turn || playerActedThisTurn)
+            return;
 
         // If act menu is already open, hide it
         if (actMenu.IsPlayerActMenuActive()) {
@@ -336,7 +344,7 @@ public class Player : GameAgent
     }
 
     public override void wait() {
-        if (!player_turn)
+        if (!player_turn || playerWaitingThisTurn)
             return;
         currentAction = GameAgentAction.Wait;
 
@@ -346,11 +354,11 @@ public class Player : GameAgent
         tile_selector.showSelectableActTiles = false;
         tile_selector.clear_path_line();
 
-        player_turn = false;
+        playerWaitingThisTurn = true;
     }
 
     public override void potion() {
-        if (!player_turn)
+        if (!player_turn || playerUsedPotionThisTurn)
             return;
         actMenu.SetPlayerActMenuActive(false);
         hoveringActionTileSelector = false;
@@ -363,7 +371,7 @@ public class Player : GameAgent
         StartCoroutine(animator.PlayUseItemAnimation());
         stats.currentHealth += 10;
         Debug.Log("Potion Action");
-        player_turn = false;
+        playerUsedPotionThisTurn = true;
     }
 
     public void UpdateViewablePlayerStats() {
@@ -389,5 +397,18 @@ public class Player : GameAgent
 
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
         DeactivatePlayerActionMenu();
+    }
+
+    public void CheckIfPlayerTurnHasEnded() {
+        // Player chose to wait
+        if (playerWaitingThisTurn) {
+            player_turn = false;
+        // Player moved and either used Act or used a Potion
+        } else if (playerMovedThisTurn && (playerActedThisTurn || playerUsedPotionThisTurn)) {
+            player_turn = false;
+        // Player used Act and used a Potion
+        } else if (playerActedThisTurn && playerUsedPotionThisTurn) {
+            player_turn = false;
+        }
     }
 }
