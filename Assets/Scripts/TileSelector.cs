@@ -75,7 +75,7 @@ public class TileSelector : MonoBehaviour
 		offset = config.GetOffset();
 		
 		this.map = map;
-		this.map_manager = GameObject.FindGameObjectWithTag("Map").GetComponent<MapManager>();
+		this.map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 		this.path_render = GetComponent<LineRenderer>();
 		
 		Vector3 collider_size = new Vector3(width * cell_size, 0.1f, height * cell_size);
