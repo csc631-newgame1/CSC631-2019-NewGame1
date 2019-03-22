@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     private List<SpawnZone> spawnZones;
     [SerializeField]
     // Consider moving this to a different location for better handling of turn based gameplay
-    private GameObject playerActionMenu;
+    private GameObject BattleMenu;
     public GameObject playerPrefab;
 
 	void Start()
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
 	}
 
     public void ShowPlayerActionMenu() {
-        playerActionMenu.SetActive(!playerActionMenu.activeSelf);
+        BattleMenu.SetActive(!BattleMenu.activeSelf);
         localPlayer.DeactivatePlayerActionMenu();
     }
 
