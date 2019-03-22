@@ -8,7 +8,10 @@ public class PlayerActMenu : MonoBehaviour
 
     public void SetPlayerActMenuActive(bool active) {
         actMenu.gameObject.SetActive(active);
-        Debug.Log("Active state: " + actMenu.gameObject.activeSelf);
+    }
+
+    public bool IsPlayerActMenuActive() {
+        return actMenu.gameObject.activeSelf;
     }
 
     public void init() {

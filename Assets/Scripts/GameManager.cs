@@ -89,8 +89,24 @@ public class GameManager : MonoBehaviour
         clone.GetComponent<Player>().move();
     }
 
-    public void ActionPlayer() {
+    public void ActPlayer() {
         clone.GetComponent<Player>().act();
+    }
+
+    public void Action1Player() {
+        clone.GetComponent<Player>().action1();
+    }
+
+    public void Action2Player() {
+        clone.GetComponent<Player>().action2();
+    }
+
+    public void Action3Player() {
+        clone.GetComponent<Player>().action3();
+    }
+
+    public void Action4Player() {
+        clone.GetComponent<Player>().action4();
     }
 
     public void WaitPlayer() {
