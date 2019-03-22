@@ -79,11 +79,11 @@ public class TurnManager : MonoBehaviour
 	void ClearDead()
 	{
 		foreach (Enemy enemy in enemies)
-			if (enemy.currentHealth < 0)
+			if (enemy.currentHealth <= 0)
 				parentManager.kill(enemy);
 			
 		foreach (Player player in players)
-			if (player.currentHealth < 0)
+			if (player.currentHealth <= 0)
 				parentManager.kill(player);
 	}
 	

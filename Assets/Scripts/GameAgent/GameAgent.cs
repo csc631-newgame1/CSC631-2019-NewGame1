@@ -6,7 +6,6 @@ using MapUtils;
 
 public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
 
-public enum GameAgentState { Alive, Unconscious, Dead };
 
 public abstract class GameAgent : MonoBehaviour
 {
@@ -14,7 +13,6 @@ public abstract class GameAgent : MonoBehaviour
     public float speed;
     protected GameAgentStats stats;
     public GameAgentAction currentAction;
-    public GameAgentState currentState;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	

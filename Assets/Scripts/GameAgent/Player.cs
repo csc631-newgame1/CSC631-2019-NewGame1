@@ -31,7 +31,8 @@ public class Player : GameAgent
     public float currentHealth;
     public float range;
     public float _speed;
-	public int move_budget = 8;
+    public int level;
+    public GameAgentState viewableState;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
@@ -53,6 +54,8 @@ public class Player : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+        level = stats.level;
+        viewableState = stats.currentState;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -67,8 +70,6 @@ public class Player : GameAgent
 		tile_selector.setPlayer(this);
 
         TurnManager.instance.AddPlayerToList(this); //add player to player list
-
-        currentState = GameAgentState.Alive;
     }
 
 	// if right mouse button is pressed, move player model to hover position
@@ -165,11 +166,15 @@ public class Player : GameAgent
 
     public override void take_turn()
 	{
-		player_turn = true;
-        playerMovedThisTurn = false;
-        playerActedThisTurn = false;
-        playerUsedPotionThisTurn = false;
-        playerWaitingThisTurn = false;
+        if (stats.currentState == GameAgentState.Alive) {
+            player_turn = true;
+            playerMovedThisTurn = false;
+            playerActedThisTurn = false;
+            playerUsedPotionThisTurn = false;
+            playerWaitingThisTurn = false;
+        }
+
+        UpdateViewablePlayerStats();
     }
 
 	public override IEnumerator smooth_movement(List<Pos> path)
@@ -224,6 +229,7 @@ public class Player : GameAgent
     }
 
 	public void Shoot(){
+        // TODO handle this
         if (isAttacking) {
             map_manager.attack(tile_selector.grid_position, (int)stats.attack);
             hoveringActionTileSelector = false;
@@ -250,7 +256,7 @@ public class Player : GameAgent
             hoveringActionTileSelector = false;
         }
 
-        if (playerMovedThisTurn || !player_turn)
+        if (playerMovedThisTurn || !player_turn || stats.currentState != GameAgentState.Alive)
             return;
 
         currentAction = GameAgentAction.Move;
@@ -271,7 +277,7 @@ public class Player : GameAgent
             tile_selector.clear_path_line();
         }
 
-        if (!player_turn || playerActedThisTurn)
+        if (!player_turn || playerActedThisTurn || stats.currentState != GameAgentState.Alive)
             return;
 
         // If act menu is already open, hide it
@@ -344,7 +350,7 @@ public class Player : GameAgent
     }
 
     public override void wait() {
-        if (!player_turn || playerWaitingThisTurn)
+        if (!player_turn || playerWaitingThisTurn || stats.currentState != GameAgentState.Alive)
             return;
         currentAction = GameAgentAction.Wait;
 
@@ -358,7 +364,7 @@ public class Player : GameAgent
     }
 
     public override void potion() {
-        if (!player_turn || playerUsedPotionThisTurn)
+        if (!player_turn || playerUsedPotionThisTurn || stats.currentState != GameAgentState.Alive)
             return;
         actMenu.SetPlayerActMenuActive(false);
         hoveringActionTileSelector = false;
@@ -372,6 +378,8 @@ public class Player : GameAgent
         stats.currentHealth += 10;
         Debug.Log("Potion Action");
         playerUsedPotionThisTurn = true;
+
+        UpdateViewablePlayerStats();
     }
 
     public void UpdateViewablePlayerStats() {
@@ -380,6 +388,8 @@ public class Player : GameAgent
         currentHealth = stats.currentHealth;
         range = stats.range;
         _speed = stats.speed;
+        level = stats.level;
+        viewableState = stats.currentState;
     }
 
     public void TestCharacterClass(int characterClassToTest) {
