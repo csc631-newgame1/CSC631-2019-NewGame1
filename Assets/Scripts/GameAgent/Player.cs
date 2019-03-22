@@ -34,6 +34,7 @@ public class Player : GameAgent
 
 	CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
+    // This menu is specific to the player character class
     PlayerActMenu actMenu;
 
     // Gets references to necessary game components
@@ -109,6 +110,22 @@ public class Player : GameAgent
 		case '6': StartCoroutine(animator.PlayKilledAimation()); break;
 		}
 	}
+
+    public void DeactivatePlayerActionMenu() {
+        if (tile_selector.showSelectableMoveTiles) {
+            hoveringActionTileSelector = false;
+            tile_selector.showSelectableMoveTiles = false;
+            tile_selector.showSelectableActTiles = false;
+            tile_selector.showPathLine = false;
+            tile_selector.clear_path_line();
+        }
+
+        if (actMenu.IsPlayerActMenuActive()) {
+            actMenu.SetPlayerActMenuActive(false);
+            tile_selector.showSelectableActTiles = false;
+            hoveringActionTileSelector = false;
+        }
+    }
 
 	IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
