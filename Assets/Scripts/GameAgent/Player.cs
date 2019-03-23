@@ -418,7 +418,8 @@ public class Player : GameAgent
         }
     }
 
-    public int[] SortPlayerListAlphabetically(List<Player> players) {
+    // returns an array of alphabetically arranged player indexes based on player.name
+    private int[] SortPlayerListAlphabetically(List<Player> players) {
         var playerNames = new List<string>();
         int[] sortedPlayersIndex = new int[players.Count];
         int playerNameIndex = 0;
@@ -427,6 +428,7 @@ public class Player : GameAgent
             playerNames.Add(player.name);
         }
 
+        // sorts alphabetically
         playerNames.Sort();
 
         // get a list of sorted alphabetical indexs
@@ -442,7 +444,7 @@ public class Player : GameAgent
             }
         }
 
-        // Move player to first spot
+        // Move this player to the first spot
         if (playerNameIndex != 0) {
             int temp = sortedPlayersIndex[0];
             sortedPlayersIndex[0] = sortedPlayersIndex[playerNameIndex];
