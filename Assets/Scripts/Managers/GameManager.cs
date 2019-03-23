@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 	private MapManager map_manager;
 
     private EnemySpawner enemySpawner;
+	private EnvironmentSpawner environmentSpawner;
     private Player localPlayer;
 
     private TurnManager turn_manager;
@@ -31,9 +32,11 @@ public class GameManager : MonoBehaviour
     {
 		map_manager = GetComponent<MapManager>();
 		enemySpawner = GetComponent<EnemySpawner>();
+		environmentSpawner = GetComponent<EnvironmentSpawner>();
 
 		map_manager.Init(this);
 		enemySpawner.Init(map_manager);
+		environmentSpawner.Init(map_manager);
 
 		localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);

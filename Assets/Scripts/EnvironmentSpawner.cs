@@ -28,7 +28,7 @@ public class EnvironmentSpawner : MonoBehaviour
     List<GameObject> allEnvironmentObject = new List<GameObject>();
     #endregion
 
-    public void Init(MapManager mapManager, MapConfiguration mapConfiguration)
+    public void Init(MapManager mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         this.width = config.width;

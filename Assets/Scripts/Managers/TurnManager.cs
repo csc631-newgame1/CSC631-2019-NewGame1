@@ -16,6 +16,7 @@ public class TurnManager : MonoBehaviour
     private List<Enemy> enemies = new List<Enemy>();
 	
 	private GameManager parentManager = null;
+	private IEnumerator mainLoop = null;
 	
 	void Awake()
 	{
@@ -25,6 +26,7 @@ public class TurnManager : MonoBehaviour
 	public void Init(GameManager parent)
 	{
 		parentManager = parent;
+		if (mainLoop != null) StopCoroutine(mainLoop);
 		StartCoroutine(TurnLoop());
 	}
 
@@ -76,13 +78,17 @@ public class TurnManager : MonoBehaviour
 	
 	void ClearDead()
 	{
-		foreach (Enemy enemy in enemies)
-			if (enemy.currentHealth < 0)
+		foreach (Enemy enemy in enemies.ToArray()) // converts to array so we can safely remove during iteration
+			if (enemy.currentHealth <= 0) {
+				enemies.Remove(enemy);
 				parentManager.kill(enemy);
+			}
 			
-		foreach (Player player in players)
-			if (player.currentHealth < 0)
+		foreach (Player player in players.ToArray())
+			if (player.currentHealth <= 0) {
+				players.Remove(player);
 				parentManager.kill(player);
+			}
 	}
 	
 	public void AddPlayerToList(Player player)

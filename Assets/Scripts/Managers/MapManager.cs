@@ -105,7 +105,8 @@ public class MapManager : MonoBehaviour
 
 	public void de_instantiate(Pos pos)
 	{
-		Destroy(map[pos.x, pos.y].resident.gameObject);
+		Debug.Log("Killing character...");
+		Destroy(map[pos.x, pos.y].resident.gameObject, 5.0f);
 
 		map[pos.x, pos.y].resident = null;
 		map[pos.x, pos.y].occupied = false;

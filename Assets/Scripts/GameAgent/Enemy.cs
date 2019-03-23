@@ -58,9 +58,10 @@ public class Enemy : GameAgent
     public override void take_damage(int amount) {
         stats.currentHealth -= amount;
         if (stats.currentHealth <= 0) {
+			
             stats.currentHealth = 0;
             StartCoroutine(animator.PlayKilledAimation());
-            TurnManager.instance.RemoveEnemyFromList(this);
+			
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
