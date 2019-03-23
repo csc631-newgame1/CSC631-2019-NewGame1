@@ -40,6 +40,7 @@ public class TurnManager : MonoBehaviour
 			
 			foreach (Player player in players) {
 				player.take_turn();
+                UpdatePlayerStats();
 			}
 			
 			while (!playerTurnOver()) yield return null;
@@ -50,8 +51,10 @@ public class TurnManager : MonoBehaviour
 			enemiesTurn = true;
 			playersTurn = false;
 
-			foreach (Enemy enemy in enemies)
-				enemy.take_turn();
+            foreach (Enemy enemy in enemies) {
+                enemy.take_turn();
+                UpdatePlayerStats();
+            }
 			
 			while (!enemyTurnOver()) yield return null;
 			ClearDead();
@@ -74,6 +77,14 @@ public class TurnManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    void UpdatePlayerStats() {
+        if (players.Count > 0) {
+            foreach (Player player in players) {
+                player.UpdatePlayerStatsMenu(players);
+            }
+        }
     }
 	
 	void ClearDead()
