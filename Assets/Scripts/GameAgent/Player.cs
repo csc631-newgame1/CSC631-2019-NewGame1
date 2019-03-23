@@ -156,6 +156,7 @@ public class Player : GameAgent
         //actMenu.SetPlayerActMenuActive(false);
         action4();
         playerActedThisTurn = true;
+        actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
     }
 
 	public override void take_damage(int amount)
@@ -177,6 +178,7 @@ public class Player : GameAgent
         playerActedThisTurn = false;
         playerUsedPotionThisTurn = false;
         playerWaitingThisTurn = false;
+        actMenu.MakeAllButtonsInteractable(true);
     }
 
 	public override IEnumerator smooth_movement(List<Pos> path)
@@ -208,6 +210,7 @@ public class Player : GameAgent
         moving = false;
 		tile_selector.clear_path_line();
         playerMovedThisTurn = true;
+        actMenu.MakeButtonNoninteractable(ActMenuButtons.MOVE);
 	}
 
     void spawnActionRadius()
@@ -364,6 +367,7 @@ public class Player : GameAgent
         stats.currentHealth += 10;
         Debug.Log("Potion Action");
         playerUsedPotionThisTurn = true;
+        actMenu.MakeButtonNoninteractable(ActMenuButtons.POTION);
     }
 
     public void UpdateViewableEditorPlayerStats() {
@@ -399,12 +403,15 @@ public class Player : GameAgent
         // Player chose to wait
         if (playerWaitingThisTurn) {
             player_turn = false;
+            actMenu.MakeAllButtonsInteractable(false);
         // Player moved and either used Act or used a Potion
         } else if (playerMovedThisTurn && (playerActedThisTurn || playerUsedPotionThisTurn)) {
             player_turn = false;
-        // Player used Act and used a Potion
+            actMenu.MakeAllButtonsInteractable(false);
+            // Player used Act and used a Potion
         } else if (playerActedThisTurn && playerUsedPotionThisTurn) {
             player_turn = false;
+            actMenu.MakeAllButtonsInteractable(false);
         }
     }
 
