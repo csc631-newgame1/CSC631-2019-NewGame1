@@ -1,20 +1,24 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+public class ActMenuButtons {
+    // Button indexes
+    public const int MOVE = 0;
+    public const int ACT = 1;
+    public const int POTION = 2;
+    public const int WAIT = 3;
+    public const int ACTION1 = 4;
+    public const int ACTION2 = 5;
+    public const int BLANK = 6;
+    public const int BACK = 7;
+}
+
 public class PlayerActMenu : MonoBehaviour
 {
     private GameObject actMenu;
     private GameObject[] playerStats;
     private Button[] buttons;
-    // Button indexes
-    private const int MOVE = 0;
-    private const int ACT = 1;
-    private const int POTION = 2;
-    private const int WAIT = 3;
-    private const int ACTION1 = 4;
-    private const int ACTION2 = 5;
-    private const int BLANK = 6;
-    private const int BACK = 7;
+    
 
     private bool isPlayerActMenuActive = false;
 
@@ -30,6 +34,16 @@ public class PlayerActMenu : MonoBehaviour
 
     public bool IsPlayerActMenuActive() {
         return isPlayerActMenuActive;
+    }
+
+    public void MakeButtonNoninteractable(int buttonIndex) {
+        buttons[buttonIndex].interactable = false;
+    }
+
+    public void MakeAllButtonsInteractable(bool active) {
+        foreach (Button button in buttons) {
+            button.interactable = active;
+        }
     }
 
     public void init() {
@@ -60,31 +74,31 @@ public class PlayerActMenu : MonoBehaviour
     }
 
     public void SetButtonsToBattleMenu() {
-        buttons[MOVE].gameObject.SetActive(true);
-        buttons[ACT].gameObject.SetActive(true);
-        buttons[POTION].gameObject.SetActive(true);
-        buttons[WAIT].gameObject.SetActive(true);
+        buttons[ActMenuButtons.MOVE].gameObject.SetActive(true);
+        buttons[ActMenuButtons.ACT].gameObject.SetActive(true);
+        buttons[ActMenuButtons.POTION].gameObject.SetActive(true);
+        buttons[ActMenuButtons.WAIT].gameObject.SetActive(true);
 
-        buttons[ACTION1].gameObject.SetActive(false);
-        buttons[ACTION2].gameObject.SetActive(false);
-        buttons[BLANK].gameObject.SetActive(false);
-        buttons[BACK].gameObject.SetActive(false);
+        buttons[ActMenuButtons.ACTION1].gameObject.SetActive(false);
+        buttons[ActMenuButtons.ACTION2].gameObject.SetActive(false);
+        buttons[ActMenuButtons.BLANK].gameObject.SetActive(false);
+        buttons[ActMenuButtons.BACK].gameObject.SetActive(false);
     }
 
     public void SetActButtons() {
-        buttons[MOVE].gameObject.SetActive(false);
-        buttons[ACT].gameObject.SetActive(false);
-        buttons[POTION].gameObject.SetActive(false);
-        buttons[WAIT].gameObject.SetActive(false);
+        buttons[ActMenuButtons.MOVE].gameObject.SetActive(false);
+        buttons[ActMenuButtons.ACT].gameObject.SetActive(false);
+        buttons[ActMenuButtons.POTION].gameObject.SetActive(false);
+        buttons[ActMenuButtons.WAIT].gameObject.SetActive(false);
 
-        buttons[ACTION1].gameObject.SetActive(true);
-        buttons[ACTION2].gameObject.SetActive(true);
-        buttons[BLANK].gameObject.SetActive(true);
-        buttons[BACK].gameObject.SetActive(true);
+        buttons[ActMenuButtons.ACTION1].gameObject.SetActive(true);
+        buttons[ActMenuButtons.ACTION2].gameObject.SetActive(true);
+        buttons[ActMenuButtons.BLANK].gameObject.SetActive(true);
+        buttons[ActMenuButtons.BACK].gameObject.SetActive(true);
     }
 
     private void SetButtons(GameAgentAction[] actions) {
-        int buttonIndex = ACTION1;
+        int buttonIndex = ActMenuButtons.ACTION1;
         foreach (GameAgentAction action in actions) {
             switch (action) {
                 case GameAgentAction.MeleeAttack:
@@ -132,8 +146,8 @@ public class PlayerActMenu : MonoBehaviour
             }
         }
 
-        buttons[BLANK].GetComponentInChildren<Text>().text = "";
-        buttons[BACK].GetComponentInChildren<Text>().text = "BACK";
+        buttons[ActMenuButtons.BLANK].GetComponentInChildren<Text>().text = "";
+        buttons[ActMenuButtons.BACK].GetComponentInChildren<Text>().text = "BACK";
 
         SetActButtons();
     }
