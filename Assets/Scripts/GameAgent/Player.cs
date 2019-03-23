@@ -134,16 +134,20 @@ public class Player : GameAgent
 	IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
 		isAttacking = true;
-        // Have player look at the target it's attacking
-        // Consider making this a smooth movement
-        this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
+			// Have player look at the target it's attacking
+			// Consider making this a smooth movement
+			this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
 
-        while (isAttacking) yield return null;
-		map_manager.attack(attackPos, (int)stats.attack);
+			//while (isAttacking) yield return null;
+			yield return new WaitForSeconds(0.5f);
+			map_manager.attack(attackPos, (int)stats.attack);
 
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableActTiles = false;
-        actMenu.SetPlayerActMenuActive(false);
+			hoveringActionTileSelector = false;
+			tile_selector.showSelectableActTiles = false;
+			actMenu.SetPlayerActMenuActive(false);
+		
+		isAttacking = false;
+		player_turn = false;
     }
 
 	public override void take_damage(int amount)
@@ -225,6 +229,9 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
+		if (playerMovedThisTurn || !player_turn)
+            return;
+		
         // Hide move selection if open
         if (tile_selector.showSelectableMoveTiles) {
             hoveringActionTileSelector = false;
@@ -241,9 +248,6 @@ public class Player : GameAgent
             tile_selector.showSelectableActTiles = false;
             hoveringActionTileSelector = false;
         }
-
-        if (playerMovedThisTurn || !player_turn)
-            return;
 
         currentAction = GameAgentAction.Move;
 		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, (int)stats.speed, currentAction);
@@ -278,17 +282,19 @@ public class Player : GameAgent
     }
 
     public void action1() {
+		if (!player_turn)
+            return;
+		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 1) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[0];
         }
 
         // If other action is shown, hide it
-        if (tile_selector.showSelectableActTiles) {
+        /*if (tile_selector.showSelectableActTiles) {
             hoveringActionTileSelector = false;
             tile_selector.showSelectableMoveTiles = false;
             tile_selector.showSelectableActTiles = false;
-            return;
-        }
+        }*/
 
         if (currentAction == GameAgentAction.MeleeAttack || currentAction == GameAgentAction.MagicAttackSingleTarget
             || currentAction == GameAgentAction.RangedAttack) {
@@ -301,41 +307,52 @@ public class Player : GameAgent
     }
 
     public void action2() {
+		if (!player_turn)
+            return;
+		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 2) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[1];
         }
 
         // If other action is shown, hide it
-        if (tile_selector.showSelectableActTiles) {
+        /*if (tile_selector.showSelectableActTiles) {
             hoveringActionTileSelector = false;
             tile_selector.showSelectableMoveTiles = false;
             tile_selector.showSelectableActTiles = false;
-            return;
-        }
+        }*/
 
         if (currentAction == GameAgentAction.Heal || currentAction == GameAgentAction.MagicAttackAOE
-            || currentAction == GameAgentAction.Taunt || currentAction == GameAgentAction.RangedAttackMultiShot) {
+        || currentAction == GameAgentAction.Taunt || currentAction == GameAgentAction.RangedAttackMultiShot) {
+			
             tile_selector.CreateListOfSelectableActTiles(grid_pos, (int)stats.range, currentAction);
-
             hoveringActionTileSelector = true;
             tile_selector.showSelectableMoveTiles = false;
             tile_selector.showSelectableActTiles = true;
         }
     }
 
-    public void action3() {
+    public void action3() 
+	{
+		if (!player_turn)
+            return;
+		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 3) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[2];
         }
     }
 
-    public void action4() {
+    public void action4() 
+	{
+		if (!player_turn)
+            return;
+		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 4) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[3];
         }
     }
 
-    public override void wait() {
+    public override void wait() 
+	{
         if (!player_turn)
             return;
         currentAction = GameAgentAction.Wait;
