@@ -3,7 +3,7 @@
 public class Mage : CharacterClass
 {
     public Mage() {
-        baseStats = new GameAgentStats(23, 40, 7, 6);
+        baseStats = new GameAgentStats(23, 40, 7, 6, true);
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
@@ -42,5 +42,17 @@ public class Mage : CharacterClass
     }
 
     public override void LevelUp() {
+    }
+
+    public override void SetWeapon(int weapon) {
+        if (weapon == CharacterClassOptions.RandomClassWeapon) {
+            GenerateRandomClassWeapon();
+        } else {
+            this.weapon = weapon;
+        }
+    }
+
+    protected override void GenerateRandomClassWeapon() {
+        weapon = CharacterClassOptions.Staff;
     }
 }

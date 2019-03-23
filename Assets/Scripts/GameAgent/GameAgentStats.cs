@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameAgentStats
 {
     public int characterClassOption;
+    public int characterRace;
     public CharacterClass playerCharacterClass;
     // unit attack damage
     public float attack;
@@ -27,9 +28,10 @@ public class GameAgentStats
     // the player will receive 1000xp * scaleFactor worth of xp
     private float scaleFactor = 0.25f;
 
-    public GameAgentStats(int characterClass, float attack, float health, float range, float speed, int desiredLevel) {
+    public GameAgentStats(int characterRace, int characterClass, float attack, float health, float range, float speed, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+        this.characterRace = characterRace;
         characterClassOption = characterClass;
-        SetGameAgentCharacterClass();
+        SetGameAgentCharacterClass(characterWeapon);
         this.attack = attack;
         maxHealth = health;
         currentHealth = health;
@@ -40,17 +42,20 @@ public class GameAgentStats
     }
 
     // Only used for creating base stats
-    public GameAgentStats(float attack, float health, float range, float speed) {
-        this.attack = attack;
-        maxHealth = health;
-        currentHealth = health;
-        this.range = range;
-        this.speed = speed;
+    public GameAgentStats(float attack, float health, float range, float speed, bool baseStats) {
+        if (baseStats) {
+            this.attack = attack;
+            maxHealth = health;
+            currentHealth = health;
+            this.range = range;
+            this.speed = speed;
+        }
     }
 
-    public GameAgentStats(int characterClass, int desiredLevel) {
+    public GameAgentStats(int characterRace, int characterClass, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+        this.characterRace = characterRace;
         characterClassOption = characterClass;
-        SetGameAgentCharacterClass();
+        SetGameAgentCharacterClass(characterWeapon);
         GetBaseCharacterClassStats();
         LevelUpToDesiredLevel(desiredLevel);
     }
@@ -104,7 +109,7 @@ public class GameAgentStats
         return Mathf.RoundToInt((level * level + level) / 2 * 100 - (level * 100) * scaleFactor);
     }
 
-    private void SetGameAgentCharacterClass() {
+    private void SetGameAgentCharacterClass(int characterWeapon) {
         switch (characterClassOption) {
             case CharacterClassOptions.Knight:
                 playerCharacterClass = new Knight();
@@ -118,9 +123,8 @@ public class GameAgentStats
             case CharacterClassOptions.Healer:
                 playerCharacterClass = new Healer();
                 break;
-            default:
-                playerCharacterClass = new Knight();
-                break;
         }
+
+        playerCharacterClass.SetWeapon(characterWeapon);
     }
 }

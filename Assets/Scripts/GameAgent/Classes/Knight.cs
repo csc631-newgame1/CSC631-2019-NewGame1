@@ -3,7 +3,7 @@
 public class Knight : CharacterClass {
 
     public Knight() {
-        baseStats = new GameAgentStats(17, 50, 1, 7);
+        baseStats = new GameAgentStats(17, 50, 1, 7, true);
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
@@ -39,5 +39,18 @@ public class Knight : CharacterClass {
     }
 
     public override void LevelUp() {
+    }
+
+    public override void SetWeapon(int weapon) {
+        if (weapon == CharacterClassOptions.RandomClassWeapon) {
+            GenerateRandomClassWeapon();
+        } else {
+            this.weapon = weapon;
+        }
+    }
+
+    protected override void GenerateRandomClassWeapon() {
+        int[] knightWeapons = new int[] { CharacterClassOptions.Sword, CharacterClassOptions.Axe, CharacterClassOptions.Club, CharacterClassOptions.Unarmed };
+        weapon = knightWeapons[Random.Range(0, knightWeapons.Length)];
     }
 }
