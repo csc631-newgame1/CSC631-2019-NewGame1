@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class PlayerActMenu : MonoBehaviour
 {
     private GameObject actMenu;
+    private GameObject[] playerStats;
     private Button[] buttons;
     // Button indexes
     private const int MOVE = 0;
@@ -33,8 +34,21 @@ public class PlayerActMenu : MonoBehaviour
 
     public void init() {
         actMenu = GameObject.FindGameObjectWithTag("PlayerActMenu");
+        playerStats = GameObject.FindGameObjectsWithTag("PlayerStats");
         buttons = actMenu.GetComponentsInChildren<Button>(true);
         SetPlayerActMenuActive(false);
+    }
+
+    public void UpdatePlayerStatsMenu(int position, string name, GameAgentStats stats) {
+        if (position < playerStats.Length) {
+            string hpString = stats.currentHealth.ToString() + "/" + stats.maxHealth.ToString();
+            string mpString = stats.currentMagicPoints.ToString() + "/" + stats.maxMagicPoints.ToString();
+
+            playerStats[position].GetComponentInChildren<Text>().text = name;
+            FindObjectwithTag("Level", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = stats.level.ToString();
+            FindObjectwithTag("HP", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = hpString;
+            FindObjectwithTag("MP", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = mpString;
+        }
     }
 
     public void SetButtonsToBattleMenu() {
@@ -114,5 +128,23 @@ public class PlayerActMenu : MonoBehaviour
         buttons[BACK].GetComponentInChildren<Text>().text = "BACK";
 
         SetActButtons();
+    }
+
+    private GameObject FindObjectwithTag(string _tag, GameObject parent) {
+        return GetChildObject(parent, _tag);
+    }
+
+    private GameObject GetChildObject(GameObject parent, string _tag) {
+        for (int i = 0; i < parent.transform.childCount; i++) {
+            Transform child = parent.transform.GetChild(i);
+            if (child.tag == _tag) {
+                return child.gameObject;
+            }
+            if (child.childCount > 0) {
+                GetChildObject(child.gameObject, _tag);
+            }
+        }
+
+        return null;
     }
 }

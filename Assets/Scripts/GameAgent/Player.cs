@@ -26,6 +26,7 @@ public class Player : GameAgent
     private bool playerWaitingThisTurn = false;
 
     [Header("Player Stats")]
+    public string name;
     public float attack;
     public float maxHealth;
     public float currentHealth;
@@ -41,11 +42,16 @@ public class Player : GameAgent
     // This menu is specific to the player character class
     PlayerActMenu actMenu;
 
+    // Get rid of this when you get rid of using keys to change player class
+    List<Player> playersForTestingPurposes;
+
     // Gets references to necessary game components
-    public override void init_agent(Pos position, GameAgentStats stats)
+    public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
 		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
+
+        this.name = name;
 
         this.stats = stats;
         attack = stats.attack;
@@ -147,7 +153,8 @@ public class Player : GameAgent
 
         hoveringActionTileSelector = false;
         tile_selector.showSelectableActTiles = false;
-        actMenu.SetPlayerActMenuActive(false);
+        //actMenu.SetPlayerActMenuActive(false);
+        action4();
         playerActedThisTurn = true;
     }
 
@@ -224,12 +231,9 @@ public class Player : GameAgent
     }
 
 	public void Shoot(){
-        if (isAttacking) {
-            map_manager.attack(tile_selector.grid_position, (int)stats.attack);
-            hoveringActionTileSelector = false;
-            tile_selector.showSelectableActTiles = false;
-        }
+        if (isAttacking) isAttacking = false;
     }
+
 	public void WeaponSwitch(){}
 
     public override void move() {
@@ -269,14 +273,6 @@ public class Player : GameAgent
         if (!player_turn || playerActedThisTurn)
             return;
 
-        // If act menu is already open, hide it
-        //if (actMenu.IsPlayerActMenuActive()) {
-        //    actMenu.SetPlayerActMenuActive(false);
-        //    tile_selector.showSelectableActTiles = false;
-        //    hoveringActionTileSelector = false;
-        //} else {
-            
-        //}
         actMenu.SetPlayerActMenuActive(true, stats.playerCharacterClass.GetAvailableActs());
     }
 
@@ -327,15 +323,10 @@ public class Player : GameAgent
     }
 
     public void action3() {
-        //if (stats.playerCharacterClass.GetAvailableActs().Length >= 3) {
-        //    currentAction = (stats.playerCharacterClass.GetAvailableActs())[2];
-        //}
+    
     }
 
     public void action4() {
-        //if (stats.playerCharacterClass.GetAvailableActs().Length >= 4) {
-        //    currentAction = (stats.playerCharacterClass.GetAvailableActs())[3];
-        //}
         // Return to the battle menu
         if (actMenu.IsPlayerActMenuActive()) {
                 actMenu.SetPlayerActMenuActive(false);
@@ -398,6 +389,10 @@ public class Player : GameAgent
 
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
         DeactivatePlayerActionMenu();
+
+        if (playersForTestingPurposes != null) {
+            UpdatePlayerStatsMenu(playersForTestingPurposes);
+        }
     }
 
     public void CheckIfPlayerTurnHasEnded() {
@@ -411,5 +406,49 @@ public class Player : GameAgent
         } else if (playerActedThisTurn && playerUsedPotionThisTurn) {
             player_turn = false;
         }
+    }
+
+    public void UpdatePlayerStatsMenu(List<Player> players) {
+        // Get rid of this when you get rid of using keys to change player class
+        playersForTestingPurposes = players;
+
+        int[] sortedPlayersIndex = SortPlayerListAlphabetically(players);
+        for (int i = 0; i < sortedPlayersIndex.Length; i++) {
+            actMenu.UpdatePlayerStatsMenu(i, players[sortedPlayersIndex[i]].name, players[sortedPlayersIndex[i]].stats);
+        }
+    }
+
+    public int[] SortPlayerListAlphabetically(List<Player> players) {
+        var playerNames = new List<string>();
+        int[] sortedPlayersIndex = new int[players.Count];
+        int playerNameIndex = 0;
+
+        foreach (Player player in players) {
+            playerNames.Add(player.name);
+        }
+
+        playerNames.Sort();
+
+        // get a list of sorted alphabetical indexs
+        for (int i=0; i < playerNames.Count; i++) {
+            for (int j=0; j < players.Count; j++) {
+                if (playerNames[i] == players[j].name) {
+                    if (name == players[j].name) {
+                        playerNameIndex = i;
+                    }
+                    sortedPlayersIndex[i] = j;
+                    break;
+                }
+            }
+        }
+
+        // Move player to first spot
+        if (playerNameIndex != 0) {
+            int temp = sortedPlayersIndex[0];
+            sortedPlayersIndex[0] = sortedPlayersIndex[playerNameIndex];
+            sortedPlayersIndex[playerNameIndex] = temp;
+        }
+
+        return sortedPlayersIndex;
     }
 }

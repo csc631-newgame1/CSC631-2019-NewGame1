@@ -82,13 +82,14 @@ public class MapManager : MonoBehaviour
 		return instantiate(type, new Pos(x, y));
 	}
 
-    public GameObject instantiate(GameObject prefab, Pos pos, GameAgentStats stats = null)
+    public GameObject instantiate(GameObject prefab, Pos pos, GameAgentStats stats = null, string name = null)
 	{
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
 		GameAgent agent = clone.GetComponent<GameAgent>();
+        string[] names = new string[] { "Keawa", "Benjamin", "Diana", "Jerry", "Joe" };
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword));
+            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), names[Random.Range(0, names.Length)]);
         } else {
             agent.init_agent(pos, stats);
         }

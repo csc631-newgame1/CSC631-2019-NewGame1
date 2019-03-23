@@ -13,6 +13,10 @@ public class GameAgentStats
     public float maxHealth;
     // unit current health
     public float currentHealth;
+    // unit max mp
+    public float maxMagicPoints = 100;
+    // unit current mp
+    public float currentMagicPoints = 100;
     // unit attack radius
     public float range;
     // unit move radius
