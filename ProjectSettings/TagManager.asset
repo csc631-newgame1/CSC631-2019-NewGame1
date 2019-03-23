@@ -10,6 +10,13 @@ TagManager:
   - PlayerActMenu
   - PlayerBattleMenu
   - PlayerStatsMenu
+  - PlayerStats
+  - Level
+  - HP
+  - MP
+  - LevelValue
+  - HPValue
+  - MPValue
   layers:
   - Default
   - TransparentFX
