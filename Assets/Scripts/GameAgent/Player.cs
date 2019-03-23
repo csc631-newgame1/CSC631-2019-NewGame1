@@ -366,7 +366,7 @@ public class Player : GameAgent
         playerUsedPotionThisTurn = true;
     }
 
-    public void UpdateViewablePlayerStats() {
+    public void UpdateViewableEditorPlayerStats() {
         attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = stats.currentHealth;
@@ -415,6 +415,11 @@ public class Player : GameAgent
         int[] sortedPlayersIndex = SortPlayerListAlphabetically(players);
         for (int i = 0; i < sortedPlayersIndex.Length; i++) {
             actMenu.UpdatePlayerStatsMenu(i, players[sortedPlayersIndex[i]].name, players[sortedPlayersIndex[i]].stats);
+        }
+
+        // Deactivate the other nonactive players
+        for (int i = sortedPlayersIndex.Length; i < 4; i++ ) {
+            actMenu.UpdatePlayerStatsMenu(i, "", null, true);
         }
     }
 

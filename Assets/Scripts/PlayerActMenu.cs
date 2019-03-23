@@ -39,15 +39,23 @@ public class PlayerActMenu : MonoBehaviour
         SetPlayerActMenuActive(false);
     }
 
-    public void UpdatePlayerStatsMenu(int position, string name, GameAgentStats stats) {
-        if (position < playerStats.Length) {
-            string hpString = stats.currentHealth.ToString() + "/" + stats.maxHealth.ToString();
-            string mpString = stats.currentMagicPoints.ToString() + "/" + stats.maxMagicPoints.ToString();
+    public void UpdatePlayerStatsMenu(int position, string name, GameAgentStats stats, bool deactivatePlayerSpot = false) {
+        if (!deactivatePlayerSpot) {
+            if (position < playerStats.Length) {
+                if (!playerStats[position].activeSelf) {
+                    playerStats[position].SetActive(true);
+                }
 
-            playerStats[position].GetComponentInChildren<Text>().text = name;
-            FindObjectwithTag("Level", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = stats.level.ToString();
-            FindObjectwithTag("HP", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = hpString;
-            FindObjectwithTag("MP", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = mpString;
+                string hpString = stats.currentHealth.ToString() + "/" + stats.maxHealth.ToString();
+                string mpString = stats.currentMagicPoints.ToString() + "/" + stats.maxMagicPoints.ToString();
+
+                playerStats[position].GetComponentInChildren<Text>().text = name;
+                FindObjectwithTag("Level", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = stats.level.ToString();
+                FindObjectwithTag("HP", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = hpString;
+                FindObjectwithTag("MP", playerStats[position]).transform.GetChild(0).gameObject.GetComponentInChildren<Text>().text = mpString;
+            }
+        } else {
+            playerStats[position].SetActive(false);
         }
     }
 
