@@ -70,8 +70,10 @@ public class TurnManager : MonoBehaviour
 
     bool playerTurnOver()
     {
-        foreach (Player player in players)
-			if (player.player_turn) return false;
+        foreach (Player player in players) {
+            player.CheckIfPlayerTurnHasEnded();
+            if (player.player_turn) return false;
+        }
 
         return true;
     }

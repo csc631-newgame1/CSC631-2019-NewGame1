@@ -55,7 +55,7 @@ public class EnemyGroupDescription
     }
 
     public int GetLevelWithVariance() {
-        return Mathf.RoundToInt(Mathf.Max(stats.level / 2, (stats.level + Random.Range(-levelVariance, levelVariance))));
+        return Mathf.RoundToInt(Mathf.Max(stats.level / 2, (stats.level + Random.Range(-levelVariance, levelVariance+1))));
     }
 
     public float GetPowerLevel() {

@@ -43,11 +43,6 @@ public class MapManager : MonoBehaviour
 		this.offset = config.GetOffset();
 	}
 
-    private void Start() {
-        Debug.Log("MapManager called");
-
-    }
-
     // called by gamemanager
     public void Init(GameManager parent)
 	{
@@ -93,7 +88,7 @@ public class MapManager : MonoBehaviour
 		GameAgent agent = clone.GetComponent<GameAgent>();
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(CharacterClassOptions.Knight, 1));
+            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword));
         } else {
             agent.init_agent(pos, stats);
         }

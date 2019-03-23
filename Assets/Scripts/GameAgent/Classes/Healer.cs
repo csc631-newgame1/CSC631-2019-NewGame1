@@ -3,7 +3,7 @@
 public class Healer : CharacterClass
 {
     public Healer() {
-        baseStats = new GameAgentStats(15, 32, 7, 10);
+        baseStats = new GameAgentStats(15, 32, 7, 10, true);
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
@@ -44,5 +44,15 @@ public class Healer : CharacterClass
     public override void LevelUp() {
     }
 
+    public override void SetWeapon(int weapon) {
+        if (weapon == CharacterClassOptions.RandomClassWeapon) {
+            GenerateRandomClassWeapon();
+        } else {
+            this.weapon = weapon;
+        }
+    }
 
+    protected override void GenerateRandomClassWeapon() {
+        weapon = CharacterClassOptions.Staff;
+    }
 }
