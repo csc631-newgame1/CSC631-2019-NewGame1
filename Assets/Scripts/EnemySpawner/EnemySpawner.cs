@@ -77,7 +77,7 @@ public class EnemySpawner : MonoBehaviour {
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
 		foreach (EnemyToSpawn enemy in enemies) {
-			GameObject enemySpawn = mapManager.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
+			mapManager.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
 		}
     }
 

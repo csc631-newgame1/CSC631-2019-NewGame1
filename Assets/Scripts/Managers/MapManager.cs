@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -74,7 +75,7 @@ public class MapManager : MonoBehaviour
 		int x = rng.Next(0, width - 1);
 		int y = rng.Next(0, height - 1);
 
-		while (!map[x, y].traversable) {
+		while (!IsWalkable(new Pos(x, y))) {
 			x = rng.Next(0, width - 1);
 			y = rng.Next(0, height - 1);
 		}
@@ -84,6 +85,8 @@ public class MapManager : MonoBehaviour
 
     public GameObject instantiate(GameObject prefab, Pos pos, GameAgentStats stats = null)
 	{
+		if (!IsWalkable(pos)) return null;
+		
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
 		GameAgent agent = clone.GetComponent<GameAgent>();
 
@@ -93,6 +96,7 @@ public class MapManager : MonoBehaviour
             agent.init_agent(pos, stats);
         }
 
+		nav_map.removeTraversableTile(pos);
 		map[pos.x, pos.y].resident = agent;
 		map[pos.x, pos.y].occupied = true;
 		return clone;
@@ -103,6 +107,7 @@ public class MapManager : MonoBehaviour
 		Debug.Log("Killing character...");
 		Destroy(map[pos.x, pos.y].resident.gameObject, 5.0f);
 
+		nav_map.insertTraversableTile(pos);
 		map[pos.x, pos.y].resident = null;
 		map[pos.x, pos.y].occupied = false;
 	}
@@ -115,34 +120,149 @@ public class MapManager : MonoBehaviour
 				if (map[x, y].resident != null)
 					Destroy(map[x, y].resident.gameObject);
 	}
-
-	public List<Pos> get_path(Pos source, Pos dest)
+	
+	public int getDistance(Pos source, Pos dest)
 	{
-		return nav_map.shortestPath(source, dest);
+		List<Pos> path = get_path(source, dest);
+		if (path == null) return -1;
+		
+		int distance = 0;
+		for (int i = 1; i < path.Count; i++)
+			distance += Pos.abs_dist(path[i], path[i-1]);
+		return distance;
+	}
+	
+	// Gets a list of map distances from a source point to a number of destination points
+	/* <param name="source"> 
+	 * 		the origin point that paths are searched relative to </param>
+	 * <param name="destinations">
+	 * 		the list of destination points we want to find distances to </param>
+	 * <param name="preserve_null"> 
+	 * 		when a path is not found, by default it is not added as an entry to the results list
+	 *		when preserve_null is set to true, paths that are not found are instead added as null entries </param>
+	 * <param name="maxDistance">
+	 *		the maximum allowed distance for resulting distances. By default this value is zero, which means there is no limit to distance </param>
+	 *		enabling this can significantly improve pathfinding performance
+	 * <returns>
+	 * A list of distances from the source to each o the destination points </returns> */
+	public List<int> getDistances(Pos source, List<Pos> destinations, bool preserve_null = false, int maxDistance=0)
+	{
+		// getDistances will ignore whether or not the destination tiles are traversable, just gets distances to them
+		foreach (Pos dest in destinations) { if (!IsWalkable(dest)) nav_map.insertTraversableTile(dest); }
+		List<List<Pos>> paths = get_paths(source, destinations, preserve_null, maxDistance);
+		foreach (Pos dest in destinations) { if (!IsWalkable(dest)) nav_map.removeTraversableTile(dest); }
+		
+		if (paths.Count == 0) return null;
+		
+		List<int> distances = new List<int>();
+		foreach (List<Pos> path in paths) {
+			
+			if (path == null) {
+				distances.Add(-1);
+				continue;
+			}
+			int distance = 0;
+			for (int i = 1; i < path.Count; i++)
+				distance += Pos.abs_dist(path[i], path[i-1]);
+			distances.Add(distance);
+		}
+		return distances;
+	}
+	
+	public List<int> getExistingDistances(List<List<Pos>> paths)
+	{
+		List<int> distances = new List<int>();
+		foreach (List<Pos> path in paths) {
+			
+			if (path == null) {
+				distances.Add(-1);
+				continue;
+			}
+			int distance = 0;
+			for (int i = 1; i < path.Count; i++)
+				distance += Pos.abs_dist(path[i], path[i-1]);
+			distances.Add(distance);
+		}
+		return distances;
 	}
 
-	public List<List<Pos>> get_paths(Pos source, List<Pos> targetPositions)
+	public List<Pos> get_path(Pos source, Pos dest, int maxDistance = 0)
 	{
-		return nav_map.shortestPathBatched(source, targetPositions);
+		if (!IsWalkable(source)) nav_map.insertTraversableTile(source);
+		List<Pos> result = nav_map.shortestPath(source, dest);
+		if (!IsWalkable(source)) nav_map.removeTraversableTile(source);
+		return result;
 	}
 
+	// Gets a list of paths from a source point to a number of destination points
+	/* <param name="source"> 
+	 * 		the origin point that paths are searched relative to </param>
+	 * <param name="destinations">
+	 * 		the list of destination points we want to find paths to </param>
+	 * <param name="preserve_null"> 
+	 * 		when a path is not found, by default it is not added as an entry to the results list
+	 *		when preserve_null is set to true, distances that are not found are instead added as -1 </param>
+	 * <param name="maxDistance">
+	 *		the maximum allowed distance for resulting paths. By default this value is zero, which means there is no limit to distance
+	 *		enabling this can significantly improve pathfinding performance </param>
+	 * <returns>
+	 * A list of paths from the source to each of the destination points </returns> */
+	public List<List<Pos>> get_paths(Pos source, List<Pos> destinations, bool preserve_null = false, int maxDistance = 0)
+	{
+		List<List<Pos>> results = null;
+		
+		if (!IsWalkable(source)) nav_map.insertTraversableTile(source);
+			if (maxDistance == 0)
+				results = nav_map.shortestPathBatched(source, destinations);
+			else
+				results = nav_map.shortestPathBatchedInRange(source, destinations, maxDistance);
+		if (!IsWalkable(source)) nav_map.removeTraversableTile(source);
+		
+		if (!preserve_null)
+			return results;
+		else {
+			List<List<Pos>> new_results = new List<List<Pos>>();
+			int i = 0, j = 0;
+			while (i < destinations.Count) {
+				if (j < results.Count && destinations[i] == results[j].Last()) {
+					new_results.Add(results[j]);
+					j++;
+				}
+				else {
+					new_results.Add(null);
+				}
+				i++;
+			}
+			return new_results;
+		}
+	}
+	
 	public bool move(Pos source, Pos dest)
 	{
 		if (!map[source.x, source.y].occupied
-		 || map[dest.x, dest.y].occupied
-		 || !map[dest.x, dest.y].traversable)
+		 || !IsWalkable(dest)) {
+			Debug.Log("Move failed!");
+			if (!IsWalkable(dest)) Debug.Log("Because dest wasn't walkable");
+			else Debug.Log("Because source wasn't occupied");
 			return false;
-
+		}
+		
 		List<Pos> path = get_path(source, dest);
 		GameAgent agent = map[source.x, source.y].resident;
-
-		map[dest.x, dest.y].occupied = true;
-		map[dest.x, dest.y].resident = agent;
-		map[source.x, source.y].occupied = false;
-		map[source.x, source.y].resident = null;
-
-		StartCoroutine(agent.smooth_movement(path));
-		return true;
+		
+		if (path != null) {
+			nav_map.removeTraversableTile(dest);
+			map[dest.x, dest.y].occupied = true;
+			map[dest.x, dest.y].resident = agent;
+			
+			nav_map.insertTraversableTile(source);
+			map[source.x, source.y].occupied = false;
+			map[source.x, source.y].resident = null;
+			
+			StartCoroutine(agent.smooth_movement(path));
+			return true;
+		}
+		else return false;
 	}
 
     public bool IsTraversable(Pos pos)
@@ -158,6 +278,11 @@ public class MapManager : MonoBehaviour
 			return false;
 		return map[pos.x, pos.y].occupied;
     }
+	
+	public bool IsWalkable(Pos pos)
+	{
+		return IsTraversable(pos) && !IsOccupied(pos);
+	}
 
 	public bool attack(Pos dest, int damage_amount)
 	{
@@ -183,5 +308,13 @@ public class MapManager : MonoBehaviour
 	{
 		pos = pos + offset;
 		return new Pos((int) pos.x, (int) pos.z);
+	}
+	
+	public void DrawLine(Pos a, Pos b, Color color, float time=5.0f)
+	{
+		Vector3 origin = grid_to_world(a);
+		Vector3 destination = grid_to_world(b);
+		
+		Debug.DrawLine(origin, destination, color, time);
 	}
 }
