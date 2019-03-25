@@ -167,9 +167,10 @@ public class TileSelector : MonoBehaviour
         if (action == GameAgentAction.Move) {
             for (int x = startx; x <= endx; x++) {
 			    for (int y = starty; y <= endy; y++) {
+					if (x == position.x && y == position.y) continue;
 				
 				    Pos candidate = new Pos(x, y);
-                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+                    if (map_manager.IsWalkable(candidate) && Pos.abs_dist(position, candidate) <= move_budget) {
 						candidates.Add(candidate);
                     }
                 }
@@ -178,6 +179,7 @@ public class TileSelector : MonoBehaviour
 		
 		List<List<Pos>> paths = map_manager.get_paths(position, candidates);
 		foreach (List<Pos> rawPath in paths) {
+			
 			Path path = new Path(rawPath);
 			if (path.distance() <= move_budget)
 				selectableMovementTiles.Add(path);

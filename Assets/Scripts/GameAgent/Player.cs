@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using MapUtils;
 
 
 public class Player : GameAgent
-{
+{	
 	private MapManager map_manager; // reference to MapManager instance with map data
     private MapConfiguration config;
 	private TileSelector tile_selector; // reference to map tile selector
@@ -19,7 +20,6 @@ public class Player : GameAgent
 	public bool godMode = true;
 
     // player turn options
-	public bool player_turn = true;
     private bool playerMovedThisTurn = false;
     private bool playerActedThisTurn = false;
     private bool playerUsedPotionThisTurn = false;
@@ -66,9 +66,12 @@ public class Player : GameAgent
 		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
 		tile_selector.setPlayer(this);
 
-        TurnManager.instance.AddPlayerToList(this); //add player to player list
-
         currentState = GameAgentState.Alive;
+		
+		// AI init
+		team = 1;
+		AI = null; // players don't have AI
+		TurnManager.instance.addToRoster(this); //add player to player list
     }
 
 	// if right mouse button is pressed, move player model to hover position
@@ -152,7 +155,6 @@ public class Player : GameAgent
 		
 		playerActedThisTurn = true;
 		isAttacking = false;
-		player_turn = false;
     }
 
 	public override void take_damage(int amount)
@@ -169,7 +171,6 @@ public class Player : GameAgent
 
     public override void take_turn()
 	{
-		player_turn = true;
         playerMovedThisTurn = false;
         playerActedThisTurn = false;
         playerUsedPotionThisTurn = false;
@@ -178,6 +179,7 @@ public class Player : GameAgent
 
 	public override IEnumerator smooth_movement(List<Pos> path)
 	{
+		grid_pos = path.Last();
 		moving = true;
         StartCoroutine(animator.StartMovementAnimation());
 
@@ -196,8 +198,6 @@ public class Player : GameAgent
 						transform.position = Vector3.Lerp(origin, target, time);
 						yield return null;
 					}
-
-				grid_pos = step;
 			}
 			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
 
@@ -237,7 +237,7 @@ public class Player : GameAgent
 	public void WeaponSwitch(){}
 
     public override void move() {
-		if (playerMovedThisTurn || !player_turn)
+		if (playerMovedThisTurn || turn_over())
             return;
 		
         // Hide move selection if open
@@ -275,7 +275,7 @@ public class Player : GameAgent
             tile_selector.clear_path_line();
         }
 
-        if (!player_turn || playerActedThisTurn)
+        if (turn_over() || playerActedThisTurn)
             return;
 
         // If act menu is already open, hide it
@@ -290,7 +290,7 @@ public class Player : GameAgent
     }
 
     public void action1() {
-		if (!player_turn)
+		if (turn_over())
             return;
 		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 1) {
@@ -315,7 +315,7 @@ public class Player : GameAgent
     }
 
     public void action2() {
-		if (!player_turn)
+		if (turn_over())
             return;
 		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 2) {
@@ -341,7 +341,7 @@ public class Player : GameAgent
 
     public void action3() 
 	{
-		if (!player_turn)
+		if (turn_over())
             return;
 		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 3) {
@@ -351,7 +351,7 @@ public class Player : GameAgent
 
     public void action4() 
 	{
-		if (!player_turn)
+		if (turn_over())
             return;
 		
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 4) {
@@ -360,7 +360,7 @@ public class Player : GameAgent
     }
 
     public override void wait() {
-        if (!player_turn || playerWaitingThisTurn)
+        if (turn_over() || playerWaitingThisTurn)
             return;
 		
         currentAction = GameAgentAction.Wait;
@@ -375,7 +375,7 @@ public class Player : GameAgent
     }
 
     public override void potion() {
-        if (!player_turn || playerUsedPotionThisTurn)
+        if (turn_over() || playerUsedPotionThisTurn)
             return;
         actMenu.SetPlayerActMenuActive(false);
         hoveringActionTileSelector = false;
@@ -416,16 +416,17 @@ public class Player : GameAgent
         DeactivatePlayerActionMenu();
     }
 
-    public void CheckIfPlayerTurnHasEnded() {
+    public override bool turn_over() {
         // Player chose to wait
         if (playerWaitingThisTurn) {
-            player_turn = false;
+            return true;
         // Player moved and either used Act or used a Potion
         } else if (playerMovedThisTurn && (playerActedThisTurn || playerUsedPotionThisTurn)) {
-            player_turn = false;
+            return true;
         // Player used Act and used a Potion
         } else if (playerActedThisTurn && playerUsedPotionThisTurn) {
-            player_turn = false;
+            return true;
         }
+		return false;
     }
 }

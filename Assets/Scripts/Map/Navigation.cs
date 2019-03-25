@@ -11,6 +11,8 @@ public class NavigationHandler
 {
 	private class Vertex
 	{
+		public const int MAX_DIST = int.MaxValue / 2;
+		
 		public int dist;
 		public bool visited;
 		public Pos pos;
@@ -19,7 +21,7 @@ public class NavigationHandler
 		
 		public Vertex(int x, int y)
 		{
-			dist 	 = int.MaxValue / 2; // to avoid overflow errors
+			dist 	 = MAX_DIST; // to avoid overflow errors
 			visited  = false;
 			pos 	 = new Pos(x, y);
 			visible  = new List<Vertex>();
@@ -28,7 +30,7 @@ public class NavigationHandler
 		
 		public Vertex(Pos p)
 		{
-			dist 	 = int.MaxValue / 2;
+			dist 	 = MAX_DIST;
 			visited  = false;
 			pos 	 = p;
 			visible  = new List<Vertex>();
@@ -37,7 +39,7 @@ public class NavigationHandler
 		
 		public void reset()
 		{
-			dist 	 = int.MaxValue / 2;
+			dist 	 = MAX_DIST;
 			visited  = false;
 			prev	 = null;
 		}
@@ -110,7 +112,7 @@ public class NavigationHandler
 		else return false;
 	}
 	
-	void removeTraversableTile(Pos tilePos)
+	public void removeTraversableTile(Pos tilePos)
 	{
 		Vertex toDie = vertex_map[tilePos.x, tilePos.y];
 		if (toDie == null) return;
@@ -119,10 +121,11 @@ public class NavigationHandler
 			neighbor.visible.Remove(toDie);
 		}
 		
+		nav_graph.Remove(toDie);
 		vertex_map[tilePos.x, tilePos.y] = null;
 	}
 	
-	void insertTraversableTile(Pos tilePos)
+	public void insertTraversableTile(Pos tilePos)
 	{
 		Vertex newVert = new Vertex(tilePos.x, tilePos.y);
 		
@@ -130,24 +133,35 @@ public class NavigationHandler
 		if (vertex_map[x, y] != null) return;
 		vertex_map[x, y] = newVert;
 		
-		if (tile_traversable(x-1, y))
+		if (vertex_map[x-1, y] != null) {
 			newVert.visible.Add(vertex_map[x-1,y]);
+			vertex_map[x-1, y].visible.Add(newVert);
+		}
 		
-		if (tile_traversable(x+1, y))
+		if (vertex_map[x+1, y] != null) {
 			newVert.visible.Add(vertex_map[x+1,y]);
+			vertex_map[x+1, y].visible.Add(newVert);
+		}
 		
-		if (tile_traversable(x, y-1))
+		if (vertex_map[x, y-1] != null) {
 			newVert.visible.Add(vertex_map[x,y-1]);
+			vertex_map[x, y-1].visible.Add(newVert);
+		}
 		
-		if (tile_traversable(x, y+1))
+		if (vertex_map[x, y+1] != null) {
 			newVert.visible.Add(vertex_map[x,y+1]);
+			vertex_map[x, y+1].visible.Add(newVert);
+		}
+		
+		nav_graph.Add(newVert);
 	}
 	
 	Vertex pop_min_dist_vert(List<Vertex> graph)
 	{
 		Vertex min = graph[0];
 		for (int i = 1; i < graph.Count; i++) {
-			min = graph[i].dist < min.dist ? graph[i] : min;
+			if (graph[i].dist < min.dist)
+				min = graph[i];
 		}
 		graph.Remove(min);
 		return min;
@@ -157,14 +171,11 @@ public class NavigationHandler
 	public List<Pos> shortestPath(Pos p_origin, Pos p_target)
 	{
 		try {
-			if (p_origin == p_target)
-				return null;
-			
 			Vertex source = vertex_map[p_origin.x, p_origin.y];
 			Vertex target = vertex_map[p_target.x, p_target.y];
 			
-			//display_vertices();
-			print_debug_info();
+			// maximum range we will need to search
+			int maxDistance = Pos.abs_dist(source.pos, target.pos);
 			
 			// create a temporary graph of vertices to be pulled from during pathfinding
 			List<Vertex> tmp_graph = new List<Vertex>(nav_graph);
@@ -173,7 +184,7 @@ public class NavigationHandler
 			Vertex min_vert = pop_min_dist_vert(tmp_graph);
 			
 			// uses dijkstra method to find minimum distance from origin to target
-			while (tmp_graph.Count > 0 && min_vert != target) {
+			while (tmp_graph.Count > 0 && min_vert != target && min_vert != null) {
 				foreach (Vertex neighbor in min_vert.visible) {
 					int alt_dist = min_vert.dist + Pos.abs_dist(min_vert.pos, neighbor.pos);
 					if (alt_dist < neighbor.dist) {
@@ -202,8 +213,12 @@ public class NavigationHandler
 		try {
 			Vertex source = vertex_map[p_origin.x, p_origin.y];
 			List<Vertex> targetVerts = new List<Vertex>();
-			foreach (Pos p in targetPositions)
-				if (p != p_origin) targetVerts.Add(vertex_map[p.x, p.y]);
+
+			foreach (Pos p in targetPositions) {
+				if (p != p_origin && vertex_map[p.x, p.y] != null) {
+					targetVerts.Add(vertex_map[p.x, p.y]);
+				}
+			}
 
 			// create a temporary graph of vertices to be pulled from during pathfinding
 			List<Vertex> tmp_graph = new List<Vertex>(nav_graph);
@@ -221,6 +236,69 @@ public class NavigationHandler
 					}
 				}
 				min_vert = pop_min_dist_vert(tmp_graph);
+			}
+			
+			// construct paths leading back to source
+			List<List<Pos>> paths = new List<List<Pos>>();
+			foreach (Vertex target in targetVerts)
+				if (target.prev != null) paths.Add(constructPath(target, source));
+			
+			return paths;
+		}
+		finally {
+			// post path-finding cleanup
+			foreach(Vertex vertex in nav_graph)
+				vertex.reset();
+		}
+	}
+	
+	Vertex pop_min_dist_vert_in_range(List<Vertex> graph, int maxDistance)
+	{
+		Vertex min = graph[0];
+		for (int i = 1; i < graph.Count; i++) {
+			if (graph[i].dist < min.dist && graph[i].dist < maxDistance)
+				min = graph[i];
+		}
+		if (min.dist == Vertex.MAX_DIST)
+			min = null;
+		graph.Remove(min);
+		return min;
+	}
+	
+	// finds an entire batch of paths, but with a specified max distance to search
+	// this can be much faster than shortestPathBatched
+	public List<List<Pos>> shortestPathBatchedInRange(Pos p_origin, List<Pos> targetPositions, int maxDistance)
+	{	
+		try {
+			Vertex source = vertex_map[p_origin.x, p_origin.y];
+			List<Vertex> targetVerts = new List<Vertex>();
+
+			foreach (Pos p in targetPositions) {
+				if (p != p_origin && vertex_map[p.x, p.y] != null) {
+					targetVerts.Add(vertex_map[p.x, p.y]);
+				}
+			}
+
+			// create a temporary graph of vertices to be pulled from during pathfinding
+			List<Vertex> tmp_graph = new List<Vertex>();
+			foreach (Vertex vert in nav_graph) {
+				if (Pos.abs_dist(vert.pos, p_origin) <= maxDistance)
+					tmp_graph.Add(vert);
+			}
+			
+			source.dist = 0;
+			Vertex min_vert = pop_min_dist_vert_in_range(tmp_graph, maxDistance);
+			
+			// uses dijkstra method to find minimum distance from origin to target
+			while (tmp_graph.Count > 0 && min_vert != null) {
+				foreach (Vertex neighbor in min_vert.visible) {
+					int alt_dist = min_vert.dist + Pos.abs_dist(min_vert.pos, neighbor.pos);
+					if (alt_dist < neighbor.dist) {
+						neighbor.dist = alt_dist;
+						neighbor.prev = min_vert;
+					}
+				}
+				min_vert = pop_min_dist_vert_in_range(tmp_graph, maxDistance);
 			}
 			
 			// construct paths leading back to source

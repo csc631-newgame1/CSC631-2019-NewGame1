@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using MapUtils;
@@ -12,7 +13,7 @@ public class Enemy : GameAgent
     // private reference to position in map grid
     private bool moving;
 	
-	public bool enemy_turn = false;
+	private bool enemy_turn = false;
 
     private CharacterAnimator animator;
     private CharacterClassDefiner classDefiner;
@@ -25,6 +26,7 @@ public class Enemy : GameAgent
     public float _speed;
     public float moveTime = 0.1f;
 	public int moveBudget;
+	public string state = "IDLE";
 
     public override void init_agent(Pos position, GameAgentStats stats) 
 	{
@@ -40,17 +42,46 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+		speed = 10;
 
-        TurnManager.instance.AddEnemyToList(this);
+        TurnManager.instance.addToRoster(this);
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
+		
+		// AI init
+		team = 0;
+		AI = new AIComponent(this); // AI component that decides the actions for this enemy to take
     }
 
-    public override IEnumerator smooth_movement(List<Pos> locations) {
-        return null;
+    public override IEnumerator smooth_movement(List<Pos> path) {
+		grid_pos = path.Last();
+        moving = true;
+        StartCoroutine(animator.StartMovementAnimation());
+
+			Vector3 origin, target;
+			foreach(Pos step in path) {
+
+				origin = transform.position;
+				target = map_manager.grid_to_world(step);
+				float dist = Vector3.Distance(origin, target);
+				float time = 0f;
+
+				transform.LookAt(target);
+
+					while(time < 1f && dist > 0f) {
+						time += (Time.deltaTime * speed) / dist;
+						transform.position = Vector3.Lerp(origin, target, time);
+						yield return null;
+					}
+			}
+			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+
+        StartCoroutine(animator.StopMovementAnimation());
+        moving = false;
+		Debug.Log("End of movment coroutine, path length was: " + path.Count);
     }
 	
 	public override void take_damage(int amount) {
@@ -69,9 +100,15 @@ public class Enemy : GameAgent
 
     public override void take_turn() {
 		enemy_turn = true;
+		AI.advance();
+		state = AI.getStateString();
         StartCoroutine(animator.PlayAttackAnimation());
 		enemy_turn = false;
     }
+	
+	public override bool turn_over() {
+		return !enemy_turn;
+	}
 
 
     public override void move() {
