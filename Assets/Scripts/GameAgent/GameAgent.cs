@@ -17,6 +17,7 @@ public abstract class GameAgent : MonoBehaviour
     public GameAgentState currentState;
 	public AIComponent AI;
 	public int team;
+	public int move_budget;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	

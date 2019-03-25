@@ -25,7 +25,6 @@ public class Enemy : GameAgent
     public float range;
     public float _speed;
     public float moveTime = 0.1f;
-	public int moveBudget;
 	public string state = "IDLE";
 
     public override void init_agent(Pos position, GameAgentStats stats) 
@@ -43,6 +42,7 @@ public class Enemy : GameAgent
         range = stats.range;
         _speed = stats.speed;
 		speed = 10;
+		move_budget = 10;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();

@@ -68,7 +68,7 @@ public class AIComponent
 				attacking = null;
 				calcReinforce();
 				// fallback to reinforcing allies, if attack move is not possible
-				if (state == STATE.REINFORCE) {
+				if (state != STATE.REINFORCE) {
 					goto case STATE.REINFORCE;
 				}
 			}

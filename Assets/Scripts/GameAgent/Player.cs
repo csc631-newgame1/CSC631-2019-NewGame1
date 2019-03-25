@@ -31,7 +31,6 @@ public class Player : GameAgent
     public float currentHealth;
     public float range;
     public float _speed;
-	public int move_budget = 8;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
@@ -51,6 +50,7 @@ public class Player : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+		move_budget = 10;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -82,7 +82,6 @@ public class Player : GameAgent
 			    case GameAgentAction.Move:
 				    if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
 
-                        grid_pos = tile_selector.grid_position;
                         hoveringActionTileSelector = false;
                         tile_selector.showSelectableMoveTiles = false;
                         tile_selector.showPathLine = false;
@@ -244,7 +243,7 @@ public class Player : GameAgent
         }
 
         currentAction = GameAgentAction.Move;
-		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, (int)stats.speed, currentAction);
+		tile_selector.CreateListOfSelectableMovementTiles(grid_pos, move_budget, currentAction);
         
         hoveringActionTileSelector = true;
         tile_selector.showPathLine = true;
