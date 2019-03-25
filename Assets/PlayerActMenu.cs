@@ -1,26 +1,28 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerActMenu : MonoBehaviour
+public class PlayerActMenu
 {
-    private GameObject actMenu;
-    private Button[] buttons;
+    static private GameObject actMenu;
+    static private Button[] buttons;
 
-    public void SetPlayerActMenuActive(bool active) {
+    static public void SetPlayerActMenuActive(bool active) {
         actMenu.gameObject.SetActive(active);
     }
 
-    public bool IsPlayerActMenuActive() {
+    static public bool IsPlayerActMenuActive() {
         return actMenu.gameObject.activeSelf;
     }
 
-    public void init() {
-        actMenu = GameObject.FindGameObjectWithTag("PlayerActMenu");
+    static public void init() {
+		if (actMenu == null)
+			actMenu = GameObject.FindWithTag("PlayerActMenu");
+		
         SetPlayerActMenuActive(false);
         buttons = actMenu.GetComponentsInChildren<Button>(true);
     }
 
-    public void SetButtons(GameAgentAction[] actions) {
+    static public void SetButtons(GameAgentAction[] actions) {
         int buttonIndex = 0;
         foreach (GameAgentAction action in actions) {
             switch (action) {

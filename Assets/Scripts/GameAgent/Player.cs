@@ -38,8 +38,6 @@ public class Player : GameAgent
 
 	CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
-    // This menu is specific to the player character class
-    PlayerActMenu actMenu;
 
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats)
@@ -56,10 +54,10 @@ public class Player : GameAgent
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
-        actMenu = GetComponent<PlayerActMenu>();
         animator.init();
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
-        actMenu.init();
+		
+		PlayerActMenu.init();
 
         selectableTiles = new List<Pos>();
 
@@ -69,7 +67,7 @@ public class Player : GameAgent
         currentState = GameAgentState.Alive;
 		
 		// AI init
-		team = 1;
+		team = 0;
 		AI = null; // players don't have AI
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
@@ -131,8 +129,8 @@ public class Player : GameAgent
             tile_selector.clear_path_line();
         }
 
-        if (actMenu.IsPlayerActMenuActive()) {
-            actMenu.SetPlayerActMenuActive(false);
+        if (PlayerActMenu.IsPlayerActMenuActive()) {
+            PlayerActMenu.SetPlayerActMenuActive(false);
             tile_selector.showSelectableActTiles = false;
             hoveringActionTileSelector = false;
         }
@@ -151,7 +149,7 @@ public class Player : GameAgent
 
 			hoveringActionTileSelector = false;
 			tile_selector.showSelectableActTiles = false;
-			actMenu.SetPlayerActMenuActive(false);
+			PlayerActMenu.SetPlayerActMenuActive(false);
 		
 		playerActedThisTurn = true;
 		isAttacking = false;
@@ -207,18 +205,6 @@ public class Player : GameAgent
         playerMovedThisTurn = true;
 	}
 
-    void spawnActionRadius()
-    {
-        var exp = GetComponent<ParticleSystem>();
-        exp.Play();
-        Destroy(gameObject, exp.duration);
-    }
-
-    bool isWithinActionReadius()
-    {
-        return false;
-    }
-
 	public void FootR(){}
 	public void FootL(){}
 
@@ -251,8 +237,8 @@ public class Player : GameAgent
         }
 
         // Hide act menu if open
-        if (actMenu.IsPlayerActMenuActive()) {
-            actMenu.SetPlayerActMenuActive(false);
+        if (PlayerActMenu.IsPlayerActMenuActive()) {
+            PlayerActMenu.SetPlayerActMenuActive(false);
             tile_selector.showSelectableActTiles = false;
             hoveringActionTileSelector = false;
         }
@@ -279,13 +265,13 @@ public class Player : GameAgent
             return;
 
         // If act menu is already open, hide it
-        if (actMenu.IsPlayerActMenuActive()) {
-            actMenu.SetPlayerActMenuActive(false);
+        if (PlayerActMenu.IsPlayerActMenuActive()) {
+            PlayerActMenu.SetPlayerActMenuActive(false);
             tile_selector.showSelectableActTiles = false;
             hoveringActionTileSelector = false;
         } else {
-            actMenu.SetPlayerActMenuActive(true);
-            actMenu.SetButtons(stats.playerCharacterClass.GetAvailableActs());
+            PlayerActMenu.SetPlayerActMenuActive(true);
+            PlayerActMenu.SetButtons(stats.playerCharacterClass.GetAvailableActs());
         }
     }
 
@@ -296,13 +282,6 @@ public class Player : GameAgent
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 1) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[0];
         }
-
-        // If other action is shown, hide it
-        /*if (tile_selector.showSelectableActTiles) {
-            hoveringActionTileSelector = false;
-            tile_selector.showSelectableMoveTiles = false;
-            tile_selector.showSelectableActTiles = false;
-        }*/
 
         if (currentAction == GameAgentAction.MeleeAttack || currentAction == GameAgentAction.MagicAttackSingleTarget
             || currentAction == GameAgentAction.RangedAttack) {
@@ -321,13 +300,6 @@ public class Player : GameAgent
         if (stats.playerCharacterClass.GetAvailableActs().Length >= 2) {
             currentAction = (stats.playerCharacterClass.GetAvailableActs())[1];
         }
-
-        // If other action is shown, hide it
-        /*if (tile_selector.showSelectableActTiles) {
-            hoveringActionTileSelector = false;
-            tile_selector.showSelectableMoveTiles = false;
-            tile_selector.showSelectableActTiles = false;
-        }*/
 
         if (currentAction == GameAgentAction.Heal || currentAction == GameAgentAction.MagicAttackAOE
         || currentAction == GameAgentAction.Taunt || currentAction == GameAgentAction.RangedAttackMultiShot) {
@@ -365,7 +337,7 @@ public class Player : GameAgent
 		
         currentAction = GameAgentAction.Wait;
 
-        actMenu.SetPlayerActMenuActive(false);
+        PlayerActMenu.SetPlayerActMenuActive(false);
         tile_selector.showPathLine = false;
         tile_selector.showSelectableMoveTiles = false;
         tile_selector.showSelectableActTiles = false;
@@ -377,7 +349,7 @@ public class Player : GameAgent
     public override void potion() {
         if (turn_over() || playerUsedPotionThisTurn)
             return;
-        actMenu.SetPlayerActMenuActive(false);
+        PlayerActMenu.SetPlayerActMenuActive(false);
         hoveringActionTileSelector = false;
         tile_selector.showPathLine = false;
         tile_selector.showSelectableMoveTiles = false;

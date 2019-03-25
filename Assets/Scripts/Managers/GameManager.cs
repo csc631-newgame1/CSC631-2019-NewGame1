@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
 
 	void DeInit()
 	{
-		turn_manager.clearRoster();
+		turn_manager.Terminate();
 		map_manager.clear_map();
 	}
 

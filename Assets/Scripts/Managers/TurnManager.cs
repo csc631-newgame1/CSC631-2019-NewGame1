@@ -11,11 +11,12 @@ public class TurnManager : MonoBehaviour
     [HideInInspector] public bool playersTurn = true;
 	[HideInInspector] public bool enemiesTurn = false;
 
-    // lists of all active player/enemies
+    // lists of all active players/enemies
     private List<GameAgent>[] teamRoster = new List<GameAgent>[16];
 	
 	private GameManager parentManager = null;
 	private IEnumerator mainLoop = null;
+	private bool loopOver = false;
 	
 	void Awake()
 	{
@@ -27,12 +28,14 @@ public class TurnManager : MonoBehaviour
 	public void Init(GameManager parent)
 	{
 		parentManager = parent;
-		if (mainLoop != null) StopCoroutine(mainLoop);
 		
 		AIManager.roster = teamRoster;
 		
-		StartCoroutine(TurnLoop());
+		mainLoop = TurnLoop();
+		StartCoroutine(mainLoop);
 	}
+	
+	
 
     IEnumerator TurnLoop()
 	{	
@@ -65,9 +68,10 @@ public class TurnManager : MonoBehaviour
 		teamRoster[agent.team].Add(agent);
 	}
 
-    public void clearRoster()
+    public void Terminate()
 	{
 		foreach (List<GameAgent> faction in teamRoster)
 			faction.Clear();
+		StopCoroutine(mainLoop);
 	}
 }

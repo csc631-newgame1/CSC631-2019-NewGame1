@@ -44,16 +44,15 @@ public class Enemy : GameAgent
         _speed = stats.speed;
 		speed = 10;
 
-        TurnManager.instance.addToRoster(this);
-
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
 		
 		// AI init
-		team = 0;
+		team = 1;
 		AI = new AIComponent(this); // AI component that decides the actions for this enemy to take
+		TurnManager.instance.addToRoster(this);
     }
 
     public override IEnumerator smooth_movement(List<Pos> path) {
@@ -81,7 +80,6 @@ public class Enemy : GameAgent
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
-		Debug.Log("End of movment coroutine, path length was: " + path.Count);
     }
 	
 	public override void take_damage(int amount) {

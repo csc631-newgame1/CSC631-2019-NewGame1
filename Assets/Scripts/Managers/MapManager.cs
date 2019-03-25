@@ -50,7 +50,10 @@ public class MapManager : MonoBehaviour
 		parentManager = parent;
 
 		// begin component init
-		GameObject mapObject = Instantiate(mapPrefab, Vector3.zero, Quaternion.identity);
+		GameObject mapObject = GameObject.FindGameObjectWithTag("Map");
+		if (mapObject == null)
+			mapObject = Instantiate(mapPrefab, Vector3.zero, Quaternion.identity);
+
 		map_raw = mapObject.GetComponent<MapGenerator>().generate_map();
 
 		nav_map = new NavigationHandler(map_raw);
