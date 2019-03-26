@@ -165,7 +165,7 @@ public class Player : GameAgent
         while (isAttacking) yield return null;
         map_manager.attack(attackPos, stats.GetMultiShotDamage());
 
-        // Stop attacking if they are dead
+        // Stop attacking if target is dead
         if (map_manager.GetGameAgentState(attackPos) != GameAgentState.Alive) {
             multiShotCount = 0;
         }
@@ -479,7 +479,7 @@ public class Player : GameAgent
 
         currentAction = GameAgentAction.Potion;
         StartCoroutine(animator.PlayUseItemAnimation());
-        stats.currentHealth += 10;
+        stats.UsePotion();
         playerUsedPotionThisTurn = true;
 
         UpdateViewableEditorPlayerStats();
