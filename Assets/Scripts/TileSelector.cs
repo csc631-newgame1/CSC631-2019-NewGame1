@@ -67,6 +67,8 @@ public class TileSelector : MonoBehaviour
 	public Material selectableTilesMaterial;
     public Material nonselectableTilesMaterial;
 
+    private List<Pos> actAOETiles;
+
     // called by the mapGenerator script
     public void init_tile_selector(int[,] map)
 	{
@@ -85,10 +87,38 @@ public class TileSelector : MonoBehaviour
 		selection_collider.size = collider_size;
 		
 		select_square = transform.Find("Selector");
-	}
-	
-	// called by the Player script
-	public void setPlayer(Player p) 
+    }
+
+    private void CreateActAOETiles(Pos pos) {
+        actAOETiles = new List<Pos>();
+
+        if (map_manager.IsTraversable(pos) && nonselectableActTiles.Count > 0 && nonselectableActTiles.Contains(pos)) {
+            actAOETiles.Add(pos);
+
+            Pos topPos = new Pos(pos.x, pos.y + 1);
+            if (map_manager.IsTraversable(topPos)) {
+                actAOETiles.Add(topPos);
+            }
+
+            Pos bottomPos = new Pos(pos.x, pos.y - 1);
+            if (map_manager.IsTraversable(bottomPos)) {
+                actAOETiles.Add(bottomPos);
+            }
+
+            Pos leftPos = new Pos(pos.x - 1, pos.y);
+            if (map_manager.IsTraversable(leftPos)) {
+                actAOETiles.Add(leftPos);
+            }
+
+            Pos rightPos = new Pos(pos.x + 1, pos.y);
+            if (map_manager.IsTraversable(rightPos)) {
+                actAOETiles.Add(rightPos);
+            }
+        }
+    }
+
+    // called by the Player script
+    public void setPlayer(Player p) 
 	{
 		this.player_main = p;
 		grid_position = p.grid_pos;
@@ -115,6 +145,10 @@ public class TileSelector : MonoBehaviour
 					grid_position = hitp;
 					select_square.gameObject.SetActive(true);
 					select_square.position = hover_position;
+
+                    if (showAOETiles) {
+                        CreateActAOETiles(hitp);
+                    }
 					
 					if (showSelectableMoveTiles) {
 						
@@ -123,7 +157,17 @@ public class TileSelector : MonoBehaviour
 						if (hit_path != null && hitp != player_main.grid_pos && !player_main.moving && showPathLine)
 							render_path_line(hit_path);
 					} 
-				}
+				} else {
+                    // allow to be able to select the player's tile
+                    if (showAOETiles) {
+                        hover_position = map_manager.grid_to_world(hitp);
+                        grid_position = hitp;
+                        select_square.gameObject.SetActive(true);
+                        select_square.position = hover_position;
+
+                        CreateActAOETiles(hitp);
+                    }
+                }
 			}
 			else {
 				select_square.gameObject.SetActive(false);
@@ -228,13 +272,12 @@ public class TileSelector : MonoBehaviour
                     }
                 }
             }
-            // TODO create area-selectable tiles to show within selectableActTiles - change nonselect to selectable
         } else if (action == GameAgentAction.MagicAttackAOE || action == GameAgentAction.Heal) {
             for (int x = startx; x <= endx; x++) {
                 for (int y = starty; y <= endy; y++) {
                     Pos candidate = new Pos(x, y);
 
-                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+                    if (map_manager.IsTraversable(candidate) && Pos.abs_dist(position, candidate) <= move_budget) {
                         nonselectableActTiles.Add(candidate);
                     }
                 }
@@ -286,6 +329,13 @@ public class TileSelector : MonoBehaviour
 
             foreach (Pos tile in nonselectableActTiles) {
                 Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), nonselectableTilesMaterial, 0);
+            }
+        }
+        if (showAOETiles) {
+            if (actAOETiles != null && actAOETiles.Count > 0) {
+                foreach (Pos tile in actAOETiles) {
+                    Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), selectableTilesMaterial, 0);
+                }
             }
         }
     }
