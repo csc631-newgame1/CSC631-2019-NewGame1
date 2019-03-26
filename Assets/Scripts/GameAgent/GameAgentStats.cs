@@ -110,7 +110,6 @@ public class GameAgentStats
         if (damageDealt < 1) {
             damageDealt = 1;
         }
-
         currentHealth -= damageDealt;
 
         if (currentHealth <= 0) {

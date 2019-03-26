@@ -16,7 +16,7 @@ public class Player : GameAgent
 	public bool moving = false;
     public bool hoveringActionTileSelector = false;
     public bool isAttacking = false;
-	public bool godMode = true;
+	public bool godMode = false;
 
     // player turn options
 	public bool player_turn = true;
@@ -106,7 +106,7 @@ public class Player : GameAgent
                     break;
                 case GameAgentAction.MagicAttackAOE:
                 case GameAgentAction.Heal:
-                    if (tile_selector.hoveringValidSelectTile() || godMode) {
+                    if (tile_selector.hoveringValidActAOETile() || godMode) {
 
                         Pos attackPos = tile_selector.grid_position;
                         StartCoroutine(animator.PlayAttackAnimation());
