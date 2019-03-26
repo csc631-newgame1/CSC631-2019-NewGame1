@@ -126,6 +126,19 @@ public class GameAgentStats
         }
     }
 
+    public void GetMP(int amount) {
+        currentMagicPoints += amount;
+
+        if (currentMagicPoints >= maxMagicPoints) {
+            currentMagicPoints = maxMagicPoints;
+        }
+    }
+
+    public void UsePotion() {
+        GetHealed(Mathf.RoundToInt(maxHealth * 0.33f));
+        GetMP(Mathf.RoundToInt(maxMagicPoints * 0.33f));
+    }
+
     public int DealDamage() {
         return Mathf.RoundToInt(attack + attackStatBoost);
     }
