@@ -4,6 +4,7 @@ using UnityEngine;
 
 using MapUtils;
 using static MapUtils.MapConstants;
+using System;
 
 public class MapManager : MonoBehaviour
 {
@@ -89,7 +90,7 @@ public class MapManager : MonoBehaviour
         string[] names = new string[] { "Keawa", "Benjamin", "Diana", "Jerry", "Joe" };
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), names[Random.Range(0, names.Length)]);
+            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), names[UnityEngine.Random.Range(0, names.Length)]);
         } else {
             agent.init_agent(pos, stats);
         }
@@ -174,7 +175,26 @@ public class MapManager : MonoBehaviour
         return map[pos.x, pos.y].resident.transform;
     }
 
-	public Vector3 grid_to_world(Pos pos)
+    public Transform GetNearestUnitTransform(Pos pos, List<Pos> agents) {
+
+        if (agents.Count > 0) {
+            int minDistance = Int32.MaxValue;
+            Pos closestAgent = agents[0];
+
+            foreach (Pos agent in agents) {
+                int distance = Pos.abs_dist(pos, agent);
+                if (distance < minDistance) {
+                    closestAgent = agent;
+                    minDistance = distance;
+                }
+            }
+            return map[closestAgent.x, closestAgent.y].resident.transform;
+        }
+
+        return null;
+    }
+
+    public Vector3 grid_to_world(Pos pos)
 	{
 		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
 	}

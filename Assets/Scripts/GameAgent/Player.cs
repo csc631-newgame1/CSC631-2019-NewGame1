@@ -105,6 +105,19 @@ public class Player : GameAgent
 					    StartCoroutine(WaitForAttackEnd(attackPos));
                     }
                     break;
+                case GameAgentAction.Taunt:
+                    StartCoroutine(animator.PlayTauntAnimation());
+                    StartCoroutine(WaitForTauntEnd());
+                    break;
+                case GameAgentAction.MagicAttackAOE:
+                case GameAgentAction.Heal:
+                    if (tile_selector.hoveringValidSelectTile() || godMode) {
+
+                        Pos attackPos = tile_selector.grid_position;
+                        StartCoroutine(animator.PlayAttackAnimation());
+                        StartCoroutine(WaitForAttackEnd(attackPos));
+                    }
+                    break;
             }
 		}
 	}
@@ -153,13 +166,31 @@ public class Player : GameAgent
 
         hoveringActionTileSelector = false;
         tile_selector.showSelectableActTiles = false;
-        //actMenu.SetPlayerActMenuActive(false);
         action4();
         playerActedThisTurn = true;
         actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
     }
 
-	public override void take_damage(int amount)
+    IEnumerator WaitForTauntEnd() {
+        isAttacking = true;
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
+        Transform lookDirection = map_manager.GetNearestUnitTransform(grid_pos, tile_selector.GetPositionOfAgentsInNonselectableActTiles());
+        if (lookDirection != null) {
+            this.transform.LookAt(lookDirection);
+        }
+
+        yield return new WaitForSeconds(0.4f);
+        isAttacking = false;
+
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
+        action4();
+        playerActedThisTurn = true;
+        actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
+    }
+
+    public override void take_damage(int amount)
 	{
         if (stats.currentState == GameAgentState.Alive) {
             if (!godMode) stats.TakeDamage(amount);
