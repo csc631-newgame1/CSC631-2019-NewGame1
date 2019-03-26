@@ -289,6 +289,10 @@ public class TileSelector : MonoBehaviour
 		return GetSelectableActTile(grid_position) != null;
 	}
 
+    public bool hoveringValidActAOETile() {
+        return GetActAOETile(grid_position) != null;
+    }
+
     private Path getSelectableTilePath(Pos tile_pos) 
 	{
         foreach(Path path in selectableMovementTiles)
@@ -299,6 +303,13 @@ public class TileSelector : MonoBehaviour
 
     private Pos GetSelectableActTile(Pos tilePos) {
         foreach (Pos tile in selectableActTiles)
+            if (tile == tilePos)
+                return tile;
+        return null;
+    }
+
+    private Pos GetActAOETile(Pos tilePos) {
+        foreach (Pos tile in actAOETiles)
             if (tile == tilePos)
                 return tile;
         return null;
