@@ -28,6 +28,10 @@ public class GameAgentStats
     public int level = 1;
     // experience points
     public int xp;
+    // stat granted through items
+    public int defense = 0;
+    // stat granted through items
+    public int attackStatBoost = 0;
 
     // This is used to determine how much xp is awarded for death
     // the scale works by awarding the scaleFactor amount of xp for that level
@@ -99,6 +103,24 @@ public class GameAgentStats
     public void GainXP(int xpGained) {
         xp += xpGained;
         CheckLevelProgression();
+    }
+
+    public void TakeDamage(int damage) {
+        int damageDealt = damage - defense;
+        if (damageDealt < 1) {
+            damageDealt = 1;
+        }
+
+        currentHealth -= damageDealt;
+
+        if (currentHealth <= 0) {
+            currentHealth = 0;
+            currentState = GameAgentState.Unconscious;
+        }
+    }
+
+    public int DealDamage() {
+        return Mathf.RoundToInt(attack + attackStatBoost);
     }
 
     private void CheckLevelProgression() {
