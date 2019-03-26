@@ -18,7 +18,7 @@ public abstract class GameAgent : MonoBehaviour
 	
 	public abstract void take_damage(int amount);
 	
-	public abstract void init_agent(Pos position, GameAgentStats stats);
+	public abstract void init_agent(Pos position, GameAgentStats stats, string name = null);
 	
 	// for enemies, this will make them go through their AI motions
 	// for players, this will trigger the boolean value that allows them to take their turn
