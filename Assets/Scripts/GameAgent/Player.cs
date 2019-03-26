@@ -141,11 +141,9 @@ public class Player : GameAgent
         this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
 
         while (isAttacking) yield return null;
-		map_manager.attack(attackPos, (int)stats.attack);
+		map_manager.attack(attackPos, stats.DealDamage());
 
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableActTiles = false;
-        tile_selector.showAOETiles = false;
+        TurnOffSelectors();
         action4();
         playerActedThisTurn = true;
         actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
@@ -163,8 +161,7 @@ public class Player : GameAgent
         while(animator.AnimatorIsPlaying()) yield return null;
         isAttacking = false;
 
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableActTiles = false;
+        TurnOffSelectors();
         action4();
         playerActedThisTurn = true;
         actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
@@ -188,13 +185,11 @@ public class Player : GameAgent
             isAttacking = true;
             while (isAttacking) yield return null;
             foreach (Pos tile in targetTiles) {
-                //map_manager.attack(tile, (int)stats.attack);
+                map_manager.GetHealed(tile, stats.GetHealAmount());
             }
         }
 
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableActTiles = false;
-        tile_selector.showAOETiles = false;
+        TurnOffSelectors();
         action4();
         playerActedThisTurn = true;
         actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
@@ -202,6 +197,8 @@ public class Player : GameAgent
 
     public override void take_damage(int amount)
 	{
+        Debug.Log("OUCH");
+        Debug.Log("currentHealth before: " + stats.currentHealth);
         if (stats.currentState == GameAgentState.Alive) {
             if (!godMode) stats.TakeDamage(amount);
 
@@ -210,6 +207,16 @@ public class Player : GameAgent
             } else {
                 StartCoroutine(animator.PlayHitAnimation());
             }
+        }
+        Debug.Log("currentHealth after: " + stats.currentHealth);
+        UpdateViewableEditorPlayerStats();
+    }
+
+    public override void GetHealed(int amount) {
+        if (stats.currentState == GameAgentState.Alive) {
+            if (!godMode) stats.GetHealed(amount);
+
+            StartCoroutine(animator.PlayUseItemAnimation());
         }
 
         UpdateViewableEditorPlayerStats();
@@ -232,7 +239,7 @@ public class Player : GameAgent
     private void UpdateViewableEditorPlayerStats() {
         attack = stats.attack;
         maxHealth = stats.maxHealth;
-        currentHealth = maxHealth;
+        currentHealth = stats.currentHealth;
         range = stats.range;
         _speed = stats.speed;
         level = stats.level;
@@ -323,8 +330,6 @@ public class Player : GameAgent
             TurnOffSelectors();
             return;
         }
-
-
 
         if (playerMovedThisTurn || !player_turn || stats.currentState != GameAgentState.Alive)
             return;
@@ -534,4 +539,6 @@ public class Player : GameAgent
 
         return sortedPlayersIndex;
     }
+
+   
 }

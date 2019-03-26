@@ -71,6 +71,16 @@ public class Enemy : GameAgent
         currentHealth = stats.currentHealth;
     }
 
+    public override void GetHealed(int amount) {
+        if (stats.currentState == GameAgentState.Alive) {
+            stats.GetHealed(amount);
+
+            StartCoroutine(animator.PlayUseItemAnimation());
+        }
+
+        currentHealth = stats.currentHealth;
+    }
+
     public override void take_turn() {
         if (stats.currentState == GameAgentState.Alive) {
             enemy_turn = true;
