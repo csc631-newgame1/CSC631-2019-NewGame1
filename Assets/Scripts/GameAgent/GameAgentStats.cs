@@ -118,8 +118,23 @@ public class GameAgentStats
         }
     }
 
+    public void GetHealed(int amount) {
+        currentHealth += amount;
+
+        if (currentHealth >= maxHealth) {
+            currentHealth = maxHealth;
+        }
+    }
+
     public int DealDamage() {
         return Mathf.RoundToInt(attack + attackStatBoost);
+    }
+
+    public int GetHealAmount() {
+        if (characterClassOption == CharacterClassOptions.Healer) {
+            return Mathf.RoundToInt(UnityEngine.Random.Range(0.5f, 0.75f) * (attack + attackStatBoost));
+        }
+        return 0;
     }
 
     private void CheckLevelProgression() {

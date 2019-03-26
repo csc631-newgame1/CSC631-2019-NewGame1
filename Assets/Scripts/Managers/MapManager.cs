@@ -169,6 +169,14 @@ public class MapManager : MonoBehaviour
 		return true;
 	}
 
+    public bool GetHealed(Pos dest, int healAmount) {
+        if (!IsOccupied(dest))
+            return false;
+
+        map[dest.x, dest.y].resident.GetHealed(healAmount);
+        return true;
+    }
+
     public Transform GetUnitTransform(Pos pos) {
         if (!map[pos.x, pos.y].occupied)
             return null;

@@ -17,6 +17,8 @@ public abstract class GameAgent : MonoBehaviour
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
 	public abstract void take_damage(int amount);
+
+    public abstract void GetHealed(int amount);
 	
 	public abstract void init_agent(Pos position, GameAgentStats stats, string name = null);
 	
