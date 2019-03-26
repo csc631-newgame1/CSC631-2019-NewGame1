@@ -51,6 +51,9 @@ public class TurnManager : MonoBehaviour
 			enemiesTurn = true;
 			playersTurn = false;
 
+            // Little delay between turns
+            yield return new WaitForSeconds(1);
+
             foreach (Enemy enemy in enemies) {
                 enemy.take_turn();
                 UpdatePlayerStats();

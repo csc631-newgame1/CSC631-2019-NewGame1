@@ -57,6 +57,7 @@ public class TileSelector : MonoBehaviour
     public bool showPathLine = false;
     public bool showSelectableMoveTiles = false;
     public bool showSelectableActTiles = false;
+    public bool showAOETiles = false;
 
     public Vector3 hover_position;
 	public Pos grid_position;
@@ -217,6 +218,26 @@ public class TileSelector : MonoBehaviour
                     }
                 }
             }
+        } else if (action == GameAgentAction.Taunt) {
+            for (int x = position.x - 1; x <= position.x + 1; x++) {
+                for (int y = position.y - 1; y <= position.y + 1; y++) {
+                    Pos candidate = new Pos(x, y);
+
+                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+                        nonselectableActTiles.Add(candidate);
+                    }
+                }
+            }
+        } else if (action == GameAgentAction.MagicAttackAOE || action == GameAgentAction.Heal) {
+            for (int x = startx; x <= endx; x++) {
+                for (int y = starty; y <= endy; y++) {
+                    Pos candidate = new Pos(x, y);
+
+                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
+                        nonselectableActTiles.Add(candidate);
+                    }
+                }
+            }
         }
     }
 	
@@ -238,6 +259,16 @@ public class TileSelector : MonoBehaviour
             if (tile == tilePos)
                 return tile;
         return null;
+    }
+
+    public List<Pos> GetPositionOfAgentsInNonselectableActTiles() {
+        List<Pos> agents = new List<Pos>();
+        foreach (Pos tile in nonselectableActTiles) {
+            if (map_manager.IsOccupied(tile)) {
+                agents.Add(tile);
+            }
+        }
+        return agents;
     }
 	
 	void DrawTiles() {
