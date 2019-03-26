@@ -219,8 +219,8 @@ public class TileSelector : MonoBehaviour
                 }
             }
         } else if (action == GameAgentAction.Taunt) {
-            for (int x = position.x - 1; x <= position.x + 1; x++) {
-                for (int y = position.y - 1; y <= position.y + 1; y++) {
+            for (int x = startx; x <= endx; x++) {
+                for (int y = starty; y <= endy; y++) {
                     Pos candidate = new Pos(x, y);
 
                     if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
@@ -228,6 +228,7 @@ public class TileSelector : MonoBehaviour
                     }
                 }
             }
+            // TODO create area-selectable tiles to show within selectableActTiles - change nonselect to selectable
         } else if (action == GameAgentAction.MagicAttackAOE || action == GameAgentAction.Heal) {
             for (int x = startx; x <= endx; x++) {
                 for (int y = starty; y <= endy; y++) {
