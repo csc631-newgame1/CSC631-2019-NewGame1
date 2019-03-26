@@ -4,11 +4,14 @@ using UnityEngine;
 
 public enum GameAgentState { Alive, Unconscious, Dead, Null };
 
+public enum GameAgentStatusEffect { None, Taunted, Taunting };
+
 public class GameAgentStats
 {
     public int characterClassOption;
     public int characterRace;
     public GameAgentState currentState;
+    public GameAgentStatusEffect currentStatus;
     public CharacterClass playerCharacterClass;
     // unit attack damage
     public float attack;
@@ -30,6 +33,8 @@ public class GameAgentStats
     public int xp;
     // stat granted through items
     public int defense = 0;
+    // stat granted from taunting
+    public int defenseFromTaunting = 0;
     // stat granted through items
     public int attackStatBoost = 0;
 
@@ -49,6 +54,7 @@ public class GameAgentStats
         this.range = range;
         this.speed = speed;
         currentState = GameAgentState.Alive;
+        currentStatus = GameAgentStatusEffect.None;
 
         LevelUpToDesiredLevel(desiredLevel);
     }
@@ -71,6 +77,7 @@ public class GameAgentStats
         GetBaseCharacterClassStats();
         LevelUpToDesiredLevel(desiredLevel);
         currentState = GameAgentState.Alive;
+        currentStatus = GameAgentStatusEffect.None;
     }
 
     private void GetBaseCharacterClassStats() {
@@ -115,6 +122,16 @@ public class GameAgentStats
         if (currentHealth <= 0) {
             currentHealth = 0;
             currentState = GameAgentState.Unconscious;
+        }
+    }
+
+    public void SetTauntingStatus(bool active) {
+        if (active) {
+            if (currentStatus != GameAgentStatusEffect.Taunting) {
+                defenseFromTaunting = Mathf.RoundToInt(attack * 0.33f);
+            }
+        } else {
+            // remove defenseFromTaunting
         }
     }
 
