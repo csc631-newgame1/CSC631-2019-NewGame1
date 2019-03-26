@@ -55,12 +55,7 @@ public class Player : GameAgent
         this.name = name;
 
         this.stats = stats;
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
-        currentHealth = maxHealth;
-        range = stats.range;
-        _speed = stats.speed;
-        level = stats.level;
+        UpdateViewableEditorPlayerStats();
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -115,7 +110,7 @@ public class Player : GameAgent
 
                         Pos attackPos = tile_selector.grid_position;
                         StartCoroutine(animator.PlayAttackAnimation());
-                        StartCoroutine(WaitForAttackEnd(attackPos));
+                        StartCoroutine(WaitForAOEEnd(tile_selector.GetPositionOfAgentsInActAOETiles()));
                     }
                     break;
             }
@@ -135,22 +130,6 @@ public class Player : GameAgent
             case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
             case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
             case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;
-        }
-    }
-
-    public void DeactivatePlayerActionMenu() {
-        if (tile_selector.showSelectableMoveTiles) {
-            hoveringActionTileSelector = false;
-            tile_selector.showSelectableMoveTiles = false;
-            tile_selector.showSelectableActTiles = false;
-            tile_selector.showPathLine = false;
-            tile_selector.clear_path_line();
-        }
-
-        if (actMenu.IsPlayerActMenuActive()) {
-            actMenu.SetPlayerActMenuActive(false);
-            tile_selector.showSelectableActTiles = false;
-            hoveringActionTileSelector = false;
         }
     }
 
@@ -181,11 +160,41 @@ public class Player : GameAgent
             this.transform.LookAt(lookDirection);
         }
 
-        yield return new WaitForSeconds(0.4f);
+        while(animator.AnimatorIsPlaying()) yield return null;
         isAttacking = false;
 
         hoveringActionTileSelector = false;
         tile_selector.showSelectableActTiles = false;
+        action4();
+        playerActedThisTurn = true;
+        actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
+    }
+
+    IEnumerator WaitForAOEEnd(List<Pos> targetTiles) {
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
+        Transform lookDirection = map_manager.GetNearestUnitTransform(grid_pos, tile_selector.GetPositionOfAgentsInActAOETiles());
+        if (lookDirection != null) {
+            this.transform.LookAt(lookDirection);
+        }
+
+        if (currentAction == GameAgentAction.MagicAttackAOE) {
+            isAttacking = true;
+            while (isAttacking) yield return null;
+            foreach (Pos tile in targetTiles) {
+                map_manager.attack(tile, (int)stats.attack);
+            }
+        } else if (currentAction == GameAgentAction.Heal) {
+            isAttacking = true;
+            while (isAttacking) yield return null;
+            foreach (Pos tile in targetTiles) {
+                //map_manager.attack(tile, (int)stats.attack);
+            }
+        }
+
+        hoveringActionTileSelector = false;
+        tile_selector.showSelectableActTiles = false;
+        tile_selector.showAOETiles = false;
         action4();
         playerActedThisTurn = true;
         actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
@@ -346,8 +355,8 @@ public class Player : GameAgent
             || currentAction == GameAgentAction.Taunt || currentAction == GameAgentAction.RangedAttackMultiShot) {
             TurnOffSelectors();
         // stop showing action1
-        } else if (currentAction == GameAgentAction.MeleeAttack || currentAction == GameAgentAction.MagicAttackSingleTarget
-            || currentAction == GameAgentAction.RangedAttack) {
+        } else if ((currentAction == GameAgentAction.MeleeAttack || currentAction == GameAgentAction.MagicAttackSingleTarget
+            || currentAction == GameAgentAction.RangedAttack) && tile_selector.showSelectableActTiles) {
             TurnOffSelectors();
             return;
         }
@@ -373,8 +382,9 @@ public class Player : GameAgent
             || currentAction == GameAgentAction.RangedAttack) {
             TurnOffSelectors();
         // stop showing action2
-        } else if (currentAction == GameAgentAction.Heal || currentAction == GameAgentAction.MagicAttackAOE
-            || currentAction == GameAgentAction.Taunt || currentAction == GameAgentAction.RangedAttackMultiShot) {
+        } else if ((currentAction == GameAgentAction.Heal || currentAction == GameAgentAction.MagicAttackAOE
+            || currentAction == GameAgentAction.Taunt || currentAction == GameAgentAction.RangedAttackMultiShot)
+            && tile_selector.showSelectableActTiles) {
             TurnOffSelectors();
             return;
         }
@@ -452,7 +462,6 @@ public class Player : GameAgent
         _speed = stats.speed;
 
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
-        DeactivatePlayerActionMenu();
 
         if (playersForTestingPurposes != null) {
             UpdatePlayerStatsMenu(playersForTestingPurposes);
