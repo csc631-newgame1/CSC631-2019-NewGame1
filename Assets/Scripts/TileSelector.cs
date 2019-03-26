@@ -51,6 +51,7 @@ public class TileSelector : MonoBehaviour
     private List<Path> selectableMovementTiles;
     private List<Pos> selectableActTiles;
     private List<Pos> nonselectableActTiles;
+    private List<Pos> actAOETiles;
 
     private int[,] map;
 
@@ -66,9 +67,7 @@ public class TileSelector : MonoBehaviour
 	public Material moveableTilesMaterial;
 	public Material selectableTilesMaterial;
     public Material nonselectableTilesMaterial;
-
-    private List<Pos> actAOETiles;
-
+    
     // called by the mapGenerator script
     public void init_tile_selector(int[,] map)
 	{
@@ -313,6 +312,23 @@ public class TileSelector : MonoBehaviour
             }
         }
         return agents;
+    }
+
+    public List<Pos> GetPositionOfAgentsInActAOETiles() {
+        List<Pos> agents = new List<Pos>();
+
+        if (actAOETiles != null & actAOETiles.Count > 0) {
+            foreach (Pos tile in actAOETiles) {
+                if (map_manager.IsOccupied(tile)) {
+                    agents.Add(tile);
+                }
+            }
+        }
+        return agents;
+    }
+
+    public List<Pos> GetActAOETiles() {
+        return actAOETiles;
     }
 	
 	void DrawTiles() {

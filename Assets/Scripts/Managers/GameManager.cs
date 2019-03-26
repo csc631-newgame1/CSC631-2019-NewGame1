@@ -72,7 +72,6 @@ public class GameManager : MonoBehaviour
 
     public void ShowPlayerActionMenu() {
         BattleMenu.SetActive(!BattleMenu.activeSelf);
-        localPlayer.DeactivatePlayerActionMenu();
     }
 
     public void MovePlayer() {
