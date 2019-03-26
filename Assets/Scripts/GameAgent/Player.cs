@@ -76,9 +76,7 @@ public class Player : GameAgent
     public void RespondToMouseClick()
     {
 		if (!moving && !isAttacking && hoveringActionTileSelector) {
-
 			switch (currentAction) {
-
 			    case GameAgentAction.Move:
 				    if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
 
@@ -88,7 +86,6 @@ public class Player : GameAgent
                         tile_selector.showPathLine = false;
                     }
 				    break;
-
 			    case GameAgentAction.MeleeAttack:
                 case GameAgentAction.MagicAttackSingleTarget:
                 case GameAgentAction.RangedAttack:
