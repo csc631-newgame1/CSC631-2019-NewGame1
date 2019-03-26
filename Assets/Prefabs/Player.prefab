@@ -3801,7 +3801,7 @@ Animator:
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
-  m_WarningMessage:
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
@@ -3815,8 +3815,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b26148990a1ecdc41a1ed3452f4d45e2, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   speed: 5
   currentAction: 0
   currentState: 0
@@ -3825,7 +3825,7 @@ MonoBehaviour:
   hoveringActionTileSelector: 0
   isAttacking: 0
   godMode: 1
-  player_turn: 1
+  player_turn: 0
   attack: 0
   maxHealth: 0
   currentHealth: 0
@@ -3843,8 +3843,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4904a3e654f834b449c405155b5b87f4, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   magicAura: {fileID: 19895582, guid: 24e29d528f11acf42974643bee14a607, type: 3}
   magicSparks: {fileID: 19898846, guid: f828b47b39be99849b37530c987975e5, type: 3}
   focusSpark: {fileID: 19859158, guid: b043edfe6ed22be46b3d939fd3f3e5bb, type: 3}
@@ -3865,8 +3865,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10533dce209499149bb2504cdf87fd67, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   sword: {fileID: 3132021457639024835}
   bow: {fileID: 1768564420784622776}
   staff: {fileID: 9001139006439954263}
@@ -3882,9 +3882,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02948c252c467a648ad803aacfd1ae9a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  actMenu: {fileID: 4749683536782705297, guid: d6f5742c67e904b45ad8e591db69841e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1037650490
 GameObject:
   m_ObjectHideFlags: 0
