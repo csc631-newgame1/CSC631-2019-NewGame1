@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MapUtils;
-
+using System;
 
 public class Player : GameAgent
 {
@@ -33,7 +33,7 @@ public class Player : GameAgent
     public float range;
     public float _speed;
     public int level;
-    public GameAgentState viewableState;
+    public string viewableState;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
@@ -61,7 +61,6 @@ public class Player : GameAgent
         range = stats.range;
         _speed = stats.speed;
         level = stats.level;
-        viewableState = stats.currentState;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -162,14 +161,17 @@ public class Player : GameAgent
 
 	public override void take_damage(int amount)
 	{
-        if (!godMode) stats.currentHealth -= amount;
+        if (stats.currentState == GameAgentState.Alive) {
+            if (!godMode) stats.TakeDamage(amount);
 
-        if (stats.currentHealth <= 0) {
-            stats.currentHealth = 0;
-            StartCoroutine(animator.PlayKilledAimation());
-        } else {
-            StartCoroutine(animator.PlayHitAnimation());
+            if (stats.currentState == GameAgentState.Unconscious) {
+                StartCoroutine(animator.PlayKilledAimation());
+            } else {
+                StartCoroutine(animator.PlayHitAnimation());
+            }
         }
+
+        UpdateViewableEditorPlayerStats();
     }
 
     public override void take_turn()
@@ -180,13 +182,34 @@ public class Player : GameAgent
             playerActedThisTurn = false;
             playerUsedPotionThisTurn = false;
             playerWaitingThisTurn = false;
-						actMenu.MakeAllButtonsInteractable(true);
+		    actMenu.MakeAllButtonsInteractable(true);
         }
 
-        UpdateViewablePlayerStats();
+        UpdateViewableEditorPlayerStats();
     }
 
-	public override IEnumerator smooth_movement(List<Pos> path)
+    private void UpdateViewableEditorPlayerStats() {
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = maxHealth;
+        range = stats.range;
+        _speed = stats.speed;
+        level = stats.level;
+
+        switch (stats.currentState) {
+            case GameAgentState.Alive:
+                viewableState = "Alive";
+                break;
+            case GameAgentState.Unconscious:
+                viewableState = "Unconscious";
+                break;
+            case GameAgentState.Dead:
+                viewableState = "Dead";
+                break;
+        }
+    }
+
+    public override IEnumerator smooth_movement(List<Pos> path)
 	{
 		moving = true;
         StartCoroutine(animator.StartMovementAnimation());
@@ -373,18 +396,8 @@ public class Player : GameAgent
         Debug.Log("Potion Action");
         playerUsedPotionThisTurn = true;
 
-        UpdateViewablePlayerStats();
-				actMenu.MakeButtonNoninteractable(ActMenuButtons.POTION);
-    }
-
-    public void UpdateViewableEditorPlayerStats() {
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
-        currentHealth = stats.currentHealth;
-        range = stats.range;
-        _speed = stats.speed;
-        level = stats.level;
-        viewableState = stats.currentState;
+        UpdateViewableEditorPlayerStats();
+		actMenu.MakeButtonNoninteractable(ActMenuButtons.POTION);
     }
 
     public void TestCharacterClass(int characterClassToTest) {

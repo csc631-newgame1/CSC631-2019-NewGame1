@@ -25,6 +25,8 @@ public class Enemy : GameAgent
     public float _speed;
     public float moveTime = 0.1f;
 	public int moveBudget;
+    public int level;
+    public GameAgentState viewableState;
 
     public override void init_agent(Pos position, GameAgentStats stats, string name = null) 
 	{
@@ -40,6 +42,8 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+        level = stats.level;
+        viewableState = stats.currentState;
 
         TurnManager.instance.AddEnemyToList(this);
 
@@ -54,10 +58,11 @@ public class Enemy : GameAgent
     }
 
     public override void take_damage(int amount) {
-        stats.currentHealth -= amount;
-        if (stats.currentHealth <= 0) {
-            stats.currentHealth = 0;
+        stats.TakeDamage(amount);
+
+        if (stats.currentState == GameAgentState.Unconscious) {
             StartCoroutine(animator.PlayKilledAimation());
+            stats.currentState = GameAgentState.Dead;
             TurnManager.instance.RemoveEnemyFromList(this);
         } else {
             StartCoroutine(animator.PlayHitAnimation());
@@ -67,9 +72,11 @@ public class Enemy : GameAgent
     }
 
     public override void take_turn() {
-		enemy_turn = true;
-        StartCoroutine(animator.PlayAttackAnimation());
-		enemy_turn = false;
+        if (stats.currentState == GameAgentState.Alive) {
+            enemy_turn = true;
+            StartCoroutine(animator.PlayAttackAnimation());
+            enemy_turn = false;
+        }
     }
 
 
