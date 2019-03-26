@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-public enum GameAgentState { Alive, Unconscious, Dead };
+public enum GameAgentState { Alive, Unconscious, Dead, Null };
 
 public class GameAgentStats
 {
@@ -135,6 +135,20 @@ public class GameAgentStats
             return Mathf.RoundToInt(UnityEngine.Random.Range(0.5f, 0.75f) * (attack + attackStatBoost));
         }
         return 0;
+    }
+
+    public int GetMultiShotCount() {
+        if (characterClassOption == CharacterClassOptions.Hunter) {
+            int min = 1;
+            int max = 4;
+            int mean = (min + max) / 2;
+            return Utility.NextGaussian(mean, 1, min, max);
+        }
+        return 0;
+    }
+
+    public int GetMultiShotDamage() {
+        return Mathf.RoundToInt(UnityEngine.Random.Range(0.55f, 0.7f) * (attack + attackStatBoost));
     }
 
     private void CheckLevelProgression() {

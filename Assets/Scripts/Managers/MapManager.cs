@@ -169,6 +169,13 @@ public class MapManager : MonoBehaviour
 		return true;
 	}
 
+    public GameAgentState GetGameAgentState(Pos dest) {
+        if (!IsOccupied(dest))
+            return GameAgentState.Null;
+
+        return map[dest.x, dest.y].resident.stats.currentState;
+    }
+
     public bool GetHealed(Pos dest, int healAmount) {
         if (!IsOccupied(dest))
             return false;

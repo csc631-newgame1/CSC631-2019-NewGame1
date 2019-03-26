@@ -92,12 +92,19 @@ public class Player : GameAgent
 			    case GameAgentAction.MeleeAttack:
                 case GameAgentAction.MagicAttackSingleTarget:
                 case GameAgentAction.RangedAttack:
-                case GameAgentAction.RangedAttackMultiShot:
-				    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position)) {
+				    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position) && map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive) {
 
 					    Pos attackPos = tile_selector.grid_position;
                         StartCoroutine(animator.PlayAttackAnimation());
 					    StartCoroutine(WaitForAttackEnd(attackPos));
+                    }
+                    break;
+                case GameAgentAction.RangedAttackMultiShot:
+                    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position) && map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive) {
+
+                        Pos attackPos = tile_selector.grid_position;
+                        StartCoroutine(animator.PlayAttackAnimation());
+                        StartCoroutine(WaitForRangedAttackMultiShotEnd(attackPos, stats.GetMultiShotCount()));
                     }
                     break;
                 case GameAgentAction.Taunt:
@@ -141,12 +148,40 @@ public class Player : GameAgent
         this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
 
         while (isAttacking) yield return null;
-		map_manager.attack(attackPos, stats.DealDamage());
+        map_manager.attack(attackPos, stats.DealDamage());
 
         TurnOffSelectors();
         action4();
         playerActedThisTurn = true;
         actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
+    }
+
+    IEnumerator WaitForRangedAttackMultiShotEnd(Pos attackPos, int multiShotCount) {
+        isAttacking = true;
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
+        this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
+
+        while (isAttacking) yield return null;
+        map_manager.attack(attackPos, stats.GetMultiShotDamage());
+
+        // Stop attacking if they are dead
+        if (map_manager.GetGameAgentState(attackPos) != GameAgentState.Alive) {
+            multiShotCount = 0;
+        }
+
+        if (multiShotCount > 0) {
+            while (animator.AnimatorIsPlaying()) yield return null;
+            StartCoroutine(animator.PlayAttackAnimation());
+            StartCoroutine(WaitForRangedAttackMultiShotEnd(attackPos, --multiShotCount));
+        } else {
+            playerActedThisTurn = true;
+        }
+
+        TurnOffSelectors();
+        action4();
+        actMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
+
     }
 
     IEnumerator WaitForTauntEnd() {
@@ -157,8 +192,8 @@ public class Player : GameAgent
         if (lookDirection != null) {
             this.transform.LookAt(lookDirection);
         }
-
-        while(animator.AnimatorIsPlaying()) yield return null;
+         //&& map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive
+        while (animator.AnimatorIsPlaying()) yield return null;
         isAttacking = false;
 
         TurnOffSelectors();
@@ -179,7 +214,7 @@ public class Player : GameAgent
             isAttacking = true;
             while (isAttacking) yield return null;
             foreach (Pos tile in targetTiles) {
-                map_manager.attack(tile, (int)stats.attack);
+                map_manager.attack(tile, stats.DealDamage());
             }
         } else if (currentAction == GameAgentAction.Heal) {
             isAttacking = true;
@@ -197,8 +232,6 @@ public class Player : GameAgent
 
     public override void take_damage(int amount)
 	{
-        Debug.Log("OUCH");
-        Debug.Log("currentHealth before: " + stats.currentHealth);
         if (stats.currentState == GameAgentState.Alive) {
             if (!godMode) stats.TakeDamage(amount);
 
@@ -208,7 +241,7 @@ public class Player : GameAgent
                 StartCoroutine(animator.PlayHitAnimation());
             }
         }
-        Debug.Log("currentHealth after: " + stats.currentHealth);
+
         UpdateViewableEditorPlayerStats();
     }
 

@@ -11,7 +11,7 @@ public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;
     public float speed;
-    protected GameAgentStats stats;
+    public GameAgentStats stats;
     public GameAgentAction currentAction;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
