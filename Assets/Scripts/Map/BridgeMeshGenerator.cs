@@ -2,10 +2,186 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using MapUtils;
 using static MapUtils.MapConstants;
 
 public class BridgeMeshGenerator : MonoBehaviour
 {
+	private enum BMETA { PLATFORM_UNCHECKED, PLATFORM_CHECKED, BRIDGE_UNCHECKED, BRIDGE_UD, BRIDGE_LR, NONE };
+	private bool shouldStopBuild(BMETA meta) { return meta == BMETA.PLATFORM_CHECKED || meta == BMETA.PLATFORM_UNCHECKED || meta == BMETA.NONE; }
+	private string getString(BMETA meta) 
+	{ 
+		switch (meta) {
+			case BMETA.PLATFORM_CHECKED: return "PC";
+			case BMETA.PLATFORM_UNCHECKED: return "PU";
+			case BMETA.BRIDGE_UNCHECKED: return "BU";
+			case BMETA.BRIDGE_UD: return "UD";
+			case BMETA.BRIDGE_LR: return "LR";
+			default: return "  ";
+		}
+	}
+	
+	public Mesh bridgeBase;
+	public Mesh bridgeLegs;
+	public Mesh platformBase;
+	public Mesh platformLegs;
+	
+	[Tooltip("The color gradient for the map, coloring based on height. Values towards 0 are closer to the map's surface, values towards 1 are closer to the map's floor")]
+	public Gradient gradient;
+	
+	public void generateBridgeMesh(int[,] map)
+	{
+		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
+		
+		int width = config.width;
+		int height = config.height;
+		float wallHeight = config.wall_height;
+		float cellSize = config.cell_size;
+		
+		BMETA[,] bridgeMeta = new BMETA[width, height];
+		
+		for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+				switch (map[x, y]) {
+					case BRIDGE: bridgeMeta[x, y] = BMETA.BRIDGE_UNCHECKED; break;
+					case PLATFORM: bridgeMeta[x, y] = BMETA.PLATFORM_UNCHECKED; break;
+					default: bridgeMeta[x, y] = BMETA.NONE; break;
+				}
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				BMETA cell = bridgeMeta[x, y];
+				if (cell == BMETA.PLATFORM_UNCHECKED) {
+					
+					bridgeMeta[x, y] = BMETA.PLATFORM_CHECKED;
+					
+					Dir build = Dir.NONE;
+					if (bridgeMeta[x-1, y] == BMETA.BRIDGE_UNCHECKED)
+						build = Dir.LEFT;
+					else if (bridgeMeta[x+1, y] == BMETA.BRIDGE_UNCHECKED)
+						build = Dir.RIGHT;
+					else if (bridgeMeta[x, y-1] == BMETA.BRIDGE_UNCHECKED)
+						build = Dir.UP;
+					else if (bridgeMeta[x, y+1] == BMETA.BRIDGE_UNCHECKED)
+						build = Dir.DOWN;
+					
+					if (build == Dir.NONE) continue;
+					
+					int bx = build.toVector().x;
+					int by = build.toVector().y;
+					
+					BMETA buildTile = bx != 0 ? BMETA.BRIDGE_LR : BMETA.BRIDGE_UD;
+					int currx = x + bx, curry = y + by;
+					while (Pos.in_bounds(new Pos(currx, curry), width, height) && !shouldStopBuild(bridgeMeta[currx, curry])) {
+						bridgeMeta[currx, curry] = buildTile;
+						currx += bx;
+						curry += by;
+					}
+				}
+				
+			}
+		}
+		
+		string debugString = "";
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++)
+				debugString += getString(bridgeMeta[x, y]);
+			debugString += "\n";
+		}	
+		Debug.Log(debugString);
+		
+		List<int> bridgeTriangles = new List<int>();
+		List<Vector3> bridgeVertices = new List<Vector3>();
+		List<Vector2> bridgeUVs = new List<Vector2>();
+				
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				
+				Mesh baseMesh, legsMesh;
+				switch (bridgeMeta[x, y]) {
+					case BMETA.PLATFORM_CHECKED:
+						baseMesh = platformBase;
+						legsMesh = platformLegs; break;
+					case BMETA.BRIDGE_LR:
+						baseMesh = bridgeBase;
+						legsMesh = bridgeLegs; break;
+					case BMETA.BRIDGE_UD:
+						baseMesh = bridgeBase;
+						legsMesh = bridgeLegs; break;
+					default:
+						continue;
+				}
+				
+				Quaternion rotation = bridgeMeta[x, y] == BMETA.BRIDGE_LR ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 90, 0);
+				Vector3 translation = config.gridToWorld(new Pos(x, y));
+				Vector3 scaling		= new Vector3(0.5f, 0.5f, 0.5f);
+				Matrix4x4 transform = Matrix4x4.TRS(translation, rotation, scaling);
+				
+				Vector3[] newBaseVerts = baseMesh.vertices.Clone() as Vector3[];
+				for (int i = 0; i < newBaseVerts.Length; i++) {
+					newBaseVerts[i] = transform.MultiplyPoint3x4(newBaseVerts[i]);
+				}
+				int[] newBaseTriangles = baseMesh.triangles.Clone() as int[];
+				int startingIndex = bridgeVertices.Count;
+				for (int i = 0; i < newBaseTriangles.Length; i++) {
+					newBaseTriangles[i] += startingIndex;
+				}
+				bridgeTriangles.AddRange(newBaseTriangles);
+				bridgeVertices.AddRange(newBaseVerts);
+				bridgeUVs.AddRange(baseMesh.uv);
+				
+				float legsYSpan = (legsMesh.bounds.max.y - legsMesh.bounds.min.y) / 2;
+				Vector3 legsPos = translation + new Vector3(0, -legsYSpan, 0);
+				
+				while (legsPos.y > -wallHeight) {
+					transform = Matrix4x4.TRS(legsPos, rotation, scaling);
+					
+					Vector3[] newLegsVerts = legsMesh.vertices.Clone() as Vector3[];
+					for (int i = 0; i < newLegsVerts.Length; i++) {
+						newLegsVerts[i] = transform.MultiplyPoint3x4(newLegsVerts[i]);
+					}
+					int[] newLegsTriangles = legsMesh.triangles.Clone() as int[];
+					startingIndex = bridgeVertices.Count;
+					for (int i = 0; i < newLegsTriangles.Length; i++) {
+						newLegsTriangles[i] += startingIndex;
+					}
+					bridgeTriangles.AddRange(newLegsTriangles);
+					bridgeVertices.AddRange(newLegsVerts);
+					bridgeUVs.AddRange(legsMesh.uv);
+					
+					legsPos.y -= legsYSpan;
+				}
+			}
+		}
+		
+		Renderer rend = GetComponent<Renderer>();
+		Texture2D texture = new Texture2D(512, 1);
+		texture.wrapMode = TextureWrapMode.Repeat;
+		rend.material.SetTexture("_FluidGradient", texture);
+		
+		Color[] colors = new Color[512];
+		for (int x = 0; x < 512; x++) {
+			colors[x] = gradient.Evaluate((float) x / 512f);
+		}
+		
+		texture.SetPixels(colors);
+		texture.Apply(true);
+		
+		Debug.Log(bridgeVertices.Count);
+		Debug.Log(bridgeTriangles.Count);
+		
+		MeshFilter mf = GetComponent<MeshFilter>();
+		mf.mesh.triangles = null;
+		mf.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+		
+		mf.mesh.vertices = bridgeVertices.ToArray();
+		mf.mesh.uv = bridgeUVs.ToArray();
+		mf.mesh.triangles = bridgeTriangles.ToArray();
+		mf.mesh.RecalculateNormals();
+		mf.mesh.RecalculateBounds();
+	}
+}
+	/*
     private int[,] map;
 	private int width;
 	private int height;
@@ -133,4 +309,4 @@ public class BridgeMeshGenerator : MonoBehaviour
 		}
 	}
 	
-}
+}*/

@@ -64,6 +64,16 @@ namespace MapUtils
 			}
 			return "NONE  ";
 		}
+		public static Pos toVector(this Dir dir)
+		{
+			switch (dir) {
+				case LEFT  : return Pos.LEFT;
+				case UP    : return Pos.UP;
+				case RIGHT : return Pos.RIGHT;
+				case DOWN  : return Pos.DOWN;
+			}
+			return Pos.NONE;
+		}
 	}
 	
 	public class Pos 
@@ -72,6 +82,7 @@ namespace MapUtils
 		public static Pos UP = new Pos(0, -1);
 		public static Pos RIGHT = new Pos(1, 0);
 		public static Pos DOWN = new Pos(0, 1);
+		public static Pos NONE = new Pos(0, 0);
 		
 		public int x;
 		public int y;
