@@ -196,7 +196,7 @@ public class MapMeshGenerator : MonoBehaviour
 
 		Vector3[] vertices = new Vector3[width * height * 4 * 2 * 3]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
 		Vector2[] uvs = new Vector2[width * height * 4 * 2 * 3];
-		Vector2[] uv2s = new Vector2[width * height * 4 * 2 * 3];
+		//Vector2[] uv2s = new Vector2[width * height * 4 * 2 * 3];
 		int[] triangles = new int[width * height * 4 * 2 * 3];
 		
 		int i = 0; // keeps track of triangles index
@@ -243,21 +243,21 @@ public class MapMeshGenerator : MonoBehaviour
 						vertices[i + 4] = v0;
 						vertices[i + 5] = v3;
 						
-						uvs[i + 0] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
+						/*uvs[i + 0] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
 						uvs[i + 1] = new Vector2(Mathf.Abs(v1.y / wall_height), 0);
 						uvs[i + 2] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
 						
 						uvs[i + 3] = new Vector2(Mathf.Abs(v2.y / wall_height), 0);
 						uvs[i + 4] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
-						uvs[i + 5] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
+						uvs[i + 5] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);*/
 						
-						uv2s[i + 0] = new Vector2(v0.x, v0.z);
-						uv2s[i + 1] = new Vector2(v1.x, v1.z);
-						uv2s[i + 2] = new Vector2(v3.x, v3.z);
+						uvs[i + 0] = new Vector2(v0.x, v0.z);
+						uvs[i + 1] = new Vector2(v1.x, v1.z);
+						uvs[i + 2] = new Vector2(v3.x, v3.z);
 						
-						uv2s[i + 3] = new Vector2(v2.x, v2.z);
-						uv2s[i + 4] = new Vector2(v0.x, v0.z);
-						uv2s[i + 5] = new Vector2(v3.x, v3.z);
+						uvs[i + 3] = new Vector2(v2.x, v2.z);
+						uvs[i + 4] = new Vector2(v0.x, v0.z);
+						uvs[i + 5] = new Vector2(v3.x, v3.z);
 					}
 					else {
 						vertices[i + 0] = v3;
@@ -268,21 +268,21 @@ public class MapMeshGenerator : MonoBehaviour
 						vertices[i + 4] = v0;
 						vertices[i + 5] = v2;
 						
-						uvs[i + 0] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
+						/*uvs[i + 0] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
 						uvs[i + 1] = new Vector2(Mathf.Abs(v1.y / wall_height), 0);
 						uvs[i + 2] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
 						
 						uvs[i + 3] = new Vector2(Mathf.Abs(v3.y / wall_height), 0);
 						uvs[i + 4] = new Vector2(Mathf.Abs(v0.y / wall_height), 0);
-						uvs[i + 5] = new Vector2(Mathf.Abs(v2.y / wall_height), 0);
+						uvs[i + 5] = new Vector2(Mathf.Abs(v2.y / wall_height), 0);*/
 						
-						uv2s[i + 0] = new Vector2(v3.x, v3.z);
-						uv2s[i + 1] = new Vector2(v1.x, v1.z);
-						uv2s[i + 2] = new Vector2(v0.x, v0.z);
+						uvs[i + 0] = new Vector2(v3.x, v3.z);
+						uvs[i + 1] = new Vector2(v1.x, v1.z);
+						uvs[i + 2] = new Vector2(v0.x, v0.z);
 						
-						uv2s[i + 3] = new Vector2(v3.x, v3.z);
-						uv2s[i + 4] = new Vector2(v0.x, v0.z);
-						uv2s[i + 5] = new Vector2(v2.x, v2.z);
+						uvs[i + 3] = new Vector2(v3.x, v3.z);
+						uvs[i + 4] = new Vector2(v0.x, v0.z);
+						uvs[i + 5] = new Vector2(v2.x, v2.z);
 					}
 				
 					triangles[i + 0] = i;
@@ -326,7 +326,7 @@ public class MapMeshGenerator : MonoBehaviour
 		
 		mf.mesh.vertices = vertices;
 		mf.mesh.uv = uvs;
-		mf.mesh.uv2 = uv2s;
+		//mf.mesh.uv2 = uv2s;
 		mf.mesh.triangles = triangles;
 		mf.mesh.RecalculateNormals();
 	}
@@ -340,7 +340,7 @@ public class MapMeshGenerator : MonoBehaviour
 
 	private float height_func(int hval, int x, int y)
 	{
-		return -wall_height * ((sigmoid(hval) - 0.5f) * 2);
+		return -wall_height * ((sigmoid(hval / 2) - 0.5f) * 2);
 	}
 	
 	private float sigmoid(float x)

@@ -67,7 +67,7 @@ public class MapGenerator : MonoBehaviour
 		surface_gen.generate_map_mesh(map);
 		
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
-		bridge_mesh_gen.generate_bridge_mesh(map);
+		bridge_mesh_gen.generateBridgeMesh(map);
 		
 		Debug.Log("Mesh generation complete!");
 
@@ -283,10 +283,12 @@ public class MapGenerator : MonoBehaviour
 		map[conn.endpt1.x, conn.endpt2.y] = PLATFORM;
 		
 		for (int x = conn.endpt1.x + ix; x != conn.endpt2.x; x += ix) {
-			map[x, conn.endpt2.y] = BRIDGE;
+			if (map[x, conn.endpt2.y] != PLATFORM) // don't overwrite platforms
+				map[x, conn.endpt2.y] = BRIDGE;
 		}
 		for (int y = conn.endpt1.y + iy; y != conn.endpt2.y; y += iy) {
-			map[conn.endpt1.x, y] = BRIDGE;
+			if (map[conn.endpt1.x, y] != PLATFORM) // don't overwrite platforms
+				map[conn.endpt1.x, y] = BRIDGE;
 		}
 		
 		return true;

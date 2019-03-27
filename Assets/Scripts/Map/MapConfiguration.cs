@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using MapUtils;
+
 public class MapConfiguration : MonoBehaviour
 {
     public int width;
@@ -28,4 +30,8 @@ public class MapConfiguration : MonoBehaviour
     public Vector3 GetOffset() {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
     }
+	
+	public Vector3 gridToWorld(Pos pos) {
+		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - GetOffset();
+	}
 }

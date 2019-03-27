@@ -16,11 +16,11 @@ public class Path
 		if (positions == null) return;
 		if (length >= distance()) return;
 		
-		int i = 1;
+		int i = 1, remaining = length;
 		int next = Pos.abs_dist(positions[1], positions[0]);
-		while (length - next > 0 && i < positions.Count) {
+		while (remaining - next > 0 && i < positions.Count) {
 			i++;
-			length -= next;
+			remaining -= next;
 			next = Pos.abs_dist(positions[i], positions[i-1]);
 		}
 		
@@ -28,12 +28,12 @@ public class Path
 		Pos diff = positions[i] - positions[i-1];
 		
 		if (diff.y != 0) {
-			length = diff.y < 0 ? -length : length;
-			cap = positions[i-1] + new Pos(0, length);
+			remaining = diff.y < 0 ? -remaining : remaining;
+			cap = positions[i-1] + new Pos(0, remaining);
 		}
 		else if (diff.x != 0) {
-			length = diff.x < 0 ? -length : length;
-			cap = positions[i-1] + new Pos(length, 0);
+			remaining = diff.x < 0 ? -remaining : remaining;
+			cap = positions[i-1] + new Pos(remaining, 0);
 		}
 		
 		List<Pos> newPositions = new List<Pos>();

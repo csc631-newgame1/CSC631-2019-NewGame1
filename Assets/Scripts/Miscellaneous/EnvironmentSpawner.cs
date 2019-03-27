@@ -36,6 +36,7 @@ public class EnvironmentSpawner : MonoBehaviour
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
         this.mapConfiguration = mapConfiguration;
+		//spawnEnvironment();
     }
 
     // spawnEnvironment(), spawnEnvironmentObject(Vector3 cellPosition), GameObject getRandomEnvironmentObject()

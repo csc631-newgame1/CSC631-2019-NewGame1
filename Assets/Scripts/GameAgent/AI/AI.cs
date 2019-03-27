@@ -55,6 +55,15 @@ public class AIComponent
 		alliedPool = new List<GameAgent>();
 	}
 	
+	public void reset()
+	{
+		state = STATE.IDLE;
+		enemyPool.Clear();
+		alliedPool.Clear();
+		attacking = null;
+		reinforcing = null;
+	}
+	
 	public void advance()
 	{	
 		switch (state) {
@@ -68,7 +77,7 @@ public class AIComponent
 				attacking = null;
 				calcReinforce();
 				// fallback to reinforcing allies, if attack move is not possible
-				if (state != STATE.REINFORCE) {
+				if (state == STATE.REINFORCE) {
 					goto case STATE.REINFORCE;
 				}
 			}
@@ -93,6 +102,10 @@ public class AIComponent
 		}
 	}
 	
+	// return values:
+	// -1: indicates that pathfinding has failed
+	//  0: indicates that we are already within attack range
+	//  1: indicates that pathfinding has succeeded
 	private int pathTowards(GameAgent agent, int maxStopDistance, int minStopDistance)
 	{
 		Pos source = parent.grid_pos;
@@ -128,15 +141,6 @@ public class AIComponent
 		
 		mapManager.move(source, bestDest);
 		return 1;
-	}
-	
-	public void reset()
-	{
-		state = STATE.IDLE;
-		enemyPool.Clear();
-		alliedPool.Clear();
-		attacking = null;
-		reinforcing = null;
 	}
 
 	public void addEnemyToPool(GameAgent enemy)
