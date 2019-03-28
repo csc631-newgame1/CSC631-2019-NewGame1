@@ -145,7 +145,11 @@ public class Player : GameAgent
         this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
 
         while (isAttacking) yield return null;
-        map_manager.attack(attackPos, stats.DealDamage());
+        // Whoever gets the last hit, gets the XP
+        // change this when you figure out how xp will be distributed
+        if (map_manager.attack(attackPos, stats.DealDamage())) {
+            stats.GainXP(map_manager.RewardXPForEnemyDeath(attackPos));
+        }
 
         TurnOffSelectors();
         action4();
@@ -160,7 +164,11 @@ public class Player : GameAgent
         this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
 
         while (isAttacking) yield return null;
-        map_manager.attack(attackPos, stats.GetMultiShotDamage());
+        // Whoever gets the last hit, gets the XP
+        // change this when you figure out how xp will be distributed
+        if (map_manager.attack(attackPos, stats.GetMultiShotDamage())) {
+            stats.GainXP(map_manager.RewardXPForEnemyDeath(attackPos)); 
+        }
 
         // Stop attacking if target is dead
         if (map_manager.GetGameAgentState(attackPos) != GameAgentState.Alive) {
@@ -211,12 +219,17 @@ public class Player : GameAgent
             isAttacking = true;
             while (isAttacking) yield return null;
             foreach (Pos tile in targetTiles) {
-                map_manager.attack(tile, stats.DealDamage());
+                // Whoever gets the last hit, gets the XP
+                // change this when you figure out how xp will be distributed
+                if (map_manager.attack(tile, stats.DealDamage())) {
+                    stats.GainXP(map_manager.RewardXPForEnemyDeath(tile));
+                }
             }
         } else if (currentAction == GameAgentAction.Heal) {
             isAttacking = true;
             while (isAttacking) yield return null;
             foreach (Pos tile in targetTiles) {
+                // implement how healers will get xp for healing
                 map_manager.GetHealed(tile, stats.GetHealAmount());
             }
         }

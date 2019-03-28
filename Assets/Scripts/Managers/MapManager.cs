@@ -162,12 +162,19 @@ public class MapManager : MonoBehaviour
 
 	public bool attack(Pos dest, int damage_amount)
 	{
-		if (!IsOccupied(dest))
+		if (!IsOccupied(dest) || GetGameAgentState(dest) != GameAgentState.Alive)
 			return false;
 
-		map[dest.x, dest.y].resident.take_damage(damage_amount);
-		return true;
-	}
+        map[dest.x, dest.y].resident.take_damage(damage_amount);
+        return true;
+    }
+
+    public int RewardXPForEnemyDeath(Pos dest) {
+        if (GetGameAgentState(dest) == GameAgentState.Dead) {
+            return map[dest.x, dest.y].resident.stats.RewardXPFromDeath();
+        }
+        return 0;
+    }
 
     public GameAgentState GetGameAgentState(Pos dest) {
         if (!IsOccupied(dest))

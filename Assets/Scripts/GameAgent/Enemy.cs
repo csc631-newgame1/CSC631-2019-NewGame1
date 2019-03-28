@@ -89,6 +89,10 @@ public class Enemy : GameAgent
         }
     }
 
+    public int RewardXPFromDeath() {
+        return stats.RewardXPFromDeath();
+    }
+
 
     public override void move() {
     }

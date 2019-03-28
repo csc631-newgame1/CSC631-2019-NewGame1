@@ -89,7 +89,6 @@ public class GameAgentStats
     }
 
     public void LevelUp() {
-        level++;
         attack += playerCharacterClass.GetAttackStatIncreaseFromLevelUp();
         range += playerCharacterClass.GetRangeStatIncreaseFromLevelUp();
         speed += playerCharacterClass.GetSpeedStatIncreaseFromLevelUp(level);
@@ -99,6 +98,7 @@ public class GameAgentStats
         if (currentHealth > 0) {
             currentHealth += healthIncrease;
         }
+        level++;
     }
 
     public void LevelUpToDesiredLevel(int desiredLevel) {
@@ -128,6 +128,7 @@ public class GameAgentStats
     public void SetTauntingStatus(bool active) {
         if (active) {
             if (currentStatus != GameAgentStatusEffect.Taunting) {
+                // consider how you are going to calculate this
                 defenseFromTaunting = Mathf.RoundToInt(attack * 0.33f);
             }
         } else {
@@ -183,15 +184,8 @@ public class GameAgentStats
 
     private void CheckLevelProgression() {
         // This formula is used for a linearly rising level gap
-        float progressionTowardsLevel = (Mathf.Sqrt(100f * (2 * xp + 25f))+50f)/ 100f;
-
-        // Level Up multiple times if needed
-        if (progressionTowardsLevel >= level + 1) {
-            while(progressionTowardsLevel > 1) {
-                LevelUp();
-                progressionTowardsLevel--;
-            }
-        }
+        float exactLevel = (Mathf.Sqrt(100f * (2 * xp + 25f))+50f)/ 100f;
+        LevelUpToDesiredLevel((int)exactLevel);
     }
     
     public int RewardXPFromDeath() {
