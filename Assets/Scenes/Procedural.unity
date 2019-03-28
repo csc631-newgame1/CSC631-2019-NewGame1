@@ -1982,7 +1982,11 @@ MonoBehaviour:
   traversableEnvironmentDensity: 0.1
   nonTraversableEnvironmentDensity: 0
   particleEnvironmentDensity: 0
-  traversableEnvironmentObject: []
+  traversableEnvironmentObject:
+  - {fileID: 100000, guid: 5d7790c8dc24c7f4087a37c492c585cd, type: 3}
+  - {fileID: 192026, guid: 16d7d3227049b944fb34c0d7bd878ee9, type: 3}
+  - {fileID: 100000, guid: 6d7bcebe78eeff74daaa56ffe40b7b83, type: 3}
+  - {fileID: 100000, guid: 7bd69d5b6182c85489899da80509fe61, type: 3}
   nonTraversableEnvironmentObject: []
   particleEnvironmentObject: []
 --- !u!4 &1591538337
