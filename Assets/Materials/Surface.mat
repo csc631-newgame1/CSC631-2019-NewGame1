@@ -48,12 +48,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FluidGradient:
-        m_Texture: {fileID: 2800000, guid: 018989f0461e1dd48ac9d4470217bbdf, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FluidTex:
         m_Texture: {fileID: 2800000, guid: 188986f6af92a334c8b22f1bb58d2b98, type: 3}
-        m_Scale: {x: 0.01, y: 0.01}
+        m_Scale: {x: 0.05, y: 0.05}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: ad6033380fee6904f812569dd899876f, type: 3}
@@ -72,7 +72,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BaseIntensity: 0.865
+    - _BaseIntensity: 0.6
     - _Bias: -0.033
     - _BlendOp: 0
     - _BumpScale: 1
@@ -95,12 +95,13 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
+    - _Height: 8
     - _InvFade: 1
     - _LightingEnabled: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _Oscillation: 0.012
+    - _Oscillation: 0.02
     - _Parallax: 0
     - _Shininess: 1
     - _SmoothnessTextureChannel: 0
