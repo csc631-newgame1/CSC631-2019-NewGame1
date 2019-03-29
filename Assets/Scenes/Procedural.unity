@@ -1266,12 +1266,12 @@ MonoBehaviour:
   showEnemySpawnZones: 0
   enemyPrefab: {fileID: 1681421950760243006, guid: 3651dfd4c31c6524d80cdc6702182ed6,
     type: 3}
-  distanceBetweenZonesScale: 0.1
+  distanceBetweenZonesScale: 2
   lowerRadius: 2
   upperRadius: 6
   minimumNumberOfTilesInSpawnZone: 1
-  maximumNumberOfTilesInSpawnZone: 100
-  maxNumberOfSpawnZones: 100
+  maximumNumberOfTilesInSpawnZone: 25
+  maxNumberOfSpawnZones: 10
 --- !u!114 &1591538339
 MonoBehaviour:
   m_ObjectHideFlags: 0
