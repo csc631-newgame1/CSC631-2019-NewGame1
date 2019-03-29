@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerActMenu
+public class PlayerActMenu_DEPRECATED
 {
     static private GameObject actMenu;
     static private Button[] buttons;

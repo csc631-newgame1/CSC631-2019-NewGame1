@@ -55,13 +55,31 @@ public class TurnManager : MonoBehaviour
 	{
 		foreach (List<GameAgent> faction in teamRoster) {
 			foreach (GameAgent agent in faction.ToArray()) {
-				if (agent.stats.currentHealth <= 0) {
+				if (agent.stats.currentState == GameAgentState.Dead) {
 					faction.Remove(agent);
 					parentManager.kill(agent);
 				}
 			}
 		}
 	}
+
+    /*bool playerTurnOver()
+    {
+        foreach (Player player in players) {
+            player.CheckIfPlayerTurnHasEnded();
+            if (player.player_turn) return false;
+        }
+
+        return true;
+    }
+
+    void UpdatePlayerStats() {
+        if (players.Count > 0) {
+            foreach (Player player in players) {
+                player.UpdatePlayerStatsMenu(players);
+            }
+        }
+    }*/
 	
 	public void addToRoster(GameAgent agent)
 	{

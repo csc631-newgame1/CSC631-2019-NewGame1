@@ -25,9 +25,12 @@ public class Enemy : GameAgent
     public float range;
     public float _speed;
     public float moveTime = 0.1f;
-	public string state = "IDLE";
 
-    public override void init_agent(Pos position, GameAgentStats stats) 
+	public int moveBudget;
+    public int level;
+    public GameAgentState viewableState;
+
+    public override void init_agent(Pos position, GameAgentStats stats, string name = null) 
 	{
         tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
         map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
@@ -41,8 +44,12 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+		
 		speed = 10;
 		move_budget = 10;
+		
+        level = stats.level;
+        viewableState = stats.currentState;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -70,6 +77,7 @@ public class Enemy : GameAgent
 
 				transform.LookAt(target);
 
+//<<<<<<< HEAD
 					while(time < 1f && dist > 0f) {
 						time += (Time.deltaTime * speed) / dist;
 						transform.position = Vector3.Lerp(origin, target, time);
@@ -82,13 +90,21 @@ public class Enemy : GameAgent
         moving = false;
     }
 	
-	public override void take_damage(int amount) {
+/*	public override void take_damage(int amount) {
         stats.currentHealth -= amount;
         if (stats.currentHealth <= 0) {
 			
             stats.currentHealth = 0;
             StartCoroutine(animator.PlayKilledAimation());
 			
+=======*/
+    public override void take_damage(int amount) {
+        stats.TakeDamage(amount);
+
+        if (stats.currentState == GameAgentState.Unconscious) {
+            StartCoroutine(animator.PlayKilledAimation());
+            stats.currentState = GameAgentState.Dead;
+//>>>>>>> dev
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
@@ -96,12 +112,26 @@ public class Enemy : GameAgent
         currentHealth = stats.currentHealth;
     }
 
-    public override void take_turn() {
-		enemy_turn = true;
-		AI.advance();
-		state = AI.getStateString();
-        StartCoroutine(animator.PlayAttackAnimation());
-		enemy_turn = false;
+    public override void GetHealed(int amount) 
+	{
+        if (stats.currentState == GameAgentState.Alive) {
+            stats.GetHealed(amount);
+
+            StartCoroutine(animator.PlayUseItemAnimation());
+        }
+
+        currentHealth = stats.currentHealth;
+    }
+
+    public override void take_turn() 
+	{	
+		if (stats.currentState == GameAgentState.Alive) {
+			enemy_turn = true;
+			AI.advance();
+			StartCoroutine(animator.PlayAttackAnimation());
+			enemy_turn = false;
+        }
+		else enemy_turn = false;
     }
 	
 	public override bool turn_over() {

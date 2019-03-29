@@ -5,6 +5,7 @@ using UnityEngine;
 
 using MapUtils;
 using static MapUtils.MapConstants;
+using System;
 
 public class MapManager : MonoBehaviour
 {
@@ -92,16 +93,18 @@ public class MapManager : MonoBehaviour
 		return instantiate(type, new Pos(x, y));
 	}
 
+
 	// instantiates an agent into the map
-    public GameObject instantiate(GameObject prefab, Pos pos, GameAgentStats stats = null)
+    public GameObject instantiate(GameObject prefab, Pos pos, GameAgentStats stats = null, string name = null)
 	{
 		if (!IsWalkable(pos)) return null;
 		
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
 		GameAgent agent = clone.GetComponent<GameAgent>();
+        string[] names = new string[] { "Keawa", "Benjamin", "Diana", "Jerry", "Joe" };
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword));
+            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), names[UnityEngine.Random.Range(0, names.Length)]);
         } else {
             agent.init_agent(pos, stats);
         }
@@ -295,6 +298,21 @@ public class MapManager : MonoBehaviour
 	{
 		return IsTraversable(pos) && !IsOccupied(pos);
 	}
+
+    public GameAgentState GetGameAgentState(Pos dest) {
+        if (!IsOccupied(dest))
+            return GameAgentState.Null;
+
+        return map[dest.x, dest.y].resident.stats.currentState;
+    }
+
+    public bool GetHealed(Pos dest, int healAmount) {
+        if (!IsOccupied(dest))
+            return false;
+
+        map[dest.x, dest.y].resident.GetHealed(healAmount);
+        return true;
+    }
 	
 	// gets the transform of agent at position on map, if there is any
     public Transform GetUnitTransform(Pos pos) {
@@ -303,7 +321,26 @@ public class MapManager : MonoBehaviour
         return map[pos.x, pos.y].resident.transform;
     }
 
-	// converts grid position (int)(x, y) to world coordinates (float)(x, y, z)
+    public Transform GetNearestUnitTransform(Pos pos, List<Pos> agents) {
+
+        if (agents.Count > 0) {
+            int minDistance = Int32.MaxValue;
+            Pos closestAgent = agents[0];
+
+            foreach (Pos agent in agents) {
+                int distance = Pos.abs_dist(pos, agent);
+                if (distance < minDistance) {
+                    closestAgent = agent;
+                    minDistance = distance;
+                }
+            }
+            return map[closestAgent.x, closestAgent.y].resident.transform;
+        }
+
+        return null;
+    }
+
+    // converts grid position (int)(x, y) to world coordinates (float)(x, y, z)
 	public Vector3 grid_to_world(Pos pos)
 	{
 		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;

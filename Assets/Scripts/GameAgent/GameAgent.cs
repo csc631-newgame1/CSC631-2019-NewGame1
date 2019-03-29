@@ -6,7 +6,6 @@ using MapUtils;
 
 public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
 
-public enum GameAgentState { Alive, Unconscious, Dead };
 
 public abstract class GameAgent : MonoBehaviour
 {
@@ -14,6 +13,7 @@ public abstract class GameAgent : MonoBehaviour
     public float speed;
     public GameAgentStats stats;
     public GameAgentAction currentAction;
+	
     public GameAgentState currentState;
 	public AIComponent AI;
 	public int team;
@@ -22,8 +22,10 @@ public abstract class GameAgent : MonoBehaviour
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
 	public abstract void take_damage(int amount);
+
+    public abstract void GetHealed(int amount);
 	
-	public abstract void init_agent(Pos position, GameAgentStats stats);
+	public abstract void init_agent(Pos position, GameAgentStats stats, string name = null);
 	
 	// for enemies, this will make them go through their AI motions
 	// for players, this will trigger the boolean value that allows them to take their turn
