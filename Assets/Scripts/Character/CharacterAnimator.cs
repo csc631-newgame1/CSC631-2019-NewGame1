@@ -84,7 +84,7 @@ public class CharacterAnimator : MonoBehaviour
     {
         animationNumber = UnityEngine.Random.Range(1, maxAttackAnimations + 1);
 
-        if (animator.GetInteger("Weapon") == 6)
+        if (animator.GetInteger("Weapon") == CharacterClassOptions.Staff)
         {
             animator.SetTrigger("CastAttack" + (animationNumber).ToString() + "Trigger");
             SpawnParticleSystemAtCharacter(magicAura);
@@ -93,7 +93,7 @@ public class CharacterAnimator : MonoBehaviour
             animator.SetTrigger("CastEndTrigger");
    
         }
-        else if (animator.GetInteger("Weapon") == 4)
+        else if (animator.GetInteger("Weapon") == CharacterClassOptions.Bow)
         {
             animator.SetTrigger("Attack" + (animationNumber).ToString() + "Trigger");
             SpawnParticleSystemAtCharacter(focusSpark);
@@ -105,6 +105,14 @@ public class CharacterAnimator : MonoBehaviour
             SpawnParticleSystemAtCharacter(slashCharge);
             yield return null;
         }
+    }
+
+    public IEnumerator PlayTauntAnimation() {
+        animator.SetTrigger("ActivateTrigger");
+        SpawnParticleSystemAtCharacter(magicAura);
+        SpawnParticleSystemAtCharacter(magicSparks);
+        yield return new WaitForSeconds(actionDuration);
+        animator.SetTrigger("CastEndTrigger");
     }
 
     public bool AnimatorIsPlaying() {

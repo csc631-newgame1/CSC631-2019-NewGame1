@@ -3820,17 +3820,20 @@ MonoBehaviour:
   currentAction: 0
   currentState: 0
   team: 0
+  move_budget: 6
   hoveringMovementTileSelector: 0
   moving: 0
   hoveringActionTileSelector: 0
   isAttacking: 0
   godMode: 1
+  name: 
   attack: 0
   maxHealth: 0
   currentHealth: 0
   range: 0
   _speed: 0
-  move_budget: 6
+  level: 0
+  viewableState: 
   weapon: 1
 --- !u!114 &1111223434817933391
 MonoBehaviour:

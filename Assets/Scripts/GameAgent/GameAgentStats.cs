@@ -2,10 +2,16 @@
 using System;
 using UnityEngine;
 
+public enum GameAgentState { Alive, Unconscious, Dead, Null };
+
+public enum GameAgentStatusEffect { None, Taunted, Taunting };
+
 public class GameAgentStats
 {
     public int characterClassOption;
     public int characterRace;
+    public GameAgentState currentState;
+    public GameAgentStatusEffect currentStatus;
     public CharacterClass playerCharacterClass;
     // unit attack damage
     public float attack;
@@ -13,6 +19,10 @@ public class GameAgentStats
     public float maxHealth;
     // unit current health
     public float currentHealth;
+    // unit max mp
+    public float maxMagicPoints = 100;
+    // unit current mp
+    public float currentMagicPoints = 100;
     // unit attack radius
     public float range;
     // unit move radius
@@ -21,6 +31,12 @@ public class GameAgentStats
     public int level = 1;
     // experience points
     public int xp;
+    // stat granted through items
+    public int defense = 0;
+    // stat granted from taunting
+    public int defenseFromTaunting = 0;
+    // stat granted through items
+    public int attackStatBoost = 0;
 
     // This is used to determine how much xp is awarded for death
     // the scale works by awarding the scaleFactor amount of xp for that level
@@ -37,6 +53,8 @@ public class GameAgentStats
         currentHealth = health;
         this.range = range;
         this.speed = speed;
+        currentState = GameAgentState.Alive;
+        currentStatus = GameAgentStatusEffect.None;
 
         LevelUpToDesiredLevel(desiredLevel);
     }
@@ -58,6 +76,8 @@ public class GameAgentStats
         SetGameAgentCharacterClass(characterWeapon);
         GetBaseCharacterClassStats();
         LevelUpToDesiredLevel(desiredLevel);
+        currentState = GameAgentState.Alive;
+        currentStatus = GameAgentStatusEffect.None;
     }
 
     private void GetBaseCharacterClassStats() {
@@ -90,6 +110,75 @@ public class GameAgentStats
     public void GainXP(int xpGained) {
         xp += xpGained;
         CheckLevelProgression();
+    }
+
+    public void TakeDamage(int damage) {
+        int damageDealt = damage - defense;
+        if (damageDealt < 1) {
+            damageDealt = 1;
+        }
+        currentHealth -= damageDealt;
+
+        if (currentHealth <= 0) {
+            currentHealth = 0;
+            currentState = GameAgentState.Unconscious;
+        }
+    }
+
+    public void SetTauntingStatus(bool active) {
+        if (active) {
+            if (currentStatus != GameAgentStatusEffect.Taunting) {
+                defenseFromTaunting = Mathf.RoundToInt(attack * 0.33f);
+            }
+        } else {
+            // remove defenseFromTaunting
+        }
+    }
+
+    public void GetHealed(int amount) {
+        currentHealth += amount;
+
+        if (currentHealth >= maxHealth) {
+            currentHealth = maxHealth;
+        }
+    }
+
+    public void GetMP(int amount) {
+        currentMagicPoints += amount;
+
+        if (currentMagicPoints >= maxMagicPoints) {
+            currentMagicPoints = maxMagicPoints;
+        }
+    }
+
+    public void UsePotion() {
+        GetHealed(Mathf.RoundToInt(maxHealth * 0.33f));
+        GetMP(Mathf.RoundToInt(maxMagicPoints * 0.33f));
+    }
+
+    public int DealDamage() {
+        return Mathf.RoundToInt(attack + attackStatBoost);
+    }
+
+    public int GetHealAmount() {
+        if (characterClassOption == CharacterClassOptions.Healer) {
+            return Mathf.RoundToInt(UnityEngine.Random.Range(0.5f, 0.75f) * (attack + attackStatBoost));
+        }
+        return 0;
+    }
+
+    public int GetMultiShotCount() {
+        if (characterClassOption == CharacterClassOptions.Hunter) {
+            int min = 1;
+            int max = 4;
+            int mean = (min + max) / 2;
+            return Utility.NextGaussian(mean, 1, min, max);
+        }
+        return 0;
+    }
+
+    public int GetMultiShotDamage() {
+        return Mathf.RoundToInt(UnityEngine.Random.Range(0.55f, 0.7f) * (attack + attackStatBoost));
     }
 
     private void CheckLevelProgression() {
