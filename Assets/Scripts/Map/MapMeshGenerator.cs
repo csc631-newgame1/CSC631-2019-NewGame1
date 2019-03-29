@@ -17,6 +17,8 @@ public class MapMeshGenerator : MonoBehaviour
 	private float wall_height;
 	private Vector3 offset;
 	
+	public float steepness;
+	
 	[Tooltip("The color gradient for the map, coloring based on height. Values towards 0 are closer to the map's surface, values towards 1 are closer to the map's floor")]
 	public Gradient gradient;
 	
@@ -324,7 +326,7 @@ public class MapMeshGenerator : MonoBehaviour
 
 	private float height_func(int hval, int x, int y)
 	{
-		return -wall_height * ((sigmoid(hval / 2) - 0.5f) * 2);
+		return -wall_height * ((sigmoid(hval * steepness) - 0.5f) * 2);
 	}
 	
 	private float sigmoid(float x)
