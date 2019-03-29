@@ -1017,6 +1017,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101985356}
   m_CullTransparentMesh: 0
+--- !u!1 &1250750738 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1487225058, guid: bcfeb66b5a365914483f3a675c49a0df,
+    type: 3}
+  m_PrefabInstance: {fileID: 2142322477}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1379268799
 GameObject:
   m_ObjectHideFlags: 0
@@ -1285,8 +1291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90021a5cb851bcb4783c1502ef62cd49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BattleMenu: {fileID: 1099876935178444135, guid: 824d195942f812742b2c48ddb81b3d6e,
-    type: 3}
+  BattleMenu: {fileID: 1250750738}
   playerPrefab: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
 --- !u!114 &1591538342
 MonoBehaviour:

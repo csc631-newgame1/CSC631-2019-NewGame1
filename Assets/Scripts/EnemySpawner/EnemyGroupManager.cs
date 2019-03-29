@@ -13,11 +13,15 @@ public class EnemyGroupManager
     private List<EnemyGroup> enemyGroups;
     private List<SpawnZone> spawnZones;
     private List<EnemyToSpawn> enemies;
+    private System.Random rng;
 
     public EnemyGroupManager(List<EnemyGroup> enemyGroups, List<SpawnZone> spawnZones) {
         this.enemyGroups = enemyGroups;
         this.spawnZones = spawnZones;
         enemies = new List<EnemyToSpawn>();
+
+        MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
+        rng = config.GetRNG();
 
         // Sort based on group size
         QuickSortEnemyGroups(enemyGroups, 0, enemyGroups.Count - 1);
@@ -70,7 +74,7 @@ public class EnemyGroupManager
     }
 
     private int GetRandomIntWithExclusion(int start, int end, List<int> exclude) {
-        int random = start + Random.Range(0, (end - start + 1 - exclude.Count));
+        int random = start + rng.Next(0, (end - start + 1 - exclude.Count));
         foreach (int ex in exclude) {
             if (random < ex) {
                 break;
