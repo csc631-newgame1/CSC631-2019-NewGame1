@@ -6,7 +6,7 @@ public class MainMenuController : MonoBehaviour
 {
 
 
-    public GameObject buttonPanel, characterSelectPanel;
+    public GameObject buttonPanel, characterSelectPanel, createCharacterPanel;
 
 
     private MainMenuCamera mainMenuCamera;
@@ -56,5 +56,28 @@ public class MainMenuController : MonoBehaviour
         //}
     }
 
+    public void CreateCharacter()
+    {
+        characterSelectPanel.SetActive(false);
+        createCharacterPanel.SetActive(true);
+
+
+    }
+
+    public void Accept()
+    {
+        characterSelectPanel.SetActive(true);
+        createCharacterPanel.SetActive(false);
+
+
+    }
+
+    public void Cancel()
+    {
+        characterSelectPanel.SetActive(true);
+        createCharacterPanel.SetActive(false);
+
+
+    }
 
 }
