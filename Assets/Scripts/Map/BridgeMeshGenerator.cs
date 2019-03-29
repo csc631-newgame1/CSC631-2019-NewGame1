@@ -21,6 +21,7 @@ public class BridgeMeshGenerator : MonoBehaviour
 		}
 	}
 	
+	// the meshes to be used for each bridge tile
 	public Mesh bridgeBase;
 	public Mesh bridgeLegs;
 	public Mesh platformBase;
@@ -29,8 +30,14 @@ public class BridgeMeshGenerator : MonoBehaviour
 	[Tooltip("The color gradient for the map, coloring based on height. Values towards 0 are closer to the map's surface, values towards 1 are closer to the map's floor")]
 	public Gradient gradient;
 	
+	// bridge mesh generation algorithm
 	public void generateBridgeMesh(int[,] map)
 	{
+		/* STEP ONE - INITIALIZATION
+		 * Initialize all relevant variables, e.g width/height etc.
+		 * Create the metadata map for use later down the line 
+		 * The metadata map contains information that is relevant for bridge generation, e.g bridges and platforms */
+		
 		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
 		
 		int width = config.width;
@@ -47,6 +54,11 @@ public class BridgeMeshGenerator : MonoBehaviour
 					case PLATFORM: bridgeMeta[x, y] = BMETA.PLATFORM_UNCHECKED; break;
 					default: bridgeMeta[x, y] = BMETA.NONE; break;
 				}
+				
+		/* STEP TWO - BRIDGE ALGORITHM
+		 * It is important to determine which orientation each bridge should be before creating the bridge mesh
+		 * This algorithm checks up/down/left/right relative to each platform to determine which direction the bridges should face
+		 * Once it determines the direction, the algorithm steps in that direction, "building" bridge tiles until it reaches another platform */
 		
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
@@ -82,13 +94,22 @@ public class BridgeMeshGenerator : MonoBehaviour
 			}
 		}
 		
-		string debugString = "";
+		// optional debug
+		/*string debugString = "";
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++)
 				debugString += getString(bridgeMeta[x, y]);
 			debugString += "\n";
 		}	
-		Debug.Log(debugString);
+		Debug.Log(debugString);*/
+		
+		/* STEP 3 - MESH CREATION
+		 * Now that the orientation for each bridge tile has been determined, it's time to generate the mesh
+		 * Each in-world bridge tile will consist of:
+		 * 1: a base mesh, i.e what is on the ground level of the bridge.
+		 * 2: N leg meshes, stacked on top of each other. How many legs there are is based on how high the surface walls are 
+		 * There are two types of bridge tiles; bridges and platforms. 
+		 * Bridges have an orientation based on what metadata value they were assigned, while platforms are omnidirectional */
 		
 		List<int> bridgeTriangles = new List<int>();
 		List<Vector3> bridgeVertices = new List<Vector3>();
@@ -102,9 +123,7 @@ public class BridgeMeshGenerator : MonoBehaviour
 					case BMETA.PLATFORM_CHECKED:
 						baseMesh = platformBase;
 						legsMesh = platformLegs; break;
-					case BMETA.BRIDGE_LR:
-						baseMesh = bridgeBase;
-						legsMesh = bridgeLegs; break;
+					case BMETA.BRIDGE_LR: // both bridge types use the same model
 					case BMETA.BRIDGE_UD:
 						baseMesh = bridgeBase;
 						legsMesh = bridgeLegs; break;
@@ -112,15 +131,18 @@ public class BridgeMeshGenerator : MonoBehaviour
 						continue;
 				}
 				
+				// determines whether to rotate the model by 90 degress, depending on what type of bridge it is
 				Quaternion rotation = bridgeMeta[x, y] == BMETA.BRIDGE_LR ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 90, 0);
-				Vector3 translation = config.gridToWorld(new Pos(x, y));
-				Vector3 scaling		= new Vector3(0.5f, 0.5f, 0.5f);
-				Matrix4x4 transform = Matrix4x4.TRS(translation, rotation, scaling);
+				Vector3 translation = config.gridToWorld(new Pos(x, y)); // transforms mesh vertices to the in-world position they should be
+				Vector3 scaling		= new Vector3(0.5f, 0.5f, 0.5f); // scaling is on 0.5 because I forgot to scale down my models in blender (oops!)
+				Matrix4x4 transform = Matrix4x4.TRS(translation, rotation, scaling); // all of these transformations are cumulated into the transform matrix
 				
+				// copies the base mesh's vertices, transforms them, then adds them to the vertices list
 				Vector3[] newBaseVerts = baseMesh.vertices.Clone() as Vector3[];
 				for (int i = 0; i < newBaseVerts.Length; i++) {
 					newBaseVerts[i] = transform.MultiplyPoint3x4(newBaseVerts[i]);
 				}
+				// copies the triangles as well, simply adds the current vertex index count to each index value
 				int[] newBaseTriangles = baseMesh.triangles.Clone() as int[];
 				int startingIndex = bridgeVertices.Count;
 				for (int i = 0; i < newBaseTriangles.Length; i++) {
@@ -128,11 +150,15 @@ public class BridgeMeshGenerator : MonoBehaviour
 				}
 				bridgeTriangles.AddRange(newBaseTriangles);
 				bridgeVertices.AddRange(newBaseVerts);
-				bridgeUVs.AddRange(baseMesh.uv);
+				bridgeUVs.AddRange(baseMesh.uv); // uvs don't need to be modified
 				
-				float legsYSpan = (legsMesh.bounds.max.y - legsMesh.bounds.min.y) / 2;
-				Vector3 legsPos = translation + new Vector3(0, -legsYSpan, 0);
+				// determines the height of the legs mesh, so we know how many times we need to tile it downwards
+				float legsYStart = (baseMesh.bounds.max.y - baseMesh.bounds.min.y) * 0.5f;
+				float legsYSpan  = (legsMesh.bounds.max.y - legsMesh.bounds.min.y) * 0.5f; // scales by 0.5 because of aforementioned blender goof
+				Vector3 legsPos  = translation + new Vector3(0, -legsYStart, 0);
 				
+				// performs the same operation we did for the base mesh for the legs mesh
+				// tiles the legs downwards until they reach wallHeight
 				while (legsPos.y > -wallHeight) {
 					transform = Matrix4x4.TRS(legsPos, rotation, scaling);
 					
@@ -154,6 +180,12 @@ public class BridgeMeshGenerator : MonoBehaviour
 			}
 		}
 		
+		/* STEP 4 - GRADIENT GENERATION
+		 * So this code is copy-pasted from the MapMeshGenerator code
+		 * I would prefer this step to only happen once, and be written to an image somewhere for both bridges and surface to use
+		 * But for some god damn reason I can't seem to find a way to create a blank image with an alpha channel, so I have to do it in code
+		 * This gradient is used to create the lava/water/fog effect for the map shader */
+		
 		Renderer rend = GetComponent<Renderer>();
 		Texture2D texture = new Texture2D(512, 1);
 		texture.wrapMode = TextureWrapMode.Repeat;
@@ -167,12 +199,13 @@ public class BridgeMeshGenerator : MonoBehaviour
 		texture.SetPixels(colors);
 		texture.Apply(true);
 		
-		Debug.Log(bridgeVertices.Count);
-		Debug.Log(bridgeTriangles.Count);
+		/* STEP 5 - FINALIZATION
+		 * Finally, we write our new vertices & triangles to the mesh filter */
 		
 		MeshFilter mf = GetComponent<MeshFilter>();
-		mf.mesh.triangles = null;
-		mf.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+		// blank any existing triangles so that unity won't throw a fit when we set the new vertices
+		mf.mesh.triangles = null; 
+		mf.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; // by default, vertex indexing only goes up to 65536 (16-bit), which often isn't enough
 		
 		mf.mesh.vertices = bridgeVertices.ToArray();
 		mf.mesh.uv = bridgeUVs.ToArray();
@@ -181,132 +214,3 @@ public class BridgeMeshGenerator : MonoBehaviour
 		mf.mesh.RecalculateBounds();
 	}
 }
-	/*
-    private int[,] map;
-	private int width;
-	private int height;
-	private float cell_size;
-	private float wall_height;
-	
-	private List<Vector3> vertices;
-	private List<Vector2> uvs;
-	private List<int> triangles;
-	private Vector3 offset;
-	
-	private MeshFilter target_mesh;
-	
-	void set_config_variables()
-	{
-		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
-		this.cell_size = config.cell_size;
-		this.wall_height = config.wall_height;
-		this.target_mesh = GetComponent<MeshFilter>();
-		this.width = config.width;
-		this.height = config.height;
-		this.offset = config.GetOffset();
-		this.offset.y -= 0.005f;
-	}
-	
-	public void generate_bridge_mesh(int[,] map)
-	{
-		set_config_variables();
-		this.map = map;
-		
-		vertices = new List<Vector3>();
-		uvs = new List<Vector2>();
-		triangles = new List<int>();
-		
-		triangulate_all_bridges();
-		
-		Mesh mesh = target_mesh.mesh;
-		
-		mesh.triangles = null;
-		mesh.vertices = vertices.ToArray();
-		mesh.uv = uvs.ToArray();
-		mesh.triangles = triangles.ToArray();
-		mesh.RecalculateNormals();
-	}
-	
-	void triangulate_all_bridges()
-	{
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				if (map[x, y] == BRIDGE || map[x, y] == PLATFORM) {
-					triangulate_bridge(x, y);
-				}
-			}
-		}
-	}
-	
-	void triangulate_bridge(int x, int y) 
-	{
-		triangulate_platform(x, y, cell_size / 4);
-		
-		triangulate_leg((x * cell_size + 0.0625f), (y * cell_size + 0.0625f), 0.0625f, wall_height);
-		triangulate_leg((x * cell_size + 0.9375f), (y * cell_size + 0.0625f), 0.0625f, wall_height);
-		triangulate_leg((x * cell_size + 0.0625f), (y * cell_size + 0.9375f), 0.0625f, wall_height);
-		triangulate_leg((x * cell_size + 0.9375f), (y * cell_size + 0.9375f), 0.0625f, wall_height);
-	}
-	
-	void triangulate_platform(float x, float y, float height)
-	{
-		triangle_fan(
-			new Vector3[] {
-				new Vector3((x + 0), 0f, (y + 0) ), new Vector3((x + 0), 0f, (y + 1) ),
-				new Vector3((x + 1), 0f, (y + 1) ), new Vector3((x + 1), 0f, (y + 0) ) },
-			new Vector2[] {
-				new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, height), new Vector2(0f, height) });
-		triangulate_leg((x + (cell_size / 2f)), y + (cell_size / 2f), cell_size / 2f, height);
-	}
-	
-	void triangulate_leg(float x, float y, float thickness, float height)
-	{
-		triangle_fan(
-			new Vector3[] {
-				new Vector3((x - thickness), 0f			 , (y - thickness)), new Vector3((x + thickness), 0f		  , (y - thickness)),
-				new Vector3((x + thickness), -height	 , (y - thickness)), new Vector3((x - thickness), -height	  , (y - thickness)) },
-			new Vector2[] {
-				new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, height), new Vector2(0f, height) });
-		triangle_fan(
-			new Vector3[] {
-				new Vector3((x + thickness), 0f			 , (y - thickness)), new Vector3((x + thickness), 0f		  , (y + thickness)),
-				new Vector3((x + thickness), -height	 , (y + thickness)), new Vector3((x + thickness), -height	  , (y - thickness)) },
-			new Vector2[] {
-				new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, height), new Vector2(0f, height) });
-		triangle_fan(
-			new Vector3[] {
-				new Vector3((x + thickness), 0f			 , (y + thickness)), new Vector3((x - thickness), 0f		  , (y + thickness)),
-				new Vector3((x - thickness), -height	 , (y + thickness)), new Vector3((x + thickness), -height	  , (y + thickness)) },
-			new Vector2[] {
-				new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, height), new Vector2(0f, height) });
-		triangle_fan(
-			new Vector3[] {
-				new Vector3((x - thickness), 0f			 , (y + thickness)), new Vector3((x - thickness), 0f		  , (y - thickness)),
-				new Vector3((x - thickness), -height	 , (y - thickness)), new Vector3((x - thickness), -height	  , (y + thickness)) },
-			new Vector2[] {
-				new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, height), new Vector2(0f, height) });
-	}
-	
-	void triangle_fan(Vector3[] verts, Vector2[] uv)
-	{
-		write_triangles((verts.Length - 2) * 3);
-		for (int i = 0; i < verts.Length - 2; i ++) {
-			vertices.Add(verts[0] - offset);
-			vertices.Add(verts[i + 1] - offset);
-			vertices.Add(verts[i + 2] - offset);
-		}
-		for (int i = 0; i < uv.Length - 2; i++) {
-			uvs.Add(uv[0]);
-			uvs.Add(uv[i + 1]);
-			uvs.Add(uv[i + 2]);
-		}
-	}
-	
-	void write_triangles(int amt)
-	{
-		for (int i = 0; i < amt; i++) {
-			triangles.Add(vertices.Count + i);
-		}
-	}
-	
-}*/
