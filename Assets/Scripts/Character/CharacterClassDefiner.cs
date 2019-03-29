@@ -23,12 +23,17 @@ public class CharacterClassDefiner : MonoBehaviour
     public GameObject staff;
     public GameObject axe;
     public GameObject club;
+
+    private System.Random rng;
     #endregion
 
     public void init(int characterRace, int characterClass, int characterWeapon) {
         // Get required components.
         character = GetComponent<GameAgent>();
         animator = GetComponent<Animator>();
+
+        MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
+        rng = config.GetRNG();
 
         // Hide all weapon objects.
         hideAllWeapons();
@@ -174,12 +179,12 @@ public class CharacterClassDefiner : MonoBehaviour
 
     int GetRandomOrc()
     {
-        return Random.Range(minOrcRange, maxOrcRange);
+        return rng.Next(minOrcRange, maxOrcRange);
     }
 
     int GetRandomSkeleton()
     {
-        return Random.Range(minSkeletonRange, maxSkeletonRange);
+        return rng.Next(minSkeletonRange, maxSkeletonRange);
     }
 
     void hideAllWeapons()
