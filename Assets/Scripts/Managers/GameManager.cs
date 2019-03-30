@@ -23,10 +23,16 @@ public class GameManager : MonoBehaviour
     private GameObject BattleMenu;
     public GameObject playerPrefab;
 
+    public static GameManager instance; //static so we can carry oour levels and st
+    
 	void Start()
 	{
 		Init();
+        instance = this;
+        DontDestroyOnLoad(gameObject);
     }
+
+ 
 
     void Init()
     {
