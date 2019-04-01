@@ -17,10 +17,14 @@ public class InventoryManager : MonoBehaviour
     delegate void ItemFunc(GameAgent agent);
     IDictionary<int, ItemFunc> itemFuncs = new Dictionary<int, ItemFunc>();
 
+    public static InventoryManager instance = null;
+
     void Start()
     {
         //add all item functions here
         //item functions will be identified via item ID
+        if (instance == null) instance = this;
+
         itemFuncs.Add(1, ApplyHealthPotion);
         itemFuncs.Add(2, ApplyManaPotion);
     }
