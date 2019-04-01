@@ -18,6 +18,8 @@ public abstract class GameAgent : MonoBehaviour
 	public AIComponent AI;
 	public int team;
 	public int move_budget;
+
+    public Inventory inventory;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
@@ -38,4 +40,5 @@ public abstract class GameAgent : MonoBehaviour
     public abstract void act();
     public abstract void wait();
     public abstract void potion();
+
 }
