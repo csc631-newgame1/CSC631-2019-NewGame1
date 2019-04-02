@@ -11,7 +11,10 @@ public class EnemySpawner : MonoBehaviour {
     private Vector3 offset;
     private Vector3 regionSize;
     private float radius;
+    private string seed;
+    private int seedHashed;
     private MapManager mapManager;
+    private System.Random rng;
     // A list of all accepted Spawn Zones
     private List<SpawnZone> spawnZones;
     public bool showEnemySpawnZones;
@@ -37,14 +40,16 @@ public class EnemySpawner : MonoBehaviour {
     public void Init(MapManager mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
-        this.width = config.width;
-        this.height = config.height;
+        width = config.width;
+        height = config.height;
         regionSize = new Vector2(width, height);
-        this.cell_size = config.cell_size;
-        this.radius = cell_size * Mathf.Sqrt(2);
-        this.offset = config.GetOffset();
+        cell_size = config.cell_size;
+        radius = cell_size * Mathf.Sqrt(2);
+        offset = config.GetOffset();
         this.mapManager = mapManager;
-        this.mapConfiguration = mapConfiguration;
+        mapConfiguration = config;
+        seed = config.seed;
+        rng = config.GetRNG();
 
         spawnZones = new List<SpawnZone>();
 		SpawnEnemies();
@@ -63,11 +68,11 @@ public class EnemySpawner : MonoBehaviour {
             List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
 
             // Create Enemies inside of the Enemy Group
-            for (int enemyPropertyIndex = 0; enemyPropertyIndex < Random.Range(1, 3+1); enemyPropertyIndex++) {
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(Random.Range(CharacterRaceOptions.Orc, CharacterRaceOptions.Skeleton+1),
-                                                                                        Random.Range(CharacterClassOptions.Knight, CharacterClassOptions.Mage+1),
-                                                                                        Random.Range(1,2+1)),
-                                                                    Random.Range(1, 2+1)));
+            for (int enemyPropertyIndex = 0; enemyPropertyIndex < rng.Next(1, 3+1); enemyPropertyIndex++) {
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(rng.Next(CharacterRaceOptions.Orc, CharacterRaceOptions.Skeleton+1),
+                                                                                        rng.Next(CharacterClassOptions.Knight, CharacterClassOptions.Mage+1),
+                                                                                        rng.Next(1,2+1)),
+                                                                    rng.Next(1, 2+1)));
             }
 
             enemyGroups.Add(new EnemyGroup(enemyGroupDescriptions, Distribution.Balanaced));
@@ -93,14 +98,17 @@ public class EnemySpawner : MonoBehaviour {
         // Attempts to create Spawn Zones of random size based on parameters
         // then checks if the Spawn Zone is acceptable
         while (remainingSpawnZones.Count > 0) {
-            int spawnIndex = Random.Range(0, remainingSpawnZones.Count);
+            int spawnIndex = rng.Next(0, remainingSpawnZones.Count);
+            //int spawnIndex = Random.Range(0, remainingSpawnZones.Count);
             SpawnZone spawnCenter = remainingSpawnZones[spawnIndex];
             bool candidateAccepted = false;
 
             for (int i=0; i<numSamplesBeforeRejection; i++) {
-                
-                float angle = Random.value * Mathf.PI * 2;
-                float spawnZoneRadius = Random.Range(lowerRadius/cell_size, upperRadius/cell_size);
+                // TODO look at this shit
+                float angle = (rng.Next(0, 100) / 100f) * Mathf.PI * 2;
+                //float angle = Random.value * Mathf.PI * 2;
+                float spawnZoneRadius = rng.Next((int)((lowerRadius / cell_size) * 100), (int)((upperRadius / cell_size) * 100)) / 100f;
+                //float spawnZoneRadius = Random.Range(lowerRadius / cell_size, upperRadius / cell_size);
                 Vector3 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
                 float distanceBetweenZones = Mathf.Max(1, i * distanceBetweenZonesScale);
                 // Creates a potential position for the center of the Spawn Zone
@@ -134,7 +142,7 @@ public class EnemySpawner : MonoBehaviour {
         if (spawnZones.Count > maxNumberOfSpawnZones) {
             int numOfZonesToRemove = spawnZones.Count - maxNumberOfSpawnZones;
             for (int i = 0; i < numOfZonesToRemove; i++) {
-                int randomIndex = Random.Range(0, spawnZones.Count - 1);
+                int randomIndex = rng.Next(0, spawnZones.Count - 1);
                 spawnZones.Remove(spawnZones[randomIndex]);
             }
         }
