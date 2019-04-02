@@ -44,7 +44,7 @@ public abstract class GameAgent : MonoBehaviour
     public void UseItemOnSelf(int slot)
     {
         Item item = inventory.GetItemFromSlot(slot);
-        InventoryManager.instance.UseItem(item.ID, this);
+        InventoryManager.instance.UseItem(item, this);
         inventory.DecrementItemAtSlot(slot);
     }
 }

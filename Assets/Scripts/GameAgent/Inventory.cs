@@ -41,6 +41,15 @@ public class Inventory
         return items[slot];
     }
 
+    public void IncrementItemAtSlot(int slot)
+    {
+        if (slot >= numItemSlots)
+        {
+            return;
+        }
+        items[slot].Amount++;
+    }
+
     //decreases amount of item by 1
     //used when item is being used, i.e. potion consumed
     public void DecrementItemAtSlot(int slot)
@@ -51,7 +60,7 @@ public class Inventory
         }
         if ((items[slot].Amount--) <= 0)
         {
-            items[slot] = null;
+            items[slot] = null; //remove item if amount is zero
         }
     }
 }
