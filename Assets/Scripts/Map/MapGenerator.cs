@@ -330,6 +330,11 @@ public class MapGenerator : MonoBehaviour
 		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
 	}
 	
+	public List<Region> getRegions()
+	{
+		return regions;
+	}
+	
 	/*******************/
 	/* DEBUG FUNCTIONS */
 	/*******************/
