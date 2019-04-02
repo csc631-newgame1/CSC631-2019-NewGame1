@@ -4576,7 +4576,7 @@ ParticleSystem:
 --- !u!199 &3944264686104388572
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -4680,24 +4680,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c430436a2ea459f4aa1117ad07911116, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steepness: 1
   gradient:
     serializedVersion: 2
     key0: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 0.40784314}
     key1: {r: 0.8018868, g: 0.09372702, b: 0, a: 1}
     key2: {r: 0.9150943, g: 0.3561353, b: 0, a: 0}
     key3: {r: 0.9137255, g: 0.54077977, b: 0, a: 0}
-    key4: {r: 0, g: 0.6216216, b: 1, a: 0}
-    key5: {r: 0.5521083, g: 0, b: 1, a: 0}
-    key6: {r: 0.29166824, g: 0.77930725, b: 0.85134906, a: 0}
-    key7: {r: 0.29166824, g: 0.77930725, b: 0.85134906, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
     ctime1: 40816
     ctime2: 62086
     ctime3: 65535
-    ctime4: 52428
-    ctime5: 65535
-    ctime6: 65535
-    ctime7: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
     atime0: 0
     atime1: 65535
     atime2: 0
@@ -4814,19 +4815,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e200e9a9eb6534f918eb71dcac6113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 150
-  height: 150
-  fill_percent: 50
+  width: 50
+  height: 50
+  fill_percent: 51
   smoothness: 8
   region_cull_threshold: 16
   cell_size: 1
-  wall_height: 4.48
+  wall_height: 7.86
   wall_texture_scale: 3
   surface_texture_scale: 5
   bridge_texture_scale: 1
   floor_texture_scale: 1
   object_size_scale: 0
-  seed: asdfasdfasdf
+  seed: 
 --- !u!1 &3944264686745319692
 GameObject:
   m_ObjectHideFlags: 0
@@ -4876,6 +4877,7 @@ MonoBehaviour:
   showPathLine: 0
   showSelectableMoveTiles: 0
   showSelectableActTiles: 0
+  showAOETiles: 0
   hover_position: {x: 0, y: 0, z: 0}
   tileMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   moveableTilesMaterial: {fileID: 2100000, guid: 9c4bdd583bc376444a09f7eb6675cbab,
@@ -5037,6 +5039,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54c6c642476f7374c8499c08b631c89e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bridgeBase: {fileID: 4300000, guid: f003a3df819c6724d9c1ea9720883bb9, type: 3}
+  bridgeLegs: {fileID: 4300000, guid: 55d84bddf7aaab44fa5b77486df56e0e, type: 3}
+  platformBase: {fileID: 4300000, guid: 4058ca01a5fb64f43b437a220ffe168e, type: 3}
+  platformLegs: {fileID: 4300000, guid: 1c5e705abbd39114f85415f4f9a5957e, type: 3}
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 0.40784314}
+    key1: {r: 0.8018868, g: 0.09372702, b: 0, a: 1}
+    key2: {r: 0.9150943, g: 0.3561353, b: 0, a: 0}
+    key3: {r: 0.9137255, g: 0.54077977, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 40816
+    ctime2: 62086
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
 --- !u!33 &3944264687251142842
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -9640,7 +9675,7 @@ ParticleSystem:
 --- !u!199 &3944264687405353572
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -14268,7 +14303,7 @@ ParticleSystem:
 --- !u!199 &3944264687542908889
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}

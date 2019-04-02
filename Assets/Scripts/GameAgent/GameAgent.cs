@@ -14,6 +14,11 @@ public abstract class GameAgent : MonoBehaviour
     public GameAgentStats stats;
     public GameAgentAction currentAction;
 	
+    public GameAgentState currentState;
+	public AIComponent AI;
+	public int team;
+	public int move_budget;
+	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
 	public abstract void take_damage(int amount);
@@ -25,7 +30,8 @@ public abstract class GameAgent : MonoBehaviour
 	// for enemies, this will make them go through their AI motions
 	// for players, this will trigger the boolean value that allows them to take their turn
 	public abstract void take_turn();
-
+	
+	public abstract bool turn_over();
 
     // commands from the action menu
     public abstract void move();

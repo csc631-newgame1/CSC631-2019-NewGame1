@@ -11,68 +11,59 @@ public class TurnManager : MonoBehaviour
     [HideInInspector] public bool playersTurn = true;
 	[HideInInspector] public bool enemiesTurn = false;
 
-    // lists of all active player/enemies
-    private List<Player> players = new List<Player>();
-    private List<Enemy> enemies = new List<Enemy>();
+    // lists of all active players/enemies
+    private List<GameAgent>[] teamRoster = new List<GameAgent>[16];
 	
 	private GameManager parentManager = null;
+	private IEnumerator mainLoop = null;
+	private bool loopOver = false;
 	
 	void Awake()
 	{
 		instance = this;
+		for (int i = 0; i < 16; i++) 
+			teamRoster[i] = new List<GameAgent>();
 	}
 	
 	public void Init(GameManager parent)
 	{
 		parentManager = parent;
-		StartCoroutine(TurnLoop());
+		
+		AIManager.roster = teamRoster;
+		
+		mainLoop = TurnLoop();
+		StartCoroutine(mainLoop);
 	}
+	
+	
 
     IEnumerator TurnLoop()
 	{	
 		while (true) {
+			
 			yield return null;
-			
-			enemiesTurn = false;
-			playersTurn = true;
-			
-			Debug.Log("Beginning player turn!");
-			
-			foreach (Player player in players) {
-				player.take_turn();
-                UpdatePlayerStats();
+			for (int team = 0; team < 16; team++) {
+				
+				AIManager.update(team);
+				while (!AIManager.turnOver(team)) yield return null;
+				ClearDead();
 			}
-			
-			while (!playerTurnOver()) yield return null;
-			ClearDead();
-			
-			Debug.Log("Beginning enemy turn!");
-			
-			enemiesTurn = true;
-			playersTurn = false;
-
-            // Little delay between turns
-            yield return new WaitForSeconds(1);
-
-            foreach (Enemy enemy in enemies) {
-                enemy.take_turn();
-                UpdatePlayerStats();
-            }
-			
-			while (!enemyTurnOver()) yield return null;
-			ClearDead();
 		}
     }
 	
-	bool enemyTurnOver()
+	void ClearDead()
 	{
-		foreach (Enemy enemy in enemies)
-			if (enemy.enemy_turn) return false;
-			
-		return true;
+		foreach (List<GameAgent> faction in teamRoster) {
+			foreach (GameAgent agent in faction.ToArray()) {
+				if (agent.stats.currentState == GameAgentState.Dead) {
+					faction.Remove(agent);
+					parentManager.kill(agent);
+				}
+			}
+		}
 	}
 
-    bool playerTurnOver()
+    /*bool playerTurnOver()
     {
         foreach (Player player in players) {
             player.CheckIfPlayerTurnHasEnded();
@@ -88,46 +79,17 @@ public class TurnManager : MonoBehaviour
                 player.UpdatePlayerStatsMenu(players);
             }
         }
-    }
+    }*/
 	
-	void ClearDead()
+	public void addToRoster(GameAgent agent)
 	{
-		foreach (Enemy enemy in enemies)
-			if (enemy.currentHealth <= 0)
-				parentManager.kill(enemy);
-			
-		foreach (Player player in players)
-			if (player.currentHealth <= 0)
-				parentManager.kill(player);
+		teamRoster[agent.team].Add(agent);
 	}
-	
-	public void AddPlayerToList(Player player)
-    {
-        players.Add(player);
-    }
 
-    public void AddEnemyToList(Enemy enemy)
-    {
-        enemies.Add(enemy);
-    }
-
-    public void RemovePlayerFromList(Player player)
-    {
-        players.Remove(player);
-    }
-
-    public void RemoveEnemyFromList(Enemy enemy)
-    {
-        enemies.Remove(enemy);
-    }
-
-    public void ClearEnemyList()
-    {
-        enemies.Clear();
-    }
-	
-	public void ClearPlayerList()
-    {
-        players.Clear();
-    }
+    public void Terminate()
+	{
+		foreach (List<GameAgent> faction in teamRoster)
+			faction.Clear();
+		StopCoroutine(mainLoop);
+	}
 }
