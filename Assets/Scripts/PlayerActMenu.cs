@@ -1,28 +1,30 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class ActMenuButtons {
-    // Button indexes
-    public const int MOVE = 0;
-    public const int ACT = 1;
-    public const int POTION = 2;
-    public const int WAIT = 3;
-    public const int ACTION1 = 4;
-    public const int ACTION2 = 5;
-    public const int BLANK = 6;
-    public const int BACK = 7;
+public class ActMenuButtons { 
+	// Button indexes
+	public const int MOVE = 0;
+	public const int ACT = 1;
+	public const int POTION = 2;
+	public const int WAIT = 3;
+	public const int ACTION1 = 4;
+	public const int ACTION2 = 5;
+	public const int BLANK = 6;
+	public const int BACK = 7;
 }
 
-public class PlayerActMenu : MonoBehaviour
+public class PlayerActMenu
 {
-    private GameObject actMenu;
-    private GameObject[] playerStats;
-    private Button[] buttons;
+	
+	
+    private static GameObject actMenu;
+    private static GameObject[] playerStats;
+    private static Button[] buttons;
     
 
-    private bool isPlayerActMenuActive = false;
+    private static bool isPlayerActMenuActive = false;
 
-    public void SetPlayerActMenuActive(bool active, GameAgentAction[] actions = null) {
+    public static void SetPlayerActMenuActive(bool active, GameAgentAction[] actions = null) {
         if (!active || actions == null) {
             SetButtonsToBattleMenu();
             isPlayerActMenuActive = false;
@@ -32,28 +34,31 @@ public class PlayerActMenu : MonoBehaviour
         }
     }
 
-    public bool IsPlayerActMenuActive() {
+    public static bool IsPlayerActMenuActive() {
         return isPlayerActMenuActive;
     }
 
-    public void MakeButtonNoninteractable(int buttonIndex) {
+    public static void MakeButtonNoninteractable(int buttonIndex) {
         buttons[buttonIndex].interactable = false;
     }
 
-    public void MakeAllButtonsInteractable(bool active) {
+    public static void MakeAllButtonsInteractable(bool active) {
         foreach (Button button in buttons) {
             button.interactable = active;
         }
     }
 
-    public void init() {
-        actMenu = GameObject.FindGameObjectWithTag("PlayerActMenu");
-        playerStats = GameObject.FindGameObjectsWithTag("PlayerStats");
+    public static void init() {
+		if (actMenu == null)
+			actMenu = GameObject.FindGameObjectWithTag("PlayerActMenu");
+		if (playerStats == null)
+			playerStats = GameObject.FindGameObjectsWithTag("PlayerStats");
+		
         buttons = actMenu.GetComponentsInChildren<Button>(true);
         SetPlayerActMenuActive(false);
     }
 
-    public void UpdatePlayerStatsMenu(int position, string name, GameAgentStats stats, bool deactivatePlayerSpot = false) {
+    public static void UpdatePlayerStatsMenu(int position, string name, GameAgentStats stats, bool deactivatePlayerSpot = false) {
         if (!deactivatePlayerSpot) {
             if (position < playerStats.Length) {
                 if (!playerStats[position].activeSelf) {
@@ -73,7 +78,7 @@ public class PlayerActMenu : MonoBehaviour
         }
     }
 
-    public void SetButtonsToBattleMenu() {
+    public static void SetButtonsToBattleMenu() {
         buttons[ActMenuButtons.MOVE].gameObject.SetActive(true);
         buttons[ActMenuButtons.ACT].gameObject.SetActive(true);
         buttons[ActMenuButtons.POTION].gameObject.SetActive(true);
@@ -85,7 +90,7 @@ public class PlayerActMenu : MonoBehaviour
         buttons[ActMenuButtons.BACK].gameObject.SetActive(false);
     }
 
-    public void SetActButtons() {
+    public static void SetActButtons() {
         buttons[ActMenuButtons.MOVE].gameObject.SetActive(false);
         buttons[ActMenuButtons.ACT].gameObject.SetActive(false);
         buttons[ActMenuButtons.POTION].gameObject.SetActive(false);
@@ -97,7 +102,7 @@ public class PlayerActMenu : MonoBehaviour
         buttons[ActMenuButtons.BACK].gameObject.SetActive(true);
     }
 
-    private void SetButtons(GameAgentAction[] actions) {
+    private static void SetButtons(GameAgentAction[] actions) {
         int buttonIndex = ActMenuButtons.ACTION1;
         foreach (GameAgentAction action in actions) {
             switch (action) {
@@ -152,11 +157,11 @@ public class PlayerActMenu : MonoBehaviour
         SetActButtons();
     }
 
-    private GameObject FindObjectwithTag(string _tag, GameObject parent) {
+    private static GameObject FindObjectwithTag(string _tag, GameObject parent) {
         return GetChildObject(parent, _tag);
     }
 
-    private GameObject GetChildObject(GameObject parent, string _tag) {
+    private static GameObject GetChildObject(GameObject parent, string _tag) {
         for (int i = 0; i < parent.transform.childCount; i++) {
             Transform child = parent.transform.GetChild(i);
             if (child.tag == _tag) {

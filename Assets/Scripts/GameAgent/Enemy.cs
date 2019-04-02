@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using MapUtils;
@@ -12,7 +13,7 @@ public class Enemy : GameAgent
     // private reference to position in map grid
     private bool moving;
 	
-	public bool enemy_turn = false;
+	private bool enemy_turn = false;
 
     private CharacterAnimator animator;
     private CharacterClassDefiner classDefiner;
@@ -24,6 +25,7 @@ public class Enemy : GameAgent
     public float range;
     public float _speed;
     public float moveTime = 0.1f;
+
 	public int moveBudget;
     public int level;
     public GameAgentState viewableState;
@@ -42,28 +44,67 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+		
+		speed = 10;
+		move_budget = 10;
+		
         level = stats.level;
         viewableState = stats.currentState;
-
-        TurnManager.instance.AddEnemyToList(this);
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
+		
+		// AI init
+		team = 1;
+		AI = new AIComponent(this); // AI component that decides the actions for this enemy to take
+		TurnManager.instance.addToRoster(this);
     }
 
-    public override IEnumerator smooth_movement(List<Pos> locations) {
-        return null;
-    }
+    public override IEnumerator smooth_movement(List<Pos> path) {
+		grid_pos = path.Last();
+        moving = true;
+        StartCoroutine(animator.StartMovementAnimation());
 
+			Vector3 origin, target;
+			foreach(Pos step in path) {
+
+				origin = transform.position;
+				target = map_manager.grid_to_world(step);
+				float dist = Vector3.Distance(origin, target);
+				float time = 0f;
+
+				transform.LookAt(target);
+
+//<<<<<<< HEAD
+					while(time < 1f && dist > 0f) {
+						time += (Time.deltaTime * speed) / dist;
+						transform.position = Vector3.Lerp(origin, target, time);
+						yield return null;
+					}
+			}
+			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+
+        StartCoroutine(animator.StopMovementAnimation());
+        moving = false;
+    }
+	
+/*	public override void take_damage(int amount) {
+        stats.currentHealth -= amount;
+        if (stats.currentHealth <= 0) {
+			
+            stats.currentHealth = 0;
+            StartCoroutine(animator.PlayKilledAimation());
+			
+=======*/
     public override void take_damage(int amount) {
         stats.TakeDamage(amount);
 
         if (stats.currentState == GameAgentState.Unconscious) {
             StartCoroutine(animator.PlayKilledAimation());
             stats.currentState = GameAgentState.Dead;
-            TurnManager.instance.RemoveEnemyFromList(this);
+//>>>>>>> dev
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
@@ -71,7 +112,8 @@ public class Enemy : GameAgent
         currentHealth = stats.currentHealth;
     }
 
-    public override void GetHealed(int amount) {
+    public override void GetHealed(int amount) 
+	{
         if (stats.currentState == GameAgentState.Alive) {
             stats.GetHealed(amount);
 
@@ -81,13 +123,20 @@ public class Enemy : GameAgent
         currentHealth = stats.currentHealth;
     }
 
-    public override void take_turn() {
-        if (stats.currentState == GameAgentState.Alive) {
-            enemy_turn = true;
-            StartCoroutine(animator.PlayAttackAnimation());
-            enemy_turn = false;
+    public override void take_turn() 
+	{	
+		if (stats.currentState == GameAgentState.Alive) {
+			enemy_turn = true;
+			AI.advance();
+			StartCoroutine(animator.PlayAttackAnimation());
+			enemy_turn = false;
         }
+		else enemy_turn = false;
     }
+	
+	public override bool turn_over() {
+		return !enemy_turn;
+	}
 
 
     public override void move() {

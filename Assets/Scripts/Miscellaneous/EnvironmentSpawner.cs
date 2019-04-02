@@ -28,7 +28,7 @@ public class EnvironmentSpawner : MonoBehaviour
     List<GameObject> allEnvironmentObject = new List<GameObject>();
     #endregion
 
-    public void Init(MapManager mapManager, MapConfiguration mapConfiguration)
+    public void Init(MapManager mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         this.width = config.width;
@@ -36,6 +36,7 @@ public class EnvironmentSpawner : MonoBehaviour
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
         this.mapConfiguration = mapConfiguration;
+		spawnEnvironment();
     }
 
     // spawnEnvironment(), spawnEnvironmentObject(Vector3 cellPosition), GameObject getRandomEnvironmentObject()
@@ -46,7 +47,7 @@ public class EnvironmentSpawner : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                Pos position = mapManager.world_to_grid(new Vector3(x, 0, y));
+                Pos position = new Pos(x, y);
                 if (mapManager.IsTraversable(position)) {
                     spawnEnvironmentObject(mapManager.grid_to_world(position));
                 }
