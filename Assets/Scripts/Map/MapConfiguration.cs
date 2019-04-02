@@ -30,6 +30,16 @@ public class MapConfiguration : MonoBehaviour
     public Vector3 GetOffset() {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
     }
+
+    public System.Random GetRNG() {
+        int seedHashed;
+        if (this.seed == string.Empty) {
+            seedHashed = Time.time.ToString().GetHashCode();
+        } else {
+            seedHashed = this.seed.GetHashCode();
+        }
+        return new System.Random(seedHashed);
+    }
 	
 	public Vector3 gridToWorld(Pos pos) {
 		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - GetOffset();
