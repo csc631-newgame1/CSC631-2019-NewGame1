@@ -197,9 +197,9 @@ public class EnemySpawner : MonoBehaviour {
         int numOfCellsToScan = Mathf.CeilToInt(spawnZoneRadius);
 
         int searchStartX = Mathf.Max(0, cellX - numOfCellsToScan);
-        int searchEndX = Mathf.Min(cellX + numOfCellsToScan, width - 1);
+        int searchEndX = Mathf.Min(cellX + numOfCellsToScan, width);
         int searchStartY = Mathf.Max(0, cellY - numOfCellsToScan);
-        int searchEndY = Mathf.Min(cellY + numOfCellsToScan, height - 1);
+        int searchEndY = Mathf.Min(cellY + numOfCellsToScan, height);
 
         for (int x = searchStartX; x <= searchEndX; x++) {
             for (int y = searchStartY; y <= searchEndY; y++) {

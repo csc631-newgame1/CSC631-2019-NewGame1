@@ -75,7 +75,7 @@ public class MapManager : MonoBehaviour
 		int x = rng.Next(0, width - 1);
 		int y = rng.Next(0, height - 1);
 
-		while (!map[x, y].traversable) {
+		while (!map[x, y].traversable || map[x, y].occupied) {
 			x = rng.Next(0, width - 1);
 			y = rng.Next(0, height - 1);
 		}
