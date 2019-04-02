@@ -207,5 +207,15 @@ namespace MapUtils
 				return true;
 			return false;
 		}
+		
+		public static bool isBridge(int tile)
+		{
+			return tile == PLATFORM || tile == BRIDGE;
+		}
+		
+		public static bool isEdge(int tile)
+		{
+			return tile == EDGE;
+		}
 	}
 }
