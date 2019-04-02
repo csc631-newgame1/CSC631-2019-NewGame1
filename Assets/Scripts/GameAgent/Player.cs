@@ -508,12 +508,12 @@ public class Player : GameAgent
         if (playerWaitingThisTurn) {
             player_turn = false;
             actMenu.MakeAllButtonsInteractable(false);
-        // Player moved and either used Act or used a Potion
-        } else if (playerMovedThisTurn && (playerActedThisTurn || playerUsedPotionThisTurn)) {
+        // Player used an Act ability
+        } else if (playerActedThisTurn) {
             player_turn = false;
             actMenu.MakeAllButtonsInteractable(false);
-            // Player used Act and used a Potion
-        } else if (playerActedThisTurn && playerUsedPotionThisTurn) {
+        // Player moved and either used Act or used a Potion
+        } else if (playerMovedThisTurn && playerUsedPotionThisTurn) {
             player_turn = false;
             actMenu.MakeAllButtonsInteractable(false);
         }
