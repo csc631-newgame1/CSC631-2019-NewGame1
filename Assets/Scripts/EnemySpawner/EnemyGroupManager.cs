@@ -61,8 +61,8 @@ public class EnemyGroupManager
 
     // Call this to get a list of EnemiesToSpawn ready to be initialized
     public List<EnemyToSpawn> GetEnemiesToSpawn() {
-        
-
+        // Trivial, Avergae, Difficult, Impossible
+        int[] enemyGroupsByDifficulty = DistributeGroupsIntoRegions();
         foreach (EnemyGroup group in enemyGroups) {
             if (spawnZones.Count <= 0) {
                 break;
@@ -95,7 +95,7 @@ public class EnemyGroupManager
             if (countOfGroupsInRegions[i % countOfGroupsInRegions.Length - 1] == 0) {
                 countOfGroupsInRegions[i % countOfGroupsInRegions.Length - 1]++;
             } else {
-                //
+                // Guassian distribution
                 countOfGroupsInRegions[Utility.NextGaussian(mean, 1, 0, numOfRegions, rng)]++;
             }
         }

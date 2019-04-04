@@ -30,7 +30,7 @@ public class EnemySpawner : MonoBehaviour {
     [Tooltip("Largest size a zone can be.")]
     public float upperRadius = 6f;
     [Tooltip("Smallest number of spawnable tiles a zone can contain.")]
-    public int minimumNumberOfTilesInSpawnZone = 1;
+    public int minimumNumberOfTilesInSpawnZone = 3;
     [Tooltip("Largest number of spawnable tiles a zone can contain.")]
     public int maximumNumberOfTilesInSpawnZone = 100;
 
