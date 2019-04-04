@@ -61,24 +61,7 @@ public class EnemySpawner : MonoBehaviour {
         GenerateSpawnZones();
         TrimSpawnZones();
 		
-        // Create random TestEnemies
-        List<EnemyGroup> enemyGroups = new List<EnemyGroup>();
-        // Create Enemy Groups
-        for (int groupIndex = 0; groupIndex < maxNumberOfSpawnZones; groupIndex++) {
-            List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
-
-            // Create Enemies inside of the Enemy Group
-            for (int enemyPropertyIndex = 0; enemyPropertyIndex < rng.Next(1, 3+1); enemyPropertyIndex++) {
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(rng.Next(CharacterRaceOptions.Orc, CharacterRaceOptions.Skeleton+1),
-                                                                                        rng.Next(CharacterClassOptions.Knight, CharacterClassOptions.Mage+1),
-                                                                                        rng.Next(1,2+1)),
-                                                                    rng.Next(1, 2+1)));
-            }
-
-            enemyGroups.Add(new EnemyGroup(enemyGroupDescriptions));
-        }
-
-        EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, spawnZones);
+        EnemyGroupManager enemyGroupManager = new EnemyGroupManager(spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
 		foreach (EnemyToSpawn enemy in enemies) {

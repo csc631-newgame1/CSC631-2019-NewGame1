@@ -32,7 +32,14 @@ public static class EnemyGroupType {
 };
 
 // Determines the level of the enemies
-public enum EnemyGroupDifficulty { Trivial, Average, Difficult, Impossible };
+public static class EnemyGroupDifficulty {
+    public const int Trivial = 0;
+    public const int Average = 1;
+    public const int Difficult = 2;
+    public const int Impossible = 3;
+
+    public const int count = 4;
+};
 
 public static class EnemyGroupSize {
     public const int Small = 3;
@@ -45,7 +52,7 @@ public static class EnemyGroupSize {
 };
 
 public static class EnemyGroupTemplate {
-    public static EnemyGroup GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty difficulty, int level, System.Random rng, int race = -1) {
+    public static EnemyGroup GetEnemyGroupGivenDifficulty(int difficulty, int level, System.Random rng, int race = -1) {
         if (race == -1) {
             race = rng.Next(CharacterRaceOptions.Orc, CharacterRaceOptions.Skeleton + 1);
         }
@@ -65,7 +72,7 @@ public static class EnemyGroupTemplate {
         return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), EnemyGroupDifficulty.Average, EnemyGroupSize.Medium, race, level);
     }
 
-    public static EnemyGroup GetEnemyGroup(int groupType, EnemyGroupDifficulty difficulty, int enemyGroupSize, int race, int level) {
+    public static EnemyGroup GetEnemyGroup(int groupType, int difficulty, int enemyGroupSize, int race, int level) {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         System.Random rng = config.GetRNG();
         List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
@@ -1282,7 +1289,7 @@ public static class EnemyGroupTemplate {
         return enemyQuantities;
     }
 
-    private static int GetLevel(EnemyGroupDifficulty difficulty, System.Random rng, int level) {
+    private static int GetLevel(int difficulty, System.Random rng, int level) {
         switch (difficulty) {
             case EnemyGroupDifficulty.Trivial:
                 if (level > 3) {
