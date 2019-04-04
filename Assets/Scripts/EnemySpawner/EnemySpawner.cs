@@ -75,7 +75,7 @@ public class EnemySpawner : MonoBehaviour {
                                                                     rng.Next(1, 2+1)));
             }
 
-            enemyGroups.Add(new EnemyGroup(enemyGroupDescriptions, Distribution.Balanaced));
+            enemyGroups.Add(new EnemyGroup(enemyGroupDescriptions));
         }
 
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(enemyGroups, spawnZones);
