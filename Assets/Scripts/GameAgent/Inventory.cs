@@ -9,6 +9,12 @@ public class Inventory
     public Item[] items = new Item[numItemSlots];
     public const int numItemSlots = 4;
 
+    public EquipItem helmet;
+    public EquipItem armor;
+    public EquipItem gloves;
+    public EquipItem boots;
+    public EquipItem weapon;
+
     //used for adding items to the inventory
     //item MUST have amount specified
     public void AddItemToSlot(int slot, Item item)
@@ -18,6 +24,23 @@ public class Inventory
             return; //out of bounds
         }
         items[slot] = item;
+    }
+
+    public void AddItem(Item item)
+    {
+        for (int i = 0; i < numItemSlots; i++)
+        {
+            if (items[i].ID == item.ID)
+            {
+                items[i].Amount = Mathf.Max(items[i].maxAmount, (items[i].Amount + item.Amount));
+                return;
+            }
+            else if (items[i] == null)
+            {
+                items[i] = item;
+                return;
+            }
+        }
     }
 
     //used to remove item completely from inventory
@@ -61,6 +84,14 @@ public class Inventory
         if ((items[slot].Amount--) <= 0)
         {
             items[slot] = null; //remove item if amount is zero
+        }
+    }
+
+    private void RearrangeSlots()
+    {
+        for (int i = 0; i < numItemSlots; i++)
+        {
+
         }
     }
 }
