@@ -92,8 +92,8 @@ public class EnemySpawner : MonoBehaviour {
         int[,] grid = new int[width, height];
         // A list of the remaining Spawn Zones to randomly generate new Spawn Zones
         List<SpawnZone> remainingSpawnZones = new List<SpawnZone>();
-
-        remainingSpawnZones.Add(new SpawnZone(new Pos((int)(regionSize / 2).x, (int)(regionSize / 2).y), radius));
+        Pos zonePoint = new Pos((int)(regionSize / 2).x, (int)(regionSize / 2).y);
+        remainingSpawnZones.Add(new SpawnZone(zonePoint, radius, mapManager.GetTileRegion(zonePoint)));
 
         // Attempts to create Spawn Zones of random size based on parameters
         // then checks if the Spawn Zone is acceptable
@@ -189,7 +189,7 @@ public class EnemySpawner : MonoBehaviour {
     // Creates the Spawn Zone and populates its traversable zone tile list
     // by checking all the tiles within its radius
     SpawnZone CreateSpawnZone(Pos candidate, float spawnZoneRadius) {
-        SpawnZone spawnZone = new SpawnZone(candidate, spawnZoneRadius);
+        SpawnZone spawnZone = new SpawnZone(candidate, spawnZoneRadius, mapManager.GetTileRegion(candidate));
         List<Pos> zoneTiles = new List<Pos>();
 
         int cellX = candidate.x;

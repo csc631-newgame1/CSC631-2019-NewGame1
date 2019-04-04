@@ -290,6 +290,10 @@ public class MapManager : MonoBehaviour
         return (map_raw[tile.x, tile.y] == ID);
     }
 
+    public int GetTileRegion(Pos tile) {
+        return map_raw[tile.x, tile.y];
+    }
+
     // returns true if tile at position contains an agent
     public bool IsOccupied(Pos pos) {
         if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)

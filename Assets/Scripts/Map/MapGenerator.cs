@@ -334,6 +334,15 @@ public class MapGenerator : MonoBehaviour
 	{
 		return regions;
 	}
+
+    public int GetRegionSize(int ID) {
+        foreach (Region region in regions) {
+            if (region.ID == ID) {
+                return region.count;
+            }
+        }
+        return 0;
+    }
 	
 	/*******************/
 	/* DEBUG FUNCTIONS */

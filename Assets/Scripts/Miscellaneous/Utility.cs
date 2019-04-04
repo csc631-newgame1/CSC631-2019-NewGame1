@@ -4,23 +4,23 @@ using UnityEngine;
 public class Utility {
 
     // Get a number with a Normal distribution
-    public static int NextGaussian(float mean, float standard_deviation, float min, float max) {
+    public static int NextGaussian(float mean, float standard_deviation, float min, float max, System.Random rng) {
         float x;
         do {
-            x = NextGaussian(mean, standard_deviation);
+            x = NextGaussian(mean, standard_deviation, rng);
         } while (x < min || x > max);
         return Mathf.RoundToInt(x);
     }
 
-    private static float NextGaussian(float mean, float standard_deviation) {
-        return mean + NextGaussian() * standard_deviation;
+    private static float NextGaussian(float mean, float standard_deviation, System.Random rng) {
+        return mean + NextGaussian(rng) * standard_deviation;
     }
 
-    private static float NextGaussian() {
+    private static float NextGaussian(System.Random rng) {
         float v1, v2, s;
         do {
-            v1 = 2.0f * Random.Range(0f, 1f) - 1.0f;
-            v2 = 2.0f * Random.Range(0f, 1f) - 1.0f;
+            v1 = 2.0f * rng.Next(0, 100)/100f - 1.0f;
+            v2 = 2.0f * rng.Next(0, 100)/100f - 1.0f;
             s = v1 * v1 + v2 * v2;
         } while (s >= 1.0f || s == 0f);
 
