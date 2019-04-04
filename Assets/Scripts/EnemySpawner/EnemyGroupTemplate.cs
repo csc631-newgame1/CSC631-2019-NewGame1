@@ -15,11 +15,20 @@ using UnityEngine;
 // MoreKnightsAndLessHunters - group of more knights and few hunters
 // MixedRange - group of hunters and mages
 // MixedRangeAndHealers - group of hunters, mages, and healers
-public enum EnemyGroupType {
-    Melee, BalancedAllUnits, BalancedSingleRange, MeleeAndSingleRange,
-    MeleeAndRange, MeleeAndHealers, RangeAndHealers, LessKnightsAndMoreMages,
-    MoreKnightsAndLessMages, LessKnightsAndMoreHunters, MoreKnightsAndLessHunters,
-    MixedRange, MixedRangeAndHealers
+public static class EnemyGroupType {
+    public const int Melee = 1;
+    public const int BalancedAllUnits = 2;
+    public const int BalancedSingleRange = 3;
+    public const int MeleeAndSingleRange = 4;
+    public const int MeleeAndRange = 5;
+    public const int MeleeAndHealers = 6;
+    public const int RangeAndHealers = 7;
+    public const int LessKnightsAndMoreMages = 8;
+    public const int MoreKnightsAndLessMages = 9;
+    public const int LessKnightsAndMoreHunters = 10;
+    public const int MoreKnightsAndLessHunters = 11;
+    public const int MixedRange = 12;
+    public const int MixedRangeAndHealers = 13;
 };
 
 // Determines the level of the enemies
@@ -36,7 +45,27 @@ public static class EnemyGroupSize {
 };
 
 public static class EnemyGroupTemplate {
-    public static EnemyGroup GetEnemyGroup(EnemyGroupType groupType, EnemyGroupDifficulty difficulty, int enemyGroupSize, int race, int level) {
+    public static EnemyGroup GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty difficulty, int level, System.Random rng, int race = -1) {
+        if (race == -1) {
+            race = rng.Next(CharacterRaceOptions.Orc, CharacterRaceOptions.Skeleton + 1);
+        }
+
+        switch (difficulty) {
+            case EnemyGroupDifficulty.Trivial:
+                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Large, race, level);
+            case EnemyGroupDifficulty.Average:
+                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Medium, race, level);
+            case EnemyGroupDifficulty.Difficult:
+                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Medium, race, level);
+            case EnemyGroupDifficulty.Impossible:
+                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Small, race, level);
+        }
+
+        // else return average group
+        return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), EnemyGroupDifficulty.Average, EnemyGroupSize.Medium, race, level);
+    }
+
+    public static EnemyGroup GetEnemyGroup(int groupType, EnemyGroupDifficulty difficulty, int enemyGroupSize, int race, int level) {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
         System.Random rng = config.GetRNG();
         List<EnemyGroupDescription> enemyGroupDescriptions = new List<EnemyGroupDescription>();
@@ -188,7 +217,7 @@ public static class EnemyGroupTemplate {
         return new EnemyGroup(enemyGroupDescriptions);
     }
 
-    private static List<int> GetEnemyQuantities(EnemyGroupType groupType, System.Random rng, int enemyGroupSize) {
+    private static List<int> GetEnemyQuantities(int groupType, System.Random rng, int enemyGroupSize) {
         List<int> enemyQuantities = new List<int>();
         int unitsRemaining = enemyGroupSize;
         List<int> exclusion = new List<int>();
