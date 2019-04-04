@@ -12,14 +12,12 @@ public class EnemyGroupManager
     public int maxNumberOfEnemyGroups;
     public int minNumberOfEnemyGroups;
 
-    private List<EnemyGroup> enemyGroups;
     private List<SpawnZone> spawnZones;
     private List<EnemyToSpawn> enemies;
     private MapGenerator mapGenerator;
     private System.Random rng;
 
-    public EnemyGroupManager(List<EnemyGroup> enemyGroups, List<SpawnZone> spawnZones) {
-        this.enemyGroups = enemyGroups;
+    public EnemyGroupManager(List<SpawnZone> spawnZones) {
         this.spawnZones = spawnZones;
         enemies = new List<EnemyToSpawn>();
 
@@ -28,13 +26,13 @@ public class EnemyGroupManager
         rng = config.GetRNG();
 
         // Sort based on group size
-        QuickSortEnemyGroups(enemyGroups, 0, enemyGroups.Count - 1);
+        // QuickSortEnemyGroups(enemyGroups, 0, enemyGroups.Count - 1);
         // Sort based on spawn zone size
         QuickSortSpawnZones(spawnZones, 0, spawnZones.Count - 1);
         
-        foreach (SpawnZone spawnZone in spawnZones) {
+        /* foreach (SpawnZone spawnZone in spawnZones) {
             Debug.Log("region: " + spawnZone.region + " region size: " + mapGenerator.GetRegionSize(spawnZone.region));
-        }
+        } */
     }
 
     // Takes the group of enemies and creates EnemyToSpawn objects with the location
@@ -63,22 +61,61 @@ public class EnemyGroupManager
     public List<EnemyToSpawn> GetEnemiesToSpawn() {
         // Trivial, Avergae, Difficult, Impossible
         int[] enemyGroupsByDifficulty = DistributeGroupsIntoRegions();
-        foreach (EnemyGroup group in enemyGroups) {
-            if (spawnZones.Count <= 0) {
-                break;
-            }
+        int currentRegion = -1;
+        int spawnZoneIndex = 0;
 
-            List<int> exclusion = new List<int>();
+        if (spawnZones.Count > 0) {
+            currentRegion = spawnZones[0].region;
+        }
 
-            while (exclusion.Count != spawnZones.Count) {
-                int randomIndex = Utility.GetRandomIntWithExclusion(0, spawnZones.Count - 1, rng, exclusion);
-
-                if(group.count <= spawnZones[randomIndex].GetNumberOfUnpopulatedTilesInZone()) {
-                    PopulateSpawnZone(group, spawnZones[randomIndex]);
+        for (int i = 0; i < enemyGroupsByDifficulty.Length; i++) {
+            for (int j = 0; j < enemyGroupsByDifficulty[i]; j++) {
+                // Stop if there are no more spawn zones
+                if (spawnZoneIndex >= spawnZones.Count) {
                     break;
                 }
 
-                exclusion.Add(randomIndex);
+                bool breakLoop = false;
+                while (spawnZoneIndex < spawnZones.Count && currentRegion == spawnZones[spawnZoneIndex].region) {
+                    switch (i) {
+                        case EnemyGroupDifficulty.Trivial:
+                            if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.LargeUpperBound) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Trivial, 1, rng), spawnZones[spawnZoneIndex]);
+                                breakLoop = true;
+                            }
+                            break;
+                        case EnemyGroupDifficulty.Average:
+                            if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Average, 1, rng), spawnZones[spawnZoneIndex]);
+                                breakLoop = true;
+                            }
+                            break;
+                        case EnemyGroupDifficulty.Difficult:
+                            if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Difficult, 1, rng), spawnZones[spawnZoneIndex]);
+                                breakLoop = true;
+                            }
+                            break;
+                        case EnemyGroupDifficulty.Impossible:
+                            if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.Small) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Impossible, 1, rng), spawnZones[spawnZoneIndex]);
+                                breakLoop = true;
+                            }
+                            break;
+                    }
+                    spawnZoneIndex++;
+
+                    if (breakLoop) {
+                        break;
+                    }
+                }
+
+                if (spawnZoneIndex >= spawnZones.Count) {
+                    break;
+                } else if (currentRegion != spawnZones[spawnZoneIndex].region) {
+                    currentRegion = spawnZones[spawnZoneIndex].region;
+                    break;
+                }
             }
         }
         return enemies;
@@ -86,17 +123,23 @@ public class EnemyGroupManager
 
     private int[] DistributeGroupsIntoRegions() {
         int numOfRegions = mapGenerator.getRegions().Count;
-        int[] countOfGroupsInRegions = new int[Enum.GetNames(typeof(EnemyGroupDifficulty)).Length];
+        int[] countOfGroupsInRegions = new int[EnemyGroupDifficulty.count];
         int mean = (0 + numOfRegions) / 2;
 
         // Guassian distribution to place enemies
         for (int i = 0; i < numOfRegions; i++) {
             // Put one group of enemies in spawn zones
-            if (countOfGroupsInRegions[i % countOfGroupsInRegions.Length - 1] == 0) {
-                countOfGroupsInRegions[i % countOfGroupsInRegions.Length - 1]++;
+            if (countOfGroupsInRegions[i % countOfGroupsInRegions.Length] == 0) {
+                countOfGroupsInRegions[i % countOfGroupsInRegions.Length]++;
             } else {
                 // Guassian distribution
-                countOfGroupsInRegions[Utility.NextGaussian(mean, 1, 0, numOfRegions, rng)]++;
+                int index = Utility.NextGaussian(mean, 1, 0, numOfRegions, rng);
+                if (index < 0) {
+                    index = 0;
+                } else if (index > countOfGroupsInRegions.Length - 1) {
+                    index = countOfGroupsInRegions.Length - 1;
+                }
+                countOfGroupsInRegions[index]++;
             }
         }
         return countOfGroupsInRegions;
