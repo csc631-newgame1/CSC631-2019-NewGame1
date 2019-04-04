@@ -39,7 +39,7 @@ public class EnemyGroupManager
         List<int> exclusion = new List<int>();
 
         foreach(GameAgentStats stats in enemyStats) {
-            int randomIndex = GetRandomIntWithExclusion(0, zoneTiles.Count - 1, exclusion);
+            int randomIndex = Utility.GetRandomIntWithExclusion(0, zoneTiles.Count - 1, rng, exclusion);
             Pos enemyPos = new Pos((int)zoneTiles[randomIndex].x, (int)zoneTiles[randomIndex].y);
             populatedZoneTiles.Add(zoneTiles[randomIndex]);
             EnemyToSpawn enemy = new EnemyToSpawn(enemyPos, stats);
@@ -60,7 +60,7 @@ public class EnemyGroupManager
             List<int> exclusion = new List<int>();
 
             while (exclusion.Count != spawnZones.Count) {
-                int randomIndex = GetRandomIntWithExclusion(0, spawnZones.Count - 1, exclusion);
+                int randomIndex = Utility.GetRandomIntWithExclusion(0, spawnZones.Count - 1, rng, exclusion);
 
                 if(group.count <= spawnZones[randomIndex].GetNumberOfUnpopulatedTilesInZone()) {
                     PopulateSpawnZone(group, spawnZones[randomIndex]);
@@ -73,16 +73,7 @@ public class EnemyGroupManager
         return enemies;
     }
 
-    private int GetRandomIntWithExclusion(int start, int end, List<int> exclude) {
-        int random = start + rng.Next(0, (end - start + 1 - exclude.Count));
-        foreach (int ex in exclude) {
-            if (random < ex) {
-                break;
-            }
-            random++;
-        }
-        return random;
-    }
+    
 
     // Sorts the EnemyGroups in descending order based on the size of the group
     private void QuickSortEnemyGroups(List<EnemyGroup> enemyGroups, int left, int right) {
