@@ -12,12 +12,15 @@ public class SpawnZone {
     private List<Pos> unpopulatedZoneTiles;
     // Populated tiles within the Spawn Zone
     private List<Pos> populatedZoneTiles;
+    // Region
+    public int region;
 
     private bool isPopulated = false;
 
-    public SpawnZone(Pos position, float radius) {
+    public SpawnZone(Pos position, float radius, int region) {
         this.position = position;
         this.radius = radius;
+        this.region = region;
         unpopulatedZoneTiles = new List<Pos>();
         populatedZoneTiles = new List<Pos>();
     }

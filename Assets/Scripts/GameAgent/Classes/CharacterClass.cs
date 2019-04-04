@@ -25,6 +25,8 @@ public abstract class CharacterClass
 
     public int weapon;
 
+    public System.Random rng;
+
     public abstract void LevelUp();
 
     public abstract GameAgentAction[] GetAvailableActs();
