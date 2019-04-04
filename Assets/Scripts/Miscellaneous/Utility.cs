@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Utility {
 
@@ -26,5 +27,16 @@ public class Utility {
         s = Mathf.Sqrt((-2.0f * Mathf.Log(s)) / s);
 
         return v1 * s;
+    }
+
+    public static int GetRandomIntWithExclusion(int start, int end, System.Random rng, List<int> exclude) {
+        int random = start + rng.Next(0, (end - start + 1 - exclude.Count));
+        foreach (int ex in exclude) {
+            if (random < ex) {
+                break;
+            }
+            random++;
+        }
+        return random;
     }
 }
