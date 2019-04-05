@@ -24,7 +24,7 @@ public class EnemySpawner : MonoBehaviour {
 
     [Header("Enemy Spawn Zone Settings")]
     [Tooltip("Increase slightly to increase distance between zones.")]
-    public float distanceBetweenZonesScale = 0.1f;
+    public float distanceBetweenZones = 1f;
     [Tooltip("Smallest size a zone can be.")]
     public float lowerRadius = 2f;
     [Tooltip("Largest size a zone can be.")]
@@ -60,7 +60,7 @@ public class EnemySpawner : MonoBehaviour {
 		
         GenerateSpawnZones();
         TrimSpawnZones();
-		
+
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
@@ -70,52 +70,93 @@ public class EnemySpawner : MonoBehaviour {
     }
 
     // Creates a list of Spawn Zones of varrying sizes in the map
-    private void GenerateSpawnZones(int numSamplesBeforeRejection = 50) {
+    private void GenerateSpawnZones(int numSamplesBeforeRejection = 100) {
 
         int[,] grid = new int[width, height];
         // A list of the remaining Spawn Zones to randomly generate new Spawn Zones
-        List<SpawnZone> remainingSpawnZones = new List<SpawnZone>();
-        Pos zonePoint = new Pos((int)(regionSize / 2).x, (int)(regionSize / 2).y);
-        remainingSpawnZones.Add(new SpawnZone(zonePoint, radius, mapManager.GetTileRegion(zonePoint)));
+        Pos zonePoint = new Pos(0, 0);
+        while (!mapManager.IsWalkable(zonePoint)) {
+            if (zonePoint.x < width) {
+                zonePoint = new Pos(zonePoint.x + 1, zonePoint.y);
+            } else {
+                zonePoint.x = 0;
+                zonePoint.y++;
+            }
+        }
 
         // Attempts to create Spawn Zones of random size based on parameters
         // then checks if the Spawn Zone is acceptable
-        while (remainingSpawnZones.Count > 0) {
-            int spawnIndex = rng.Next(0, remainingSpawnZones.Count);
-            //int spawnIndex = Random.Range(0, remainingSpawnZones.Count);
-            SpawnZone spawnCenter = remainingSpawnZones[spawnIndex];
-            bool candidateAccepted = false;
+        int attempts = 0;
+        bool end = false;
+        int distanceBetweenZones = Mathf.RoundToInt(this.distanceBetweenZones);
+        int spawnZoneRadius = 0;
+        int oldRadiusAndDistance = 0;
 
-            for (int i=0; i<numSamplesBeforeRejection; i++) {
-                // TODO look at this shit
-                float angle = (rng.Next(0, 100) / 100f) * Mathf.PI * 2;
-                //float angle = Random.value * Mathf.PI * 2;
-                float spawnZoneRadius = rng.Next((int)((lowerRadius / cell_size) * 100), (int)((upperRadius / cell_size) * 100)) / 100f;
-                //float spawnZoneRadius = Random.Range(lowerRadius / cell_size, upperRadius / cell_size);
-                Vector3 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
-                float distanceBetweenZones = Mathf.Max(1, i * distanceBetweenZonesScale);
-                // Creates a potential position for the center of the Spawn Zone
-                Vector3 candidateVector = new Vector3(spawnCenter.GetPosition().x, spawnCenter.GetPosition().y) + dir * spawnZoneRadius * distanceBetweenZones;
-                Pos candidate = new Pos(Mathf.CeilToInt(candidateVector.x), Mathf.CeilToInt(candidateVector.y));
+        while (attempts < 1000 && !end) {
+            // retain old radius + distance
+            oldRadiusAndDistance = distanceBetweenZones + spawnZoneRadius;
+            // set new values
+            distanceBetweenZones = rng.Next(Mathf.Max(1, Mathf.RoundToInt(this.distanceBetweenZones / 2f)), Mathf.RoundToInt(this.distanceBetweenZones));
+            spawnZoneRadius = rng.Next(Mathf.RoundToInt(lowerRadius), Mathf.RoundToInt(upperRadius + 1));
 
-                if (IsValid(candidate, spawnZones, grid, spawnZoneRadius)) {
-                    SpawnZone spawnZone = CreateSpawnZone(candidate, spawnZoneRadius);
-                    // Checks if the number of zone tiles is acceptable
-                    if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
-                        && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
+            // Reached the end
+            if (zonePoint.x > (width - upperRadius - this.distanceBetweenZones) && zonePoint.y > (height - upperRadius - this.distanceBetweenZones)) {
+                end = true;
+            }
 
-                        // Spawn Zone is accepted and added to the list
-                        spawnZones.Add(spawnZone);
-                        remainingSpawnZones.Add(spawnZone);
-                        grid[(int)(candidate.x / cell_size), (int)(candidate.y / cell_size)] = spawnZones.Count;
-                        candidateAccepted = true;
-                        break;
+            bool valid = true;
+            Pos temp = new Pos(zonePoint.x, zonePoint.y);
+            while (!IsValid(temp, spawnZones, grid, spawnZoneRadius)) {
+                // Move the point to compensate for the smaller radius
+                if (temp.x - 1 < 0) {
+                    temp.x = 0;
+                    if (temp.y - 1 < 0) {
+                        temp.y = 0;
+                    } else {
+                        temp.y--;
                     }
+                } else {
+                    temp.x--;
+                }
+
+                // If smallest radius doesn't work, then it isn't a valid spawn point
+                if (spawnZoneRadius == lowerRadius) {
+                    valid = false;
+                    break;
+                } else {
+                    // Try a smaller radius
+                    spawnZoneRadius--;
                 }
             }
 
-            if (!candidateAccepted) {
-                remainingSpawnZones.RemoveAt(spawnIndex);
+            if (valid) {
+                zonePoint = temp;
+                SpawnZone spawnZone = CreateSpawnZone(zonePoint, spawnZoneRadius);
+                // Checks if the number of zone tiles is acceptable
+                if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
+                    && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
+
+                    // Spawn Zone is accepted and added to the list
+                    spawnZones.Add(spawnZone);
+                    grid[zonePoint.x, zonePoint.y] = spawnZones.Count;
+                }
+            }
+
+            // Move point to next position
+            if (zonePoint.x + oldRadiusAndDistance + spawnZoneRadius >= width) {
+                zonePoint.x = 0;
+                if (zonePoint.y + spawnZoneRadius + oldRadiusAndDistance >= height) {
+                    zonePoint.y = 0;
+                } else {
+                    zonePoint.y += spawnZoneRadius + oldRadiusAndDistance;
+                }
+            } else {
+                zonePoint.x += spawnZoneRadius + oldRadiusAndDistance;
+            }
+
+            attempts++;
+            if (attempts == 999) {
+                Debug.Log("ended by attempts");
             }
         }
     }

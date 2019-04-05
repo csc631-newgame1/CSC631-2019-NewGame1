@@ -68,4 +68,8 @@ public class SpawnZone {
             this.populatedZoneTiles = populatedZoneTiles;
         }
     }
+
+    public void SetPosition (Pos pos) {
+        position = pos;
+    }
 }
