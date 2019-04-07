@@ -14,6 +14,7 @@ public class EnemySpawner : MonoBehaviour {
     private string seed;
     private int seedHashed;
     private MapManager mapManager;
+    private MapGenerator mapGenerator;
     private System.Random rng;
     // A list of all accepted Spawn Zones
     private List<SpawnZone> spawnZones;
@@ -40,6 +41,7 @@ public class EnemySpawner : MonoBehaviour {
     public void Init(MapManager mapManager)
     {
         MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
+        mapGenerator = GameObject.FindGameObjectWithTag("Map").GetComponent<MapGenerator>();
         width = config.width;
         height = config.height;
         regionSize = new Vector2(width, height);
@@ -57,9 +59,15 @@ public class EnemySpawner : MonoBehaviour {
 
     // Call this to spawn enemies on the Map Manager
     public void SpawnEnemies() {
-		
         GenerateSpawnZones();
         TrimSpawnZones();
+
+        // /*
+        List<RegionUtils.Region> regions = mapGenerator.getRegions();
+        foreach (RegionUtils.Region region in regions) {
+            Debug.Log("Region amount using count: " + region.count + " Region amount using method: " + region.GetRegionTiles().Count);
+        }
+        // */
 
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
