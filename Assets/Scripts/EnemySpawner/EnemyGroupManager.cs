@@ -68,9 +68,12 @@ public class EnemyGroupManager
                 if (spawnZoneIndex >= spawnZones.Count) {
                     break;
                 }
+
+                // Populate spawn zones in region by difficulty
                 while (spawnZoneIndex < spawnZones.Count && currentRegion == spawnZones[spawnZoneIndex].region) {
                     switch (i) {
                         case EnemyGroupDifficulty.Trivial:
+                            // Adjust the group size until it fits within the spawn zone
                             if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.LargeUpperBound) {
                                 PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Trivial, 1, rng), spawnZones[spawnZoneIndex]);
                             } else if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
@@ -80,6 +83,7 @@ public class EnemyGroupManager
                             }
                             break;
                         case EnemyGroupDifficulty.Average:
+                            // Adjust the group size until it fits within the spawn zone
                             if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
                                 PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Average, 1, rng), spawnZones[spawnZoneIndex]);
                             } else if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.Small) {
@@ -87,6 +91,7 @@ public class EnemyGroupManager
                             }
                             break;
                         case EnemyGroupDifficulty.Difficult:
+                            // Adjust the group size until it fits within the spawn zone
                             if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
                                 PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Difficult, 1, rng), spawnZones[spawnZoneIndex]);
                             } else if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.Small) {
@@ -109,12 +114,7 @@ public class EnemyGroupManager
                 }
             }
         }
-        int counter = 0;
-        foreach (SpawnZone zone in spawnZones) {
-            if (zone.IsPopulated()) {
-                counter++;
-            }
-        }
+
         return enemies;
     }
 
