@@ -1,4 +1,5 @@
 ﻿using MapUtils;
+using RegionUtils;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -18,6 +19,7 @@ public class EnemySpawner : MonoBehaviour {
     private System.Random rng;
     // A list of all accepted Spawn Zones
     private List<SpawnZone> spawnZones;
+    List<Region> regions;
     public bool showEnemySpawnZones;
     private MapConfiguration mapConfiguration;
 	
@@ -33,9 +35,9 @@ public class EnemySpawner : MonoBehaviour {
     [Tooltip("Smallest number of spawnable tiles a zone can contain.")]
     public int minimumNumberOfTilesInSpawnZone = 3;
     [Tooltip("Largest number of spawnable tiles a zone can contain.")]
-    public int maximumNumberOfTilesInSpawnZone = 100;
+    public int maximumNumberOfTilesInSpawnZone = 30;
 
-    public int maxNumberOfSpawnZones = 100;
+    public int maxNumberOfSpawnZones = 20;
 
     // Initializes map data
     public void Init(MapManager mapManager)
@@ -62,12 +64,9 @@ public class EnemySpawner : MonoBehaviour {
         GenerateSpawnZones();
         TrimSpawnZones();
 
-        // /*
-        List<RegionUtils.Region> regions = mapGenerator.getRegions();
-        foreach (RegionUtils.Region region in regions) {
-            Debug.Log("Region amount using count: " + region.count + " Region amount using method: " + region.GetRegionTiles().Count);
+        foreach (Region region in regions) {
+            Debug.Log("region: " + region.ID + " #spawnZones: " + region.numOfSpawnZones);
         }
-        // */
 
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
@@ -78,104 +77,123 @@ public class EnemySpawner : MonoBehaviour {
     }
 
     // Creates a list of Spawn Zones of varrying sizes in the map
-    private void GenerateSpawnZones(int numSamplesBeforeRejection = 100) {
+    private void GenerateSpawnZones() {
 
+        regions = mapGenerator.getRegions();
+        List<Pos> regionTiles = new List<Pos>();
         int[,] grid = new int[width, height];
-        // A list of the remaining Spawn Zones to randomly generate new Spawn Zones
-        Pos zonePoint = new Pos(0, 0);
-        while (!mapManager.IsWalkable(zonePoint)) {
-            if (zonePoint.x < width) {
-                zonePoint = new Pos(zonePoint.x + 1, zonePoint.y);
-            } else {
-                zonePoint.x = 0;
-                zonePoint.y++;
-            }
-        }
-
-        // Attempts to create Spawn Zones of random size based on parameters
-        // then checks if the Spawn Zone is acceptable
-        int attempts = 0;
-        bool end = false;
-        int distanceBetweenZones = Mathf.RoundToInt(this.distanceBetweenZones);
+        int distanceBetweenZones = 0;
         int spawnZoneRadius = 0;
-        int oldRadiusAndDistance = 0;
+        int radiusAndDistance = 0;
+        int numOfSpawnZonesInRegion = 0;
 
-        while (attempts < 1000 && !end) {
-            // retain old radius + distance
-            oldRadiusAndDistance = distanceBetweenZones + spawnZoneRadius;
-            // set new values
-            distanceBetweenZones = rng.Next(Mathf.Max(1, Mathf.RoundToInt(this.distanceBetweenZones / 2f)), Mathf.RoundToInt(this.distanceBetweenZones));
-            spawnZoneRadius = rng.Next(Mathf.RoundToInt(lowerRadius), Mathf.RoundToInt(upperRadius + 1));
+        // Iterates through each region
+        foreach (Region region in regions) {
+            numOfSpawnZonesInRegion = 0;
+            regionTiles = region.GetRegionTiles();
 
-            // Reached the end
-            if (zonePoint.x > (width - upperRadius - this.distanceBetweenZones) && zonePoint.y > (height - upperRadius - this.distanceBetweenZones)) {
-                end = true;
-            }
+            // Checks through each tile in the region
+            foreach (Pos tile in regionTiles) {
+                distanceBetweenZones = rng.Next(Mathf.Max(1, Mathf.RoundToInt(this.distanceBetweenZones / 2f)), Mathf.RoundToInt(this.distanceBetweenZones));
+                spawnZoneRadius = rng.Next(Mathf.RoundToInt(lowerRadius), Mathf.RoundToInt(upperRadius + 1));
+                radiusAndDistance = distanceBetweenZones + spawnZoneRadius;
+                bool valid = true;
 
-            bool valid = true;
-            Pos temp = new Pos(zonePoint.x, zonePoint.y);
-            while (!IsValid(temp, spawnZones, grid, spawnZoneRadius)) {
-                // Move the point to compensate for the smaller radius
-                if (temp.x - 1 < 0) {
-                    temp.x = 0;
-                    if (temp.y - 1 < 0) {
-                        temp.y = 0;
+                while (!IsValid(tile, spawnZones, grid, spawnZoneRadius)) {
+                    // If smallest radius doesn't work, then it isn't a valid spawn point
+                    if (spawnZoneRadius == lowerRadius) {
+                        valid = false;
+                        break;
                     } else {
-                        temp.y--;
+                        // Try a smaller radius
+                        spawnZoneRadius--;
                     }
-                } else {
-                    temp.x--;
                 }
 
-                // If smallest radius doesn't work, then it isn't a valid spawn point
-                if (spawnZoneRadius == lowerRadius) {
-                    valid = false;
-                    break;
-                } else {
-                    // Try a smaller radius
-                    spawnZoneRadius--;
-                }
-            }
+                if (valid) {
+                    SpawnZone spawnZone = CreateSpawnZone(tile, spawnZoneRadius);
+                    // Checks if the number of zone tiles is acceptable
+                    if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
+                        && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
 
-            if (valid) {
-                zonePoint = temp;
-                SpawnZone spawnZone = CreateSpawnZone(zonePoint, spawnZoneRadius);
-                // Checks if the number of zone tiles is acceptable
-                if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
-                    && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
-
-                    // Spawn Zone is accepted and added to the list
-                    spawnZones.Add(spawnZone);
-                    grid[zonePoint.x, zonePoint.y] = spawnZones.Count;
+                        // Spawn Zone is accepted and added to the list
+                        spawnZones.Add(spawnZone);
+                        grid[tile.x, tile.y] = spawnZones.Count;
+                        numOfSpawnZonesInRegion++;
+                    }
                 }
             }
 
-            // Move point to next position
-            if (zonePoint.x + oldRadiusAndDistance + spawnZoneRadius >= width) {
-                zonePoint.x = 0;
-                if (zonePoint.y + spawnZoneRadius + oldRadiusAndDistance >= height) {
-                    zonePoint.y = 0;
-                } else {
-                    zonePoint.y += spawnZoneRadius + oldRadiusAndDistance;
-                }
-            } else {
-                zonePoint.x += spawnZoneRadius + oldRadiusAndDistance;
-            }
-
-            attempts++;
-            if (attempts == 999) {
-                Debug.Log("ended by attempts");
-            }
+            region.numOfSpawnZones = numOfSpawnZonesInRegion;
         }
     }
 
-    // Randomly removes spawn zones until it is within the max number of spawn zones
+    // Randomly removes spawn zones
+    // Makes sure there is at least one spawn zone per region
     private void TrimSpawnZones() {
-        if (spawnZones.Count > maxNumberOfSpawnZones) {
+        if (spawnZones.Count > maxNumberOfSpawnZones && regions.Count > 0) {
             int numOfZonesToRemove = spawnZones.Count - maxNumberOfSpawnZones;
-            for (int i = 0; i < numOfZonesToRemove; i++) {
-                int randomIndex = rng.Next(0, spawnZones.Count - 1);
-                spawnZones.Remove(spawnZones[randomIndex]);
+            int randomIndex = 0;
+            bool oneSpawnZoneLeftInEveryRegion = false;
+            bool zoneRemoved = false;
+            List<int> exclude = new List<int>();
+
+            // Removes spawn zones until the max is in reach
+            while (numOfZonesToRemove > 0) {
+
+                if (!oneSpawnZoneLeftInEveryRegion) {
+                    // Checks through all the regions
+                    for (int i = 0; i < regions.Count; i++) {
+                        // All the spawn zones needed have been removed
+                        if (numOfZonesToRemove <= 0) {
+                            break;
+                        }
+
+                        exclude.Clear();
+                        for (int j = 0; j < spawnZones.Count; j++) {
+                            // Get a random spawn zone
+                            randomIndex = Utility.GetRandomIntWithExclusion(0, spawnZones.Count - 1, rng, exclude);
+                            // Remove the spawn zone as long as the region has more than 1 spawn zone
+                            if (regions[i].numOfSpawnZones > 1 && spawnZones[randomIndex].region == regions[i].ID) {
+                                spawnZones.Remove(spawnZones[randomIndex]);
+                                regions[i].numOfSpawnZones--;
+                                numOfZonesToRemove--;
+                                zoneRemoved = true;
+                                break;
+                            } else {
+                                exclude.Add(randomIndex);
+                            }
+                        }
+                    }
+
+                    // Every region has 1 or less spawn zones
+                    if (!zoneRemoved) {
+                        oneSpawnZoneLeftInEveryRegion = true;
+                    }
+                } else {
+                    // Begins removing spawn zones once every region only has 1 spawn zone
+                    for (int i = 0; i < regions.Count; i++) {
+                        // All the spawn zones needed have been removed
+                        if (numOfZonesToRemove <= 0) {
+                            break;
+                        }
+
+                        exclude.Clear();
+                        for (int j = 0; j < spawnZones.Count; j++) {
+                            // Get a random spawn zone
+                            randomIndex = Utility.GetRandomIntWithExclusion(0, spawnZones.Count - 1, rng, exclude);
+                            // Remove the spawn zone if able
+                            if (regions[i].numOfSpawnZones > 0 && spawnZones[randomIndex].region == regions[i].ID) {
+                                spawnZones.Remove(spawnZones[randomIndex]);
+                                regions[i].numOfSpawnZones--;
+                                numOfZonesToRemove--;
+                                break;
+                            } else {
+                                exclude.Add(randomIndex);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
