@@ -36,6 +36,7 @@ namespace RegionUtils
 	{
 		public int count;
 		public int ID;
+        public int numOfSpawnZones = 0;
 		public Pos startpos;
 		public List<Connection> closest; // stores closest connections of each region
 		public List<Cmd> cmds; // stores geometry of the wall of each region
@@ -66,6 +67,7 @@ namespace RegionUtils
             List<Pos> regionTiles = new List<Pos>();
 
             AddRegionTile(startpos.x, startpos.y, visitedMap, regionTiles);
+
             return regionTiles;
         }
 
