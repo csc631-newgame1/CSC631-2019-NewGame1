@@ -68,22 +68,29 @@ public class EnemyGroupManager
                 if (spawnZoneIndex >= spawnZones.Count) {
                     break;
                 }
-
                 while (spawnZoneIndex < spawnZones.Count && currentRegion == spawnZones[spawnZoneIndex].region) {
                     switch (i) {
                         case EnemyGroupDifficulty.Trivial:
                             if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.LargeUpperBound) {
                                 PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Trivial, 1, rng), spawnZones[spawnZoneIndex]);
+                            } else if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Trivial, 1, rng, -1, EnemyGroupSize.Medium), spawnZones[spawnZoneIndex]);
+                            } else if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.Small) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Trivial, 1, rng, -1, EnemyGroupSize.Small), spawnZones[spawnZoneIndex]);
                             }
                             break;
                         case EnemyGroupDifficulty.Average:
                             if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
                                 PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Average, 1, rng), spawnZones[spawnZoneIndex]);
+                            } else if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.Small) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Average, 1, rng, -1, EnemyGroupSize.Small), spawnZones[spawnZoneIndex]);
                             }
                             break;
                         case EnemyGroupDifficulty.Difficult:
                             if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.MediumUpperBound) {
                                 PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Difficult, 1, rng), spawnZones[spawnZoneIndex]);
+                            } else if (spawnZones[spawnZoneIndex].GetNumberOfUnpopulatedTilesInZone() >= EnemyGroupSize.Small) {
+                                PopulateSpawnZone(EnemyGroupTemplate.GetEnemyGroupGivenDifficulty(EnemyGroupDifficulty.Difficult, 1, rng, -1, EnemyGroupSize.Small), spawnZones[spawnZoneIndex]);
                             }
                             break;
                         case EnemyGroupDifficulty.Impossible:
@@ -99,8 +106,13 @@ public class EnemyGroupManager
                     break;
                 } else if (currentRegion != spawnZones[spawnZoneIndex].region) {
                     currentRegion = spawnZones[spawnZoneIndex].region;
-                    break;
                 }
+            }
+        }
+        int counter = 0;
+        foreach (SpawnZone zone in spawnZones) {
+            if (zone.IsPopulated()) {
+                counter++;
             }
         }
         return enemies;
@@ -127,46 +139,8 @@ public class EnemyGroupManager
                 countOfGroupsInRegions[index]++;
             }
         }
+
         return countOfGroupsInRegions;
-    }
-
-    // Sorts the EnemyGroups in descending order based on the size of the group
-    private void QuickSortEnemyGroups(List<EnemyGroup> enemyGroups, int left, int right) {
-        if (left < right) {
-            int pivot = PartitionEnemyGroups(enemyGroups, left, right);
-
-            if (pivot > 1) {
-                QuickSortEnemyGroups(enemyGroups, left, pivot - 1);
-            }
-            if (pivot + 1 < right) {
-                QuickSortEnemyGroups(enemyGroups, pivot + 1, right);
-            }
-        }
-    }
-
-    private int PartitionEnemyGroups(List<EnemyGroup> enemyGroups, int left, int right) {
-        EnemyGroup pivot = enemyGroups[left];
-        while (true) {
-            while (enemyGroups[left].count > pivot.count) {
-                left++;
-            }
-
-            while (enemyGroups[right].count < pivot.count) {
-                right--;
-            }
-
-            if (left < right) {
-                EnemyGroup temp = enemyGroups[left];
-                enemyGroups[left] = enemyGroups[right];
-                enemyGroups[right] = temp;
-
-                if (enemyGroups[left].count == enemyGroups[right].count) {
-                    left++;
-                }
-            } else {
-                return right;
-            }
-        }
     }
 
     // Sorts the Spawn Zones in descending order based on the size of the region size

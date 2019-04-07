@@ -52,24 +52,36 @@ public static class EnemyGroupSize {
 };
 
 public static class EnemyGroupTemplate {
-    public static EnemyGroup GetEnemyGroupGivenDifficulty(int difficulty, int level, System.Random rng, int race = -1) {
+    public static EnemyGroup GetEnemyGroupGivenDifficulty(int difficulty, int level, System.Random rng, int race = -1, int enemyGroupSize = -1) {
         if (race == -1) {
             race = rng.Next(CharacterRaceOptions.Orc, CharacterRaceOptions.Skeleton + 1);
         }
 
         switch (difficulty) {
             case EnemyGroupDifficulty.Trivial:
-                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Large, race, level);
+                if (enemyGroupSize < 0) {
+                    return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Large, race, level);
+                }
+                break;
             case EnemyGroupDifficulty.Average:
-                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Medium, race, level);
+                if (enemyGroupSize < 0) {
+                    return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Medium, race, level);
+                }
+                break;
             case EnemyGroupDifficulty.Difficult:
-                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Medium, race, level);
+                if (enemyGroupSize < 0) {
+                    return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Medium, race, level);
+                }
+                break;
             case EnemyGroupDifficulty.Impossible:
-                return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Small, race, level);
+                if (enemyGroupSize < 0) {
+                    return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, EnemyGroupSize.Small, race, level);
+                }
+                break;
         }
 
-        // else return average group
-        return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), EnemyGroupDifficulty.Average, EnemyGroupSize.Medium, race, level);
+        // else return group of specified size
+        return GetEnemyGroup(rng.Next(EnemyGroupType.Melee, EnemyGroupType.MixedRangeAndHealers + 1), difficulty, enemyGroupSize, race, level);
     }
 
     public static EnemyGroup GetEnemyGroup(int groupType, int difficulty, int enemyGroupSize, int race, int level) {
