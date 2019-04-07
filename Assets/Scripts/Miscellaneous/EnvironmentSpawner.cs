@@ -15,16 +15,24 @@ public class EnvironmentSpawner : MonoBehaviour
     float cell_size;
     int width;
     int height;
-    enum environmentType {traversable, nonTraversable, particle};
+    enum environmentType {traversableFolliage, nonTraversableFolliage, traversableObject, nonTraversableObject, traversableStructure, nonTraversableStructure, particle };
 
     // Environment object variables.
     public int environmentDensity = 50;
-    public float traversableEnvironmentDensity = 0.10f;
-    public float nonTraversableEnvironmentDensity = 0.0f;
-    public float particleEnvironmentDensity = 0.0f;
-    public GameObject[] traversableEnvironmentObject;
-    public GameObject[] nonTraversableEnvironmentObject;
-    public GameObject[] particleEnvironmentObject;
+    public float traversableFolliagDensity = 0.10f;
+    public float nonTraversableFolliageDensity = 0.10f;
+    public float traversableObjectDensity = 0.10f;
+    public float nonTraversableObjectDensity = 0.0f;
+    public float traversableStructureDensity = 0.0f;
+    public float nonTraversableStructureDensity = 0.0f;
+    public float particleDensity = 0.0f;
+    public GameObject[] traversableFolliageObject;
+    public GameObject[] nonTraversableFolliageObject;
+    public GameObject[] traversableObjectObject;
+    public GameObject[] nonTraversableObjectObject;
+    public GameObject[] traversableStructureObject;
+    public GameObject[] nonTraversableStructureObject;
+    public GameObject[] particleObject;
     List<GameObject> allEnvironmentObject = new List<GameObject>();
     #endregion
 
@@ -57,12 +65,57 @@ public class EnvironmentSpawner : MonoBehaviour
 
     void spawnEnvironmentObject(Vector3 cellPosition)
     {
-        float random = Random.Range(0, environmentDensity);
+        float random;
         var clone = new GameObject();
         clone.transform.position = cellPosition;
-        if (random < environmentDensity * particleEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.particle), clone.transform) as GameObject);
-        else if (random < environmentDensity * nonTraversableEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversable), clone.transform) as GameObject);
-        else if (random < environmentDensity * traversableEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversable), clone.transform) as GameObject);
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * traversableFolliagDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversableFolliage), clone.transform) as GameObject);
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * traversableObjectDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversableObject), clone.transform) as GameObject);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * traversableStructureDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversableStructure), clone.transform) as GameObject);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * nonTraversableFolliageDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversableFolliage), clone.transform) as GameObject);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * nonTraversableObjectDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversableObject), clone.transform) as GameObject);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * nonTraversableStructureDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversableStructure), clone.transform) as GameObject);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * particleDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.particle), clone.transform) as GameObject);
+            return;
+        }
     }
 
     public void clearEnvironment()
@@ -79,15 +132,27 @@ public class EnvironmentSpawner : MonoBehaviour
         int index;
         switch (type)
         {
-            case environmentType.traversable:
-                index = Random.Range(0, traversableEnvironmentObject.Length);
-                return traversableEnvironmentObject[index];
-            case environmentType.nonTraversable:
-                index = Random.Range(0, nonTraversableEnvironmentObject.Length);
-                return nonTraversableEnvironmentObject[index];
+            case environmentType.traversableFolliage:
+                index = Random.Range(0, traversableFolliageObject.Length);
+                return traversableFolliageObject[index];
+            case environmentType.nonTraversableFolliage:
+                index = Random.Range(0, nonTraversableFolliageObject.Length);
+                return nonTraversableFolliageObject[index];
+            case environmentType.traversableObject:
+                index = Random.Range(0, traversableObjectObject.Length);
+                return traversableObjectObject[index];
+            case environmentType.nonTraversableObject:
+                index = Random.Range(0, nonTraversableObjectObject.Length);
+                return nonTraversableObjectObject[index];
+            case environmentType.traversableStructure:
+                index = Random.Range(0, traversableStructureObject.Length);
+                return traversableStructureObject[index];
+            case environmentType.nonTraversableStructure:
+                index = Random.Range(0, nonTraversableStructureObject.Length);
+                return nonTraversableStructureObject[index];
             case environmentType.particle:
-                index = Random.Range(0, particleEnvironmentObject.Length);
-                return particleEnvironmentObject[index];
+                index = Random.Range(0, particleObject.Length);
+                return particleObject[index];
             default:
                 Debug.Log("getRandomEnvironmentObject() error.");
                 return null;

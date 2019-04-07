@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
 
 		map_manager.Init(this);
         enemySpawner.Init(map_manager);
-        //environmentSpawner.Init(map_manager);
+        environmentSpawner.Init(map_manager);
 
 		localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour
 	{
 		turn_manager.Terminate();
 		map_manager.clear_map();
+        environmentSpawner.clearEnvironment();
 	}
 
     void Update()
