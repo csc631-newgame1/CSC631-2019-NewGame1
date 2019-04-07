@@ -64,10 +64,6 @@ public class EnemySpawner : MonoBehaviour {
         GenerateSpawnZones();
         TrimSpawnZones();
 
-        foreach (Region region in regions) {
-            Debug.Log("region: " + region.ID + " #spawnZones: " + region.numOfSpawnZones);
-        }
-
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
