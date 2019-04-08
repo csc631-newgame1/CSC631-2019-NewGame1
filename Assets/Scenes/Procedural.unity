@@ -376,19 +376,59 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbc0170768d98304099868114963348a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  environmentDensity: 50
-  folliageDensity: 0.3
-  traversableEnvironmentDensity: 0.05
-  nonTraversableEnvironmentDensity: 0
-  particleEnvironmentDensity: 0
-  folliageObject:
-  - {fileID: 178538, guid: d6267d2e6296e7946afb915ef648ed67, type: 3}
-  - {fileID: 198516, guid: a03e2dd3dba33b9418311d00a91cf378, type: 3}
-  traversableEnvironmentObject:
+  environmentDensity: 1000
+  traversableFolliagDensity: 0.05
+  nonTraversableFolliageDensity: 0.01
+  traversableObjectDensity: 0.05
+  nonTraversableObjectDensity: 0.02
+  traversableStructureDensity: 0.01
+  nonTraversableStructureDensity: 0.02
+  particleDensity: 0.02
+  traversableFolliageObject:
+  - {fileID: 168602, guid: 3e0f6b0ee51e6eb42a731a26210989b9, type: 3}
+  - {fileID: 113888, guid: 6b8ef567fab8aae4fb47c66e41111903, type: 3}
+  nonTraversableFolliageObject:
+  - {fileID: 122796, guid: 146879b9a407b4947a38bacaa6fc4dd8, type: 3}
+  - {fileID: 164760, guid: 8ed44b12ca34ce34e9754ece5b325562, type: 3}
+  traversableObjectObject:
   - {fileID: 129420, guid: ff5c549bd91cb7c43ba46386303671e8, type: 3}
   - {fileID: 155898, guid: 50aa90a81020d7f4d9882a4bede1b4f3, type: 3}
-  nonTraversableEnvironmentObject: []
-  particleEnvironmentObject: []
+  - {fileID: 143182, guid: 8659f67b76d6a314f9e352d6d0c7b43b, type: 3}
+  - {fileID: 188464, guid: ec78f1131a3a5464a8882bd020e329ff, type: 3}
+  - {fileID: 146684, guid: 7c9ebadcd73cafa4980b3f63b3c75f1a, type: 3}
+  - {fileID: 162878, guid: b2f08fb2048c75245a7094d0147b4eca, type: 3}
+  - {fileID: 158264, guid: 99a526f2ec49c0c4a9b0d668b8456f52, type: 3}
+  nonTraversableObjectObject:
+  - {fileID: 123292, guid: df22dae66d96c2944adb65e1661878de, type: 3}
+  - {fileID: 100352, guid: eb2fd9123802bbb43bd44dd7dd3c8df4, type: 3}
+  - {fileID: 133876, guid: 617f333324332de47a8b5f07cc0870cc, type: 3}
+  - {fileID: 182792, guid: 27ac44c94d7f6e741a7e270ce72ccd9b, type: 3}
+  - {fileID: 152086, guid: f5d18f98ce863ec418f3683ffd58ad85, type: 3}
+  - {fileID: 179390, guid: a2e4cdc587395c04cba2cad21f37b658, type: 3}
+  - {fileID: 192992, guid: 5ca5ea1058c3f1446bc9ae4b2d19d453, type: 3}
+  - {fileID: 195432, guid: 077e585196f15914fa6e50566e92f321, type: 3}
+  - {fileID: 194676, guid: 238adf4eb5ddbf9409618642507a3eba, type: 3}
+  - {fileID: 191224, guid: 1c98f16d861b9c64dbd9c4b2ad29927a, type: 3}
+  - {fileID: 167682, guid: 466425cd105379046beddc7cb48df13e, type: 3}
+  - {fileID: 193476, guid: 46c0fb398117dc647a6b7cb2cbba421b, type: 3}
+  - {fileID: 190188, guid: 87874848711c372419e6cf6ca05d9ea1, type: 3}
+  - {fileID: 149278, guid: cfed6864439a806439810e6a55908101, type: 3}
+  - {fileID: 141250, guid: 668e6a33e8614334c822a49aa47f9729, type: 3}
+  traversableStructureObject:
+  - {fileID: 121376, guid: 19fe5cc2a44e36940b2b60a288b72525, type: 3}
+  - {fileID: 113812, guid: fb45b4bb31f66c946ab6381c0b798f81, type: 3}
+  nonTraversableStructureObject:
+  - {fileID: 113726, guid: b83206f9ae850f24dae2564d16c0fa60, type: 3}
+  - {fileID: 129630, guid: 276be0eeb7d45eb4eada49334e36062d, type: 3}
+  - {fileID: 174132, guid: 0564a3134c3163c4a8ff1e64350bce79, type: 3}
+  - {fileID: 131778, guid: 74231780cc79e3a45a60bfadd89b76d5, type: 3}
+  - {fileID: 102200, guid: daaae00e85b960e41ad98de75ef9b6de, type: 3}
+  - {fileID: 147756, guid: b914f597dc60ac94ead6d334b15d6622, type: 3}
+  - {fileID: 123956, guid: 54dabe5d3db0f8141bfc1e5a978ee094, type: 3}
+  - {fileID: 135490, guid: 20835ebfc4c46754b87029a07c3887a8, type: 3}
+  - {fileID: 164130, guid: 153a911f3443d404eb0ed69fbc149a02, type: 3}
+  particleObject:
+  - {fileID: 173810, guid: 258197df3dfea514095084e83b1981fc, type: 3}
 --- !u!4 &1591538337
 Transform:
   m_ObjectHideFlags: 0
