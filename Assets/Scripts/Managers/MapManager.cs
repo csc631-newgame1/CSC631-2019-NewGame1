@@ -6,6 +6,7 @@ using UnityEngine;
 using MapUtils;
 using static MapUtils.MapConstants;
 using System;
+using Random = UnityEngine.Random;
 
 public class MapManager : MonoBehaviour
 {
@@ -77,8 +78,88 @@ public class MapManager : MonoBehaviour
 	/* MAP FUNCTIONS */
 	/*****************/
 
-	// instantiates an agent into the map at a random position
-	public GameObject instantiate_randomly(GameObject type)
+    public void instantiateAtCorners(GameObject object1, GameObject object2)
+    {
+        int random = Random.Range(0, 4);
+        System.Random rng = new System.Random(1);
+
+        if (random == 1) // Top right, bottom left.
+        {
+            instantiateAtClosestTraversable(object1, width - 1, 0);
+            instantiateAtClosestTraversable(object2, 0, height - 1);
+        }
+        else if (random == 2) // Top left, bottom right.
+        {
+            instantiateAtClosestTraversable(object1, 0, 0);
+            instantiateAtClosestTraversable(object2, width - 1, height - 1);
+        }
+        else if (random == 3) // Bottom right, top left.
+        {
+            instantiateAtClosestTraversable(object1, width - 1, height - 1);
+            instantiateAtClosestTraversable(object2, 0, 0);
+        }
+        else if (random == 4) // Bottom left, top right.
+        {
+            instantiateAtClosestTraversable(object1, 0, height - 1);
+            instantiateAtClosestTraversable(object2, width - 1, 0);
+        }
+        else Debug.Log("Error with instantiateAtCorners() in MapManager.");
+    }
+
+    public void instantiateAtClosestTraversable (GameObject object1, int x, int y)
+    {
+
+        if (x > 0) for (int i = x; i > 0; i--)
+            {
+                if (y > 0) for (int j = y; j > 0; j--)
+                    {
+                        Pos position = new Pos(i, j);
+                        if (IsTraversable(position))
+                        {
+                            Instantiate(object1, grid_to_world(position), Quaternion.identity);
+                            map[position.x, position.y].occupied = true;
+                            return;
+                        }
+                    }
+                else for (int j = y; j < height; j++)
+                    {
+                        Pos position = new Pos(i, j);
+                        if (IsTraversable(position))
+                        {
+                            Instantiate(object1, grid_to_world(position), Quaternion.identity);
+                            map[position.x, position.y].occupied = true;
+                            return;
+                        }
+                    }
+            }
+        else for (int i = x; i < height; i++)
+            {
+                if (y > 0) for (int j = y; j > 0; j--)
+                    {
+                        Pos position = new Pos(i, j);
+                        if (IsTraversable(position))
+                        {
+                            Instantiate(object1, grid_to_world(position), Quaternion.identity);
+                            map[position.x, position.y].occupied = true;
+                            return;
+                        }
+                    }
+                else for (int j = y; j < height; j++)
+                    {
+                        Pos position = new Pos(i, j);
+                        if (IsTraversable(position))
+                        {
+                            Instantiate(object1, grid_to_world(position), Quaternion.identity);
+                            map[position.x, position.y].occupied = true;
+                            return;
+                        }
+                    }
+            }
+
+    }
+
+    // instantiates an agent into the map at a random position
+    public GameObject instantiate_randomly(GameObject type)
 	{
 		System.Random rng = new System.Random(1);
 
