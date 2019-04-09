@@ -16,7 +16,7 @@ public class EnvironmentSpawner : MonoBehaviour
     float cell_size;
     int width;
     int height;
-    enum environmentType {traversableFolliage, nonTraversableFolliage, traversableObject, nonTraversableObject, traversableStructure, nonTraversableStructure, particle };
+    enum environmentType {traversableFolliage, nonTraversableFolliage, traversableObject, nonTraversableObject, traversableStructure, nonTraversableStructure, particle, portal};
 
     // Environment object variables.
     public int environmentDensity = 50;
@@ -27,6 +27,7 @@ public class EnvironmentSpawner : MonoBehaviour
     public float traversableStructureDensity = 0.0f;
     public float nonTraversableStructureDensity = 0.0f;
     public float particleDensity = 0.0f;
+    public float portalMargin = 0.30f;
     public GameObject portal;
     public GameObject[] traversableFolliageObject;
     public GameObject[] nonTraversableFolliageObject;
@@ -46,7 +47,8 @@ public class EnvironmentSpawner : MonoBehaviour
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
         this.map = mapManager.map;
-		spawnEnvironment();
+        spawnPortals();
+        spawnEnvironment();
     }
 
     // spawnEnvironment(), spawnEnvironmentObject(Vector3 cellPosition), GameObject getRandomEnvironmentObject()
@@ -74,6 +76,26 @@ public class EnvironmentSpawner : MonoBehaviour
         allEnvironmentObject.Clear();
     }
 
+    void spawnPortals()
+    {
+        int randomX, randomY;
+        Pos position;
+        do
+        {
+            randomX = Random.Range(0, (int)(width * portalMargin));
+            randomY = Random.Range(0, (int)(height * portalMargin));
+            position = new Pos(randomX, randomY);
+        } while (!mapManager.IsTraversable(position));
+        spawNonTraversableObject(portal, position);
+        do
+        {
+            randomX = Random.Range((int)(width - width * portalMargin), width);
+            randomY = Random.Range((int)(width - width * portalMargin), height);
+            position = new Pos(randomX, randomY);
+        } while (!mapManager.IsTraversable(position));
+        spawNonTraversableObject(portal, position);
+    }
+
     void spawnEnvironmentObject(Pos position)
     {
         float random;
@@ -81,58 +103,66 @@ public class EnvironmentSpawner : MonoBehaviour
         random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * traversableFolliagDensity)
         {
-            spawnTraversableObject(environmentType.traversableFolliage, position);
+            spawnRandomTraversableObject(environmentType.traversableFolliage, position);
         }
 
         random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * particleDensity)
         {
-            spawnTraversableObject(environmentType.particle, position);
+            spawnRandomTraversableObject(environmentType.particle, position);
         }
 
         random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * traversableObjectDensity)
         {
-            spawnTraversableObject(environmentType.traversableObject, position);
+            spawnRandomTraversableObject(environmentType.traversableObject, position);
         }
 
         random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * traversableStructureDensity)
         {
-            spawnTraversableObject(environmentType.traversableStructure, position);
+            spawnRandomTraversableObject(environmentType.traversableStructure, position);
             return;
         }
 
         random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * nonTraversableFolliageDensity)
         {
-            spawnNonTraversableObject(environmentType.nonTraversableFolliage, position);
+            spawnRandomNonTraversableObject(environmentType.nonTraversableFolliage, position);
             return;
         }
 
         random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * nonTraversableObjectDensity)
         {
-            spawnNonTraversableObject(environmentType.nonTraversableObject, position);
+            spawnRandomNonTraversableObject(environmentType.nonTraversableObject, position);
             return;
         }
 
         random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * nonTraversableStructureDensity)
         {
-            spawnNonTraversableObject(environmentType.nonTraversableStructure, position);
+            spawnRandomNonTraversableObject(environmentType.nonTraversableStructure, position);
             return;
         }
     }
 
-    void spawnTraversableObject (environmentType type, Pos position)
+    void spawnRandomTraversableObject (environmentType type, Pos position)
     {
         allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(type), mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
     }
 
-    void spawnNonTraversableObject(environmentType type, Pos position)
+    void spawnRandomNonTraversableObject(environmentType type, Pos position)
     {
         allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(type), mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
+        map[position.x, position.x].occupied = true;
+        map[position.x, position.x].traversable = false;
+        return;
+    }
+
+    void spawNonTraversableObject(GameObject type, Pos position)
+    {
+        allEnvironmentObject.Add(Instantiate(type, mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
         map[position.x, position.x].occupied = true;
         map[position.x, position.x].traversable = false;
         return;
