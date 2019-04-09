@@ -40,6 +40,10 @@ public class NetworkManager : MonoBehaviour
 					Debug.Log("Received READY");
 					
 					Client peer = Network.getPeer(ready.clientID);
+					if (client == null) {
+						Network.setPeer(ready.clientID);
+						client = Network.getPeer(ready.clientID);
+					}
 					peer.ready = !peer.ready;
 				}
 				if (cmd is NicknameCommand) {
@@ -47,6 +51,10 @@ public class NetworkManager : MonoBehaviour
 					Debug.Log("Received nickname: " + nickname.nickname);
 					
 					Client client = Network.getPeer(nickname.clientID);
+					if (client == null) {
+						Network.setPeer(nickname.clientID);
+						client = Network.getPeer(nickname.clientID);
+					}
 					client.nickname = nickname.nickname;
 				}
 				if (cmd is ClassnameCommand) {
@@ -54,6 +62,10 @@ public class NetworkManager : MonoBehaviour
 					Debug.Log("Received classname: " + classname.classname);
 					
 					Client client = Network.getPeer(classname.clientID);
+					if (client == null) {
+						Network.setPeer(classname.clientID);
+						client = Network.getPeer(classname.clientID);
+					}
 					client.classname = classname.classname;
 				}
 				if (cmd is UpdateClientInfoCommand) { // called when a new player joins and needs to be synchronized
@@ -76,10 +88,9 @@ public class NetworkManager : MonoBehaviour
 						Debug.Log("Joined game! Client ID #" + clientID + " assigned!");
 					} else {
 						Debug.Log("New player with client ID #" + _join.clientID + " joined!");
+						Network.submitCommand(new UpdateClientInfoCommand(Network.getPeer(clientID)));
 					}
 					Network.setPeer(_join.clientID);
-					
-					Network.submitCommand(new UpdateClientInfoCommand(Network.getPeer(clientID)));
 				}
 				if (cmd is StartCommand) {
 					StartCommand start = (StartCommand) cmd;
