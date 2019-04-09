@@ -10,7 +10,6 @@ public class EnvironmentSpawner : MonoBehaviour
     // Referenced conponents.
     MapManager mapManager;
     MapConfiguration mapConfiguration;
-    MapManager.MapCell[,] map;
 
     // Map variables.
     float cell_size;
@@ -46,7 +45,6 @@ public class EnvironmentSpawner : MonoBehaviour
         this.height = config.height;
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
-        this.map = mapManager.map;
         spawnPortals();
         spawnEnvironment();
     }
