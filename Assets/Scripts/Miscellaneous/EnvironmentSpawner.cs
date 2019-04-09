@@ -76,12 +76,6 @@ public class EnvironmentSpawner : MonoBehaviour
         }
 
         random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * particleDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.particle), clone.transform) as GameObject);
-        }
-
-        random = Random.Range(0, environmentDensity);
         if (random < environmentDensity * traversableObjectDensity)
         {
             allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversableObject), clone.transform) as GameObject);
@@ -116,6 +110,12 @@ public class EnvironmentSpawner : MonoBehaviour
             return;
         }
 
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * particleDensity)
+        {
+            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.particle), clone.transform) as GameObject);
+            return;
+        }
     }
 
     public void clearEnvironment()

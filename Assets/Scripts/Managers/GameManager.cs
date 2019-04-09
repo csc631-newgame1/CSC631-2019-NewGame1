@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     private EnemySpawner enemySpawner;
 	private EnvironmentSpawner environmentSpawner;
     private Player localPlayer;
-    
+
     private TurnManager turn_manager;
 
     private List<SpawnZone> spawnZones;
@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
     // Consider moving this to a different location for better handling of turn based gameplay
     private GameObject BattleMenu;
     public GameObject playerPrefab;
-    public GameObject exit;
 
     public static GameManager instance; //static so we can carry oour levels and st
     
@@ -32,6 +31,8 @@ public class GameManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
+
+ 
 
     void Init()
     {
@@ -43,10 +44,8 @@ public class GameManager : MonoBehaviour
         enemySpawner.Init(map_manager);
         environmentSpawner.Init(map_manager);
 
-        localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
-        map_manager.instantiateAtCorners(exit, exit);
-
-        Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
+		localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
+		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
 
 		turn_manager = GetComponent<TurnManager>();
 		turn_manager.Init(this);
