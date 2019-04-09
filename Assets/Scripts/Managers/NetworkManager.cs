@@ -61,6 +61,10 @@ public class NetworkManager : MonoBehaviour
 					Debug.Log("Received update from client#" + update.clientID);
 					
 					Client client = Network.getPeer(update.clientID);
+					if (client == null) {
+						Network.setPeer(update.clientID);
+						client = Network.getPeer(update.clientID);
+					}
 					client.nickname = update.nickname;
 					client.classname = update.classname;
 					client.ready = update.ready;
