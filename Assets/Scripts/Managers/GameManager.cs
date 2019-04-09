@@ -31,9 +31,7 @@ public class GameManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
-
- 
-
+	
     void Init()
     {
 		map_manager = GetComponent<MapManager>();
