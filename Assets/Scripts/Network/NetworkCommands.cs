@@ -64,7 +64,7 @@ public class ReadyCommand : NetworkCommand
 {
 	public const int ID = 1;
 	
-	private int clientID;
+	public int clientID;
 	public ReadyCommand(int clientID)
 	{
 		this.directive = Directive.ECHO;
@@ -99,6 +99,66 @@ public class NicknameCommand : NetworkCommand
 		string nickname = nnID[0];
 		int clientID = Int32.Parse(nnID[1]);
 		return new NicknameCommand(nickname, clientID);
+	}
+}
+
+public class ClassnameCommand : NetworkCommand
+{
+	public const int ID = 5;
+	
+	public int clientID;
+	public string classname;
+	public ClassnameCommand(string classname, int clientID)
+	{
+		this.directive = Directive.ECHO;
+		this.classname = classname;
+		this.clientID = clientID;
+	}
+	public override string getString() { return ID + "$" + classname + "," + clientID; }
+	
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		string[] cnID = cmdString.Split(',');
+		string classname = cnID[0];
+		int clientID = Int32.Parse(cnID[1]);
+		return new ClassnameCommand(classname, clientID);
+	}
+}
+
+public class UpdateClientInfoCommand : NetworkCommand
+{
+	public const int ID = 6;
+	
+	public int clientID;
+	public string nickname;
+	public string classname;
+	public bool ready;
+	public UpdateClientInfoCommand(int clientID, string nickname, string classname, bool ready)
+	{
+		this.clientID = clientID;
+		this.nickname = nickname;
+		this.classname = classname;
+		this.ready = ready;
+	}
+	public UpdateClientInfoCommand(Client client)
+	{
+		this.clientID = client.ID;
+		this.nickname = client.nickname;
+		this.classname = client.classname;
+		this.ready = client.ready;
+	}
+	public override string getString() { 
+		return ID + "$" + clientID + "," + nickname + "," + classname + "," + ready; 
+	}
+	
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		string[] info = cmdString.Split(',');
+		int clientID = int.Parse(info[0]);
+		string nickname = info[1];
+		string classname = info[2];
+		bool ready = bool.Parse(info[3]);
+		return new UpdateClientInfoCommand(clientID, nickname, classname, ready);
 	}
 }
 
