@@ -77,8 +77,18 @@ public class MapManager : MonoBehaviour
 	/* MAP FUNCTIONS */
 	/*****************/
 
-	// instantiates an agent into the map at a random position
-	public GameObject instantiate_randomly(GameObject type)
+    public void removeTraversableTile(Pos position)
+    {
+        nav_map.removeTraversableTile(position);
+    }
+
+    public void insertTraversableTile(Pos position)
+    {
+        nav_map.insertTraversableTile(position);
+    }
+
+    // instantiates an agent into the map at a random position
+    public GameObject instantiate_randomly(GameObject type)
 	{
 		System.Random rng = new System.Random(1);
 
