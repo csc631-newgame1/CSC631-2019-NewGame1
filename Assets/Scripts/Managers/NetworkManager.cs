@@ -39,12 +39,12 @@ public class NetworkManager : MonoBehaviour
 					ReadyCommand ready = (ReadyCommand) cmd;
 					Debug.Log("Received READY");
 					
-					Client peer = Network.getPeer(ready.clientID);
+					Client client = Network.getPeer(ready.clientID);
 					if (client == null) {
 						Network.setPeer(ready.clientID);
 						client = Network.getPeer(ready.clientID);
 					}
-					peer.ready = !peer.ready;
+					client.ready = !client.ready;
 				}
 				if (cmd is NicknameCommand) {
 					NicknameCommand nickname = (NicknameCommand) cmd;
