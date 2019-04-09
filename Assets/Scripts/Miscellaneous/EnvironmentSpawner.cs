@@ -10,6 +10,7 @@ public class EnvironmentSpawner : MonoBehaviour
     // Referenced conponents.
     MapManager mapManager;
     MapConfiguration mapConfiguration;
+    MapManager.MapCell[,] map;
 
     // Map variables.
     float cell_size;
@@ -26,6 +27,7 @@ public class EnvironmentSpawner : MonoBehaviour
     public float traversableStructureDensity = 0.0f;
     public float nonTraversableStructureDensity = 0.0f;
     public float particleDensity = 0.0f;
+    public GameObject portal;
     public GameObject[] traversableFolliageObject;
     public GameObject[] nonTraversableFolliageObject;
     public GameObject[] traversableObjectObject;
@@ -43,7 +45,7 @@ public class EnvironmentSpawner : MonoBehaviour
         this.height = config.height;
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
-        this.mapConfiguration = mapConfiguration;
+        this.map = mapManager.map;
 		spawnEnvironment();
     }
 
@@ -57,64 +59,9 @@ public class EnvironmentSpawner : MonoBehaviour
             {
                 Pos position = new Pos(x, y);
                 if (mapManager.IsTraversable(position)) {
-                    spawnEnvironmentObject(mapManager.grid_to_world(position));
+                    spawnEnvironmentObject(position);
                 }
             }
-        }
-    }
-
-    void spawnEnvironmentObject(Vector3 cellPosition)
-    {
-        float random;
-        var clone = new GameObject();
-        clone.transform.position = cellPosition;
-
-        random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * traversableFolliagDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversableFolliage), clone.transform) as GameObject);
-        }
-
-        random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * traversableObjectDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversableObject), clone.transform) as GameObject);
-            return;
-        }
-
-        random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * traversableStructureDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversableStructure), clone.transform) as GameObject);
-            return;
-        }
-
-        random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * nonTraversableFolliageDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversableFolliage), clone.transform) as GameObject);
-            return;
-        }
-
-        random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * nonTraversableObjectDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversableObject), clone.transform) as GameObject);
-            return;
-        }
-
-        random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * nonTraversableStructureDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversableStructure), clone.transform) as GameObject);
-            return;
-        }
-
-        random = Random.Range(0, environmentDensity);
-        if (random < environmentDensity * particleDensity)
-        {
-            allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.particle), clone.transform) as GameObject);
-            return;
         }
     }
 
@@ -125,6 +72,70 @@ public class EnvironmentSpawner : MonoBehaviour
             Destroy(allEnvironmentObject[i]);
         }
         allEnvironmentObject.Clear();
+    }
+
+    void spawnEnvironmentObject(Pos position)
+    {
+        float random;
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * traversableFolliagDensity)
+        {
+            spawnTraversableObject(environmentType.traversableFolliage, position);
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * particleDensity)
+        {
+            spawnTraversableObject(environmentType.particle, position);
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * traversableObjectDensity)
+        {
+            spawnTraversableObject(environmentType.traversableObject, position);
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * traversableStructureDensity)
+        {
+            spawnTraversableObject(environmentType.traversableStructure, position);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * nonTraversableFolliageDensity)
+        {
+            spawnNonTraversableObject(environmentType.nonTraversableFolliage, position);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * nonTraversableObjectDensity)
+        {
+            spawnNonTraversableObject(environmentType.nonTraversableObject, position);
+            return;
+        }
+
+        random = Random.Range(0, environmentDensity);
+        if (random < environmentDensity * nonTraversableStructureDensity)
+        {
+            spawnNonTraversableObject(environmentType.nonTraversableStructure, position);
+            return;
+        }
+    }
+
+    void spawnTraversableObject (environmentType type, Pos position)
+    {
+        allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(type), mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
+    }
+
+    void spawnNonTraversableObject(environmentType type, Pos position)
+    {
+        allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(type), mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
+        map[position.x, position.x].occupied = true;
+        map[position.x, position.x].traversable = false;
+        return;
     }
 
     GameObject getRandomEnvironmentObject(environmentType type)
