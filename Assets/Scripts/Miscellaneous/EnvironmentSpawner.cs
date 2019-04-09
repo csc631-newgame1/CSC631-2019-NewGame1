@@ -155,16 +155,14 @@ public class EnvironmentSpawner : MonoBehaviour
     void spawnRandomNonTraversableObject(environmentType type, Pos position)
     {
         allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(type), mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
-        map[position.x, position.x].occupied = true;
-        map[position.x, position.x].traversable = false;
+        mapManager.removeTraversableTile(position);
         return;
     }
 
     void spawNonTraversableObject(GameObject type, Pos position)
     {
         allEnvironmentObject.Add(Instantiate(type, mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
-        map[position.x, position.x].occupied = true;
-        map[position.x, position.x].traversable = false;
+        mapManager.removeTraversableTile(position);
         return;
     }
 
