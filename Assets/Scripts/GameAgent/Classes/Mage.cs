@@ -4,20 +4,21 @@ public class Mage : CharacterClass
 {
     public Mage() {
         baseStats = new GameAgentStats(23, 40, 7, 6, true);
+        rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
         int min = 2;
         int max = 4;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override int GetHealthStatIncreaseFromLevelUp(int level = -1) {
         int min = 1;
         int max = 2;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override int GetRangeStatIncreaseFromLevelUp(int level = -1) {
