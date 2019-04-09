@@ -286,7 +286,19 @@ public class MapManager : MonoBehaviour
 		return map[pos.x, pos.y].traversable;
     }
 
-	// returns true if tile at position contains an agent
+    public bool IsTileInRegion(Pos tile, int ID) {
+        return (map_raw[tile.x, tile.y] == ID);
+    }
+
+    public int GetTileRegion(Pos tile) {
+        return map_raw[tile.x, tile.y];
+    }
+
+    public int[,] GetRegionMap() {
+        return map_raw;
+    }
+
+    // returns true if tile at position contains an agent
     public bool IsOccupied(Pos pos) {
         if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
 			return false;

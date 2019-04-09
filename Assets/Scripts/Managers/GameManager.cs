@@ -39,8 +39,8 @@ public class GameManager : MonoBehaviour
 		environmentSpawner = GetComponent<EnvironmentSpawner>();
 
 		map_manager.Init(this);
-		enemySpawner.Init(map_manager);
-		//environmentSpawner.Init(map_manager);
+        enemySpawner.Init(map_manager);
+        //environmentSpawner.Init(map_manager);
 
 		localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
