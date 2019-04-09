@@ -7,7 +7,7 @@ public class Inventory
 {
 
     public Item[] items = new Item[numItemSlots];
-    public const int numItemSlots = 4;
+    public const int numItemSlots = 10;
 
     public EquipItem helmet;
     public EquipItem armor;
@@ -15,32 +15,36 @@ public class Inventory
     public EquipItem boots;
     public EquipItem weapon;
 
-    //used for adding items to the inventory
-    //item MUST have amount specified
-    public void AddItemToSlot(int slot, Item item)
+    public int AddItem(Item item)
     {
-        if (slot >= numItemSlots)
-        {
-            return; //out of bounds
-        }
-        items[slot] = item;
-    }
-
-    public void AddItem(Item item)
-    {
+        int count = 0;
         for (int i = 0; i < numItemSlots; i++)
         {
             if (items[i].ID == item.ID)
             {
-                items[i].Amount = Mathf.Max(items[i].maxAmount, (items[i].Amount + item.Amount));
-                return;
+                int maxInsert = items[i].maxAmount - items[i].Amount;
+                if (item.Amount - maxInsert > 0)
+                {
+                    items[i].Amount = items[i].maxAmount;
+                    item.Amount -= maxInsert;
+                    count += maxInsert;
+                }
+                else
+                {
+                    items[i].Amount += item.Amount;
+                    count += item.Amount;
+                    return count;
+                }
             }
             else if (items[i] == null)
             {
+                count += item.Amount;
                 items[i] = item;
-                return;
+                return count;
             }
         }
+
+        return count;
     }
 
     //used to remove item completely from inventory
@@ -52,6 +56,7 @@ public class Inventory
             return; //out of bounds
         }
         items[slot] = null;
+        RearrangeSlots();
     }
 
     //returns item in slot
@@ -81,9 +86,10 @@ public class Inventory
         {
             return; //out of bounds
         }
-        if ((items[slot].Amount--) <= 0)
+        if ((--items[slot].Amount) <= 0)
         {
             items[slot] = null; //remove item if amount is zero
+            RearrangeSlots();
         }
     }
 
@@ -91,7 +97,13 @@ public class Inventory
     {
         for (int i = 0; i < numItemSlots; i++)
         {
-
+            if (items[i] == null)
+            {
+                for (int j = i + 1; j < numItemSlots; j++)
+                {
+                    items[j - 1] = items[j];
+                }
+            }
         }
     }
 }

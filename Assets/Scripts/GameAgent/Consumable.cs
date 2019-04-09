@@ -10,11 +10,16 @@ public enum ConsumableType
 
 public class Consumable : Item
 {
-    public Consumable(string name, int id, int max, int amt)
+    private int restoreAmount;
+    private ConsumableType ctype;
+
+    public Consumable(string name, int id, int max, int amt, int res, ConsumableType type)
     {
         Name = name;
         ID = id;
         maxAmount = max;
         Amount = amt;
+        restoreAmount = res;
+        ctype = type;
     }
 }
