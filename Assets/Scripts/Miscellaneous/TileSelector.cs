@@ -86,16 +86,30 @@ public class TileSelector : MonoBehaviour
 					grid_position = hitp;
 					select_square.gameObject.SetActive(true);
 					select_square.position = hover_position;
-					
-					if (showSelectableMoveTiles) {
+
+                    if (showAOETiles) {
+                        CreateActAOETiles(hitp);
+                    }
+
+                    if (showSelectableMoveTiles) {
 						
 						Path hit_path = getSelectableTilePath(hitp);
 						
 						if (hit_path != null && hitp != player_main.grid_pos && !player_main.moving && showPathLine)
 							render_path_line(hit_path);
 					} 
-				}
-			}
+                } else {
+                    // allow to be able to select the player's tile
+                    if (showAOETiles) {
+                        hover_position = map_manager.grid_to_world(hitp);
+                        grid_position = hitp;
+                        select_square.gameObject.SetActive(true);
+                        select_square.position = hover_position;
+
+                        CreateActAOETiles(hitp);
+                    }
+                }
+            }
 			else {
 				select_square.gameObject.SetActive(false);
 			}
@@ -212,7 +226,8 @@ public class TileSelector : MonoBehaviour
 	private void CreateActAOETiles(Pos pos) {
         actAOETiles = new List<Pos>();
 
-        if (map_manager.IsTraversable(pos) && nonselectableActTiles.Count > 0 && nonselectableActTiles.Contains(pos)) {
+        if (map_manager.IsTraversable(pos) && ((nonselectableActTiles.Count > 0 && nonselectableActTiles.Contains(pos)) ||
+                                                (selectableActTiles.Count > 0 && selectableActTiles.Contains(pos)))) {
             actAOETiles.Add(pos);
 
             Pos topPos = new Pos(pos.x, pos.y + 1);
