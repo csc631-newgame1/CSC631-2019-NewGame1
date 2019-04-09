@@ -9,7 +9,7 @@ using System;
 
 public class MapManager : MonoBehaviour
 {
-	public class MapCell {
+	private class MapCell {
         public bool traversable;
         public bool occupied;
         public GameAgent resident;
@@ -30,7 +30,7 @@ public class MapManager : MonoBehaviour
 
 	// map data
 	private int[,] map_raw;
-    public MapCell[,] map;
+    private MapCell[,] map;
 	private NavigationHandler nav_map;
 
 	private GameManager parentManager = null;
