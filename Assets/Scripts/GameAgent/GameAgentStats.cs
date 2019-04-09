@@ -38,6 +38,8 @@ public class GameAgentStats
     // stat granted through items
     public int attackStatBoost = 0;
 
+    private System.Random rng;
+
     // This is used to determine how much xp is awarded for death
     // the scale works by awarding the scaleFactor amount of xp for that level
     // ex. if it takes 1000xp to reach level, and the player kills a level 5 monster
@@ -45,6 +47,8 @@ public class GameAgentStats
     private float scaleFactor = 0.25f;
 
     public GameAgentStats(int characterRace, int characterClass, float attack, float health, float range, float speed, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+        rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
+
         this.characterRace = characterRace;
         characterClassOption = characterClass;
         SetGameAgentCharacterClass(characterWeapon);
@@ -71,6 +75,8 @@ public class GameAgentStats
     }
 
     public GameAgentStats(int characterRace, int characterClass, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+        rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
+
         this.characterRace = characterRace;
         characterClassOption = characterClass;
         SetGameAgentCharacterClass(characterWeapon);
@@ -172,7 +178,7 @@ public class GameAgentStats
             int min = 1;
             int max = 4;
             int mean = (min + max) / 2;
-            return Utility.NextGaussian(mean, 1, min, max);
+            return Utility.NextGaussian(mean, 1, min, max, rng);
         }
         return 0;
     }

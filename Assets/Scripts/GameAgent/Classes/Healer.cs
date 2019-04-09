@@ -4,20 +4,21 @@ public class Healer : CharacterClass
 {
     public Healer() {
         baseStats = new GameAgentStats(15, 32, 7, 10, true);
+        rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
         int min = 1;
         int max = 3;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override int GetHealthStatIncreaseFromLevelUp(int level = -1) {
         int min = 1;
         int max = 2;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override int GetRangeStatIncreaseFromLevelUp(int level = -1) {

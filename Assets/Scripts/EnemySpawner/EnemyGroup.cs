@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-// Used to determine how the enemies should be created in the group
-// based on power level
-public enum Distribution { Balanaced, Strong, Weak, Random };
-
 // Group of enemies to be spawned in a spawn zone
 public class EnemyGroup
 {
@@ -19,15 +15,13 @@ public class EnemyGroup
 
     private List<EnemyGroupDescription> typesOfEnemies;
     private List<GameAgentStats> enemies;
-    private Distribution dist;
 
     public int count;
 
-    public EnemyGroup(List<EnemyGroupDescription> typesOfEnemies, Distribution dist, bool randomRangeNumberOfEnemies = false,
+    public EnemyGroup(List<EnemyGroupDescription> typesOfEnemies, bool randomRangeNumberOfEnemies = false,
                         int minNumberOfEnemies = -1, int maxNumberOfEnemies = -1, bool powerBalance = false) {
 
         this.typesOfEnemies = typesOfEnemies;
-        this.dist = dist;
         this.randomRangeNumberOfEnemies = randomRangeNumberOfEnemies;
         this.minNumberOfEnemies = minNumberOfEnemies;
         this.maxNumberOfEnemies = maxNumberOfEnemies;

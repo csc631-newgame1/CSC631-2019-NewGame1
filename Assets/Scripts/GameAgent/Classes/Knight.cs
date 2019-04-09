@@ -4,13 +4,14 @@ public class Knight : CharacterClass {
 
     public Knight() {
         baseStats = new GameAgentStats(17, 50, 1, 7, true);
+        rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
         int min = 1;
         int max = 3;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override GameAgentAction[] GetAvailableActs() {
@@ -21,7 +22,7 @@ public class Knight : CharacterClass {
         int min = 3;
         int max = 4;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override int GetRangeStatIncreaseFromLevelUp(int level = -1) {

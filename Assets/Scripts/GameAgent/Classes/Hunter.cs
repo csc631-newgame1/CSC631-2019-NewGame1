@@ -4,20 +4,21 @@ public class Hunter : CharacterClass
 {
     public Hunter() {
         baseStats = new GameAgentStats(18, 35, 9, 9, true);
+        rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
     public override int GetAttackStatIncreaseFromLevelUp(int level = -1) {
         int min = 2;
         int max = 4;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override int GetHealthStatIncreaseFromLevelUp(int level = -1) {
         int min = 1;
         int max = 3;
         int mean = (min + max) / 2;
-        return Utility.NextGaussian(mean, 1, min, max);
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
     public override int GetRangeStatIncreaseFromLevelUp(int level = -1) {
