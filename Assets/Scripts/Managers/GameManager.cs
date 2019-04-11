@@ -42,8 +42,14 @@ public class GameManager : MonoBehaviour
         enemySpawner.Init(map_manager);
 		tileSelector.Init(map_manager);
         //environmentSpawner.Init(map_manager);
+		
+		foreach (Client player in Network.getPeers()) {
+			Player instance = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
+			player.playerObject = instance;
+			if (player.ID == NetworkManager.clientID) localPlayer = instance;
+		}
 
-		localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
+		//localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
 		UI_BattleMenu.SetActButtons(localPlayer.getActions());
 
@@ -75,6 +81,7 @@ public class GameManager : MonoBehaviour
 			switch (tileSelector.mode) {
 				case "MOVE":
 					if (tileSelector.hoveringValidMoveTile()) {
+						// Network.submitCommand(new MoveCommand(localPlayer.grid_pos, tileSelector.grid_position));
 						map_manager.move(
 							localPlayer.grid_pos, tileSelector.grid_position);
 						tileSelector.mode = "NONE";
@@ -82,8 +89,9 @@ public class GameManager : MonoBehaviour
 					break;
 				case "ACT":
 					if (tileSelector.hoveringValidActTile()) {
+						// Network.submitCommand(new AttackCommand(localPlayer.grid_pos, tileSelector.grid_position));
 						map_manager.attack(
-							localPlayer, tileSelector.grid_position);
+							localPlayer.grid_pos, tileSelector.grid_position);
 						tileSelector.mode = "NONE";
 					}
 					break;

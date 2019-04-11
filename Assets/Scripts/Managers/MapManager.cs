@@ -149,10 +149,12 @@ public class MapManager : MonoBehaviour
 	}
 	
 	// applies damage to agent at position, if one is there
-	public void attack(GameAgent attacker, Pos dest)
+	public void attack(Pos source, Pos dest)
 	{
 		//map[dest.x, dest.y].resident.take_damage(damage_amount);
-		StartCoroutine(attacker.animate_attack(map[dest.x, dest.y].resident));
+		GameAgent attacker = map[source.x, source.y].resident;
+		GameAgent target = map[dest.x, dest.y].resident;
+		StartCoroutine(attacker.animate_attack(target));
 		//return true;
 	}
 	

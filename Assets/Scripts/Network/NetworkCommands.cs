@@ -162,6 +162,26 @@ public class UpdateClientInfoCommand : NetworkCommand
 	}
 }
 
+public class AttackCommand : NetworkCommand
+{
+	public const int ID = 7;
+	
+	Pos a, b;
+	public AttackCommand(Pos a, Pos b)
+	{
+		this.directive = Directive.ECHO;
+		this.a = a;
+		this.b = b;
+	}
+	public override string getString() { return ID + "$" + a.x + "," + a.y + "," + b.x + "," + b.y; }
+	// parse everything to the right of the '$' in the string returned by getString() for this object
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		int[] pts = Array.ConvertAll(cmdString.Split(','), int.Parse);
+		return new MoveCommand(new Pos(pts[0], pts[1]), new Pos(pts[2], pts[3]));
+	}
+}
+
 /* #######################
  * ## NON-ECHO Commands ##
  * #######################

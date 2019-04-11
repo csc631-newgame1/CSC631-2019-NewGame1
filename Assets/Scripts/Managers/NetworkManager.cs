@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using MapUtils;
 
@@ -86,6 +87,9 @@ public class NetworkManager : MonoBehaviour
 				if (cmd is StartCommand) {
 					StartCommand start = (StartCommand) cmd;
 					Debug.Log("Received START");
+					if (SceneManager.GetActiveScene().name == "NewMenu") {
+						SceneManager.LoadScene("Procedural");
+					}
 				}
 				if (cmd is EndCommand) {
 					EndCommand end = (EndCommand) cmd;
