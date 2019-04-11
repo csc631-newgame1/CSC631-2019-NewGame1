@@ -7,21 +7,32 @@ public class AIManager
 {
     public static List<GameAgent>[] roster;
 	
-	public static void update(int team)
+	public static IEnumerator update(int team)
 	{
-		if (roster[team].Count == 0) return;
+		if (roster[team].Count == 0) yield break;
 		resetAgents(team);
 		
-		foreach (GameAgent agent in roster[team]) {
-			
-			if (agent.AI != null) {
-				updatePools(agent);
-				agent.AI.calcDistances();
-				agent.AI.calcAttack();
-				agent.AI.calcReinforce();
-			}
+		List<GameAgent> AIPool = new List<GameAgent>();
+		List<GameAgent> HumanPool = new List<GameAgent>();
+		
+		foreach (GameAgent agent in roster[team])
+			if (agent.AI != null)
+				AIPool.Add(agent);
+			else
+				HumanPool.Add(agent);
+		
+		foreach (GameAgent agent in AIPool) {
+			updatePools(agent);
+			agent.AI.calcDistances();
+			agent.AI.calcAttack();
+			agent.AI.calcReinforce();
 			agent.take_turn();
+			while (!agent.turn_over())
+				yield return null;
 		}
+		
+		foreach (GameAgent agent in HumanPool)
+			agent.take_turn();
 	}
 	
 	public static bool turnOver(int team)

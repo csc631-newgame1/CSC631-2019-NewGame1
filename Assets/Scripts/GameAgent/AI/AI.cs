@@ -25,6 +25,7 @@ public class AIComponent
 	private GameAgent attacking;
 	private GameAgent reinforcing;
 	private STATE state;
+	public  bool finished;
 	
 	private MapManager mapManager;
 	private List<GameAgent> enemyPool;
@@ -49,6 +50,7 @@ public class AIComponent
 		attacking = null;
 		reinforcing = null;
 		state = STATE.IDLE;
+		finished = false;
 		
 		mapManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 		enemyPool = new List<GameAgent>();
@@ -62,9 +64,10 @@ public class AIComponent
 		alliedPool.Clear();
 		attacking = null;
 		reinforcing = null;
+		finished = false;
 	}
 	
-	public void advance()
+	public IEnumerator advance()
 	{	
 		switch (state) {
 		case STATE.IDLE: 
@@ -72,7 +75,8 @@ public class AIComponent
 			break;
 		case STATE.ATTACK: 
 			// pathfind towards attacker, attack if possible
-			if (pathTowards(attacking, 3, 1) == -1) {
+			int result = pathTowards(attacking, (int)parent.stats.range, 1);
+			if (result == -1) {
 				state = STATE.IDLE;
 				attacking = null;
 				calcReinforce();
@@ -81,12 +85,23 @@ public class AIComponent
 					goto case STATE.REINFORCE;
 				}
 			}
+			else if (result == 1) {
+				while (parent.animating) yield return null; // waits for move animation to finish before moving on
+				mapManager.attack(parent, attacking.grid_pos); // attack enemy
+				while (parent.animating) yield return null; // waits for attack animation to finish
+			}
+			else if (result == 2) {
+				while (parent.animating) yield return null; // waits for move animation to finish
+			}
 			break;
 		case STATE.REINFORCE: 
 			// pathfind towards character we're reinforcing
 			if (pathTowards(reinforcing, 3, 1) == -1) {
 				reinforcing = null;
 				state = STATE.IDLE;
+			}
+			else {
+				while (parent.animating) yield return null; // waits for move animation to finish before moving on
 			}
 			break;
 		case STATE.FLEE: 
@@ -100,12 +115,15 @@ public class AIComponent
 		else if (state == STATE.REINFORCE && reinforcing != null) {
 			mapManager.DrawLine(parent.grid_pos, reinforcing.grid_pos, Color.green);
 		}
+		
+		finished = true;
 	}
 	
 	// return values:
 	// -1: indicates that pathfinding has failed
 	//  0: indicates that we are already within attack range
-	//  1: indicates that pathfinding has succeeded
+	//  1: indicates that pathfinding has succeeded, and it is ok to attack
+	//  2: indicates that pathfinding has succeeded, but it is not ok to attack
 	private int pathTowards(GameAgent agent, int maxStopDistance, int minStopDistance)
 	{
 		Pos source = parent.grid_pos;
@@ -139,8 +157,18 @@ public class AIComponent
 		if (bestDest == null) return -1;
 		if (bestDist == 0) return 0;
 		
+		Path path = mapManager.get_path(source, bestDest);
+		path.truncateTo(parent.move_budget);
+		
+		bestDest = path.endPos();
 		mapManager.move(source, bestDest);
-		return 1;
+		
+		// if enemy path has been truncated
+		int trunc_amount = bestDist - parent.move_budget;
+		if (trunc_amount > 0 && trunc_amount > maxStopDistance)
+			return 2;
+		else
+			return 1;
 	}
 
 	public void addEnemyToPool(GameAgent enemy)
