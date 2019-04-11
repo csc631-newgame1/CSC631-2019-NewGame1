@@ -40,7 +40,7 @@ public class Enemy : GameAgent
         range = stats.range;
         _speed = stats.speed;
 		
-		speed = 10;
+		speed = 100;
 		move_budget = 10;
 		
         level = stats.level;
@@ -107,7 +107,7 @@ public class Enemy : GameAgent
 		// wait for animation trigger
 		while (attacking) yield return null;
 		// wait a little longer based on projectile distance
-		yield return new WaitForSeconds(distance / 10f);
+		yield return new WaitForSeconds(distance / 100f);
 		
 		target.take_damage(stats.DealDamage());
 		transform.position = ownPos; // reset to previous position after animation

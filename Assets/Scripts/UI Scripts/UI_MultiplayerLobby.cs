@@ -27,12 +27,12 @@ public class UI_MultiplayerLobby : MonoBehaviour
     public void Awake()
     {
         Panel_Main = transform.parent.Find("MainMenu").gameObject;
-		Transform names = transform.Find("MiddleBar").transform.Find("Names");
+		Transform names = transform.Find("MiddleBar").Find("Names");
 		for (int i = 0; i < 4; i++) {
 			clientNames[i] = names.Find("Client (" + i + ")").GetComponent<Text>();
 		}
 		
-		Transform icons = transform.Find("MiddleBar").transform.Find("ClassIcons");
+		Transform icons = transform.Find("MiddleBar").Find("ClassIcons");
 		for (int i = 0; i < 4; i++) {
 			clientIcons[i] = icons.Find("ClassIcon (" + i + ")").GetComponent<ClassIcon>();
 		}
