@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
 			if (player.ID == NetworkManager.clientID) localPlayer = instance;
 		}
 
-		//localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
+		tileSelector.setPlayer(localPlayer);
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
 		UI_BattleMenu.SetActButtons(localPlayer.getActions());
 
