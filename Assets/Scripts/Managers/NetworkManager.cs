@@ -12,15 +12,6 @@ public class NetworkManager : MonoBehaviour
     void Awake()
     {
 		DontDestroyOnLoad(this.gameObject);
-
-        /*Network.connectToServer("18.223.24.205", 1337); // remote network
-        //Network.connectToServer("127.0.0.1", 1337); // local network
-		
-		Thread.Sleep(1000);
-		Network.submitCommand(new MoveCommand(new Pos(2, 2), new Pos(3, 3)));
-		Network.submitCommand(new StartCommand());
-		Network.submitCommand(new EndCommand());
-		Network.submitCommand(new NicknameCommand("Big Boy", clientID));*/
     }
 
     // Update is called once per frame

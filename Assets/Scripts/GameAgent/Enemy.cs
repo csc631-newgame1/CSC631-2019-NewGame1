@@ -8,7 +8,6 @@ using UnityEngine;
 public class Enemy : GameAgent
 {
     private MapManager map_manager; // reference to MapManager instance with map data
-    private TileSelector tile_selector; // reference to map tile selector
 
     // private reference to position in map grid
     private bool moving;
@@ -32,7 +31,6 @@ public class Enemy : GameAgent
 
     public override void init_agent(Pos position, GameAgentStats stats, string name = null) 
 	{
-        tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
         map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 

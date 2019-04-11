@@ -1,5 +1,4 @@
-//<<<<<<< HEAD:Assets/Scripts/Miscellaneous/TileSelector.cs
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,13 +22,6 @@ public class TileSelector : MonoBehaviour
     private List<Pos> nonselectableActTiles;
     private List<Pos> actAOETiles;
 
-    private int[,] map;
-
-    public bool showPathLine = false;
-    public bool showSelectableMoveTiles = false;
-    public bool showSelectableActTiles = false;
-    public bool showAOETiles = false;
-
     public Vector3 hover_position;
 	public Pos grid_position;
 	
@@ -37,9 +29,25 @@ public class TileSelector : MonoBehaviour
 	public Material moveableTilesMaterial;
 	public Material selectableTilesMaterial;
     public Material nonselectableTilesMaterial;
+	
+	private string modeStr;
+	public string mode {
+		get {
+			return modeStr;
+		}
+		set {
+			modeStr = value;
+			switch (value) {
+				case "MOVE":
+					CreateListOfSelectableMovementTiles(); break;
+				case "ACT":
+					CreateListOfSelectableActTiles(); break;
+			}
+		}
+	}
 
-    // called by the mapGenerator script
-    public void init_tile_selector(int[,] map)
+    // called by the gameManager script
+    public void Init(MapManager map_manager)
 	{
 		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
 		cell_size = config.cell_size;
@@ -47,8 +55,7 @@ public class TileSelector : MonoBehaviour
 		height = config.height;
 		offset = config.GetOffset();
 		
-		this.map = map;
-		this.map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
+		this.map_manager = map_manager;
 		this.path_render = GetComponent<LineRenderer>();
 		
 		Vector3 collider_size = new Vector3(width * cell_size, 0.1f, height * cell_size);
@@ -67,57 +74,34 @@ public class TileSelector : MonoBehaviour
 	
 	void Update()
 	{
-		DrawTiles();
-		
 		RaycastHit hit;
-		Pos hitp = new Pos(-1, -1);
 		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		
 		if (Physics.Raycast(ray, out hit)) {
 			
-			Vector3 diff = hit.point + offset;
-			hitp = new Pos((int)(diff.x / cell_size), (int)(diff.z / cell_size));
+			Pos hitp = map_manager.world_to_grid(hit.point);
 			
-			if (map_manager.IsTraversable(hitp) && Pos.in_bounds(hitp, width, height)) {
+			if (map_manager.IsTraversable(hitp) && hitp != grid_position) {
 				
-				if (hitp != grid_position) {
-					
-					hover_position = map_manager.grid_to_world(hitp);
-					grid_position = hitp;
-					select_square.gameObject.SetActive(true);
-					select_square.position = hover_position;
-
-                    if (showAOETiles) {
-                        CreateActAOETiles(hitp);
-                    }
-
-                    if (showSelectableMoveTiles) {
-						
-						Path hit_path = getSelectableTilePath(hitp);
-						
-						if (hit_path != null && hitp != player_main.grid_pos && !player_main.moving && showPathLine)
-							render_path_line(hit_path);
-					} 
-                } else {
-                    // allow to be able to select the player's tile
-                    if (showAOETiles) {
-                        hover_position = map_manager.grid_to_world(hitp);
-                        grid_position = hitp;
-                        select_square.gameObject.SetActive(true);
-                        select_square.position = hover_position;
-
-                        CreateActAOETiles(hitp);
-                    }
-                }
-            }
-			else {
+				grid_position = hitp;
+				select_square.gameObject.SetActive(true);
+				select_square.position = map_manager.grid_to_world(hitp);
+				
+			} // check if hovering same position as last turn so as to not cause flickering
+			else if (hitp != grid_position) {
+				
 				select_square.gameObject.SetActive(false);
+				grid_position = null;
 			}
 		}
+		
+		DrawTiles();
     }
 	
 	void render_path_line(Path path)
 	{
+		if (path == null || path.empty()) return;
+		
 		List<Pos> path_raw = path.getPositions();
 		Vector3[] path_verts = new Vector3[path_raw.Count];
 		
@@ -139,8 +123,11 @@ public class TileSelector : MonoBehaviour
 	
     // Creates a list of all selectable tiles within a given radius of a position
     // Consider turning this static for enemy AI if this is the only method they need from this class
-    public void CreateListOfSelectableMovementTiles(Pos position, int move_budget) 
+    public void CreateListOfSelectableMovementTiles() 
 	{	
+		Pos position = player_main.grid_pos;
+		int move_budget = player_main.move_budget;
+	
 		int startx 	= position.x - move_budget >= 0 ? position.x - move_budget : 0;
 		int endx	= position.x + move_budget < width ? position.x + move_budget : width - 1;
 		
@@ -169,16 +156,19 @@ public class TileSelector : MonoBehaviour
 	
 	// Creates a list of all selectable tiles within a given radius of a position
     // Consider turning this static for enemy AI if this is the only method they need from this class
-    public void CreateListOfSelectableActTiles(Pos position, int move_budget)//, GameAgentAction action) 
+    public void CreateListOfSelectableActTiles()//, GameAgentAction action) 
 	{
+		Pos position = player_main.grid_pos;
+		int range = (int) player_main.stats.range;
+		
         selectableActTiles = new List<Pos>();
         nonselectableActTiles = new List<Pos>();
 
-        int startx = position.x - move_budget >= 0 ? position.x - move_budget : 0;
-        int endx = position.x + move_budget < width ? position.x + move_budget : width - 1;
+        int startx = position.x - range >= 0 ? position.x - range : 0;
+        int endx = position.x + range < width ? position.x + range : width - 1;
 
-        int starty = position.y - move_budget >= 0 ? position.y - move_budget : 0;
-        int endy = position.y + move_budget < height ? position.y + move_budget : height - 1;
+        int starty = position.y - range >= 0 ? position.y - range : 0;
+        int endy = position.y + range < height ? position.y + range : height - 1;
 
         // TODO figure out if you are going to create a new method that doesn't fuck around with the List<Path>
         //if (action == GameAgentAction.MeleeAttack || action == GameAgentAction.MagicAttackSingleTarget
@@ -190,7 +180,7 @@ public class TileSelector : MonoBehaviour
 
 				Pos candidate = new Pos(x, y);
 				
-				if (Pos.abs_dist(position, candidate) <= move_budget) 
+				if (Pos.abs_dist(position, candidate) <= range) 
 					
 					if (map_manager.IsOccupied(candidate))
 						selectableActTiles.Add(candidate);
@@ -199,31 +189,12 @@ public class TileSelector : MonoBehaviour
 						nonselectableActTiles.Add(candidate);
 			}
 		}
-		
-        /*} else if (action == GameAgentAction.Taunt) {
-            for (int x = startx; x <= endx; x++) {
-                for (int y = starty; y <= endy; y++) {
-                    Pos candidate = new Pos(x, y);
-
-                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
-                        nonselectableActTiles.Add(candidate);
-                    }
-                }
-            }
-        } else if (action == GameAgentAction.MagicAttackAOE || action == GameAgentAction.Heal) {
-            for (int x = startx; x <= endx; x++) {
-                for (int y = starty; y <= endy; y++) {
-                    Pos candidate = new Pos(x, y);
-
-                    if (map_manager.IsTraversable(candidate) && Pos.abs_dist(position, candidate) <= move_budget) {
-                        nonselectableActTiles.Add(candidate);
-                    }
-                }
-            }
-        }*/
     }
 	
-	private void CreateActAOETiles(Pos pos) {
+	// disabling AOE while I test changes
+	/*private void CreateActAOETiles() {
+		Pos pos = player_main.grid_pos; // i know this isn't right, but... it's a quick fix
+		
         actAOETiles = new List<Pos>();
 
         if (map_manager.IsTraversable(pos) && ((nonselectableActTiles.Count > 0 && nonselectableActTiles.Contains(pos)) ||
@@ -250,16 +221,23 @@ public class TileSelector : MonoBehaviour
                 actAOETiles.Add(rightPos);
             }
         }
-    }
+    }*/
 	
-	public bool hoveringValidSelectTile()
+	/*public bool hoveringValidActAOETile() {
+        return GetActAOETile(grid_position) != null;
+    }*/
+	
+	/*private Pos GetActAOETile(Pos tilePos) {
+        foreach (Pos tile in actAOETiles)
+            if (tile == tilePos)
+                return tile;
+        return null;
+    }*/
+	
+	public bool hoveringValidActTile()
 	{
 		return GetSelectableActTile(grid_position) != null;
 	}
-
-    public bool hoveringValidActAOETile() {
-        return GetActAOETile(grid_position) != null;
-    }
 
     private Path getSelectableTilePath(Pos tile_pos) 
 	{
@@ -271,13 +249,6 @@ public class TileSelector : MonoBehaviour
 
     private Pos GetSelectableActTile(Pos tilePos) {
         foreach (Pos tile in selectableActTiles)
-            if (tile == tilePos)
-                return tile;
-        return null;
-    }
-
-    private Pos GetActAOETile(Pos tilePos) {
-        foreach (Pos tile in actAOETiles)
             if (tile == tilePos)
                 return tile;
         return null;
@@ -311,238 +282,47 @@ public class TileSelector : MonoBehaviour
     }
 	
 	void DrawTiles() {
-        if (showSelectableMoveTiles) {
-			foreach (Path path in selectableMovementTiles) {
-				Pos tile = path.endPos();
-				Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), moveableTilesMaterial, 0);
-			}
-        }
-        if (showSelectableActTiles) {
-			foreach (Pos tile in selectableActTiles) {
-				Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), selectableTilesMaterial, 0);
-			}
-
-            foreach (Pos tile in nonselectableActTiles) {
-                Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), nonselectableTilesMaterial, 0);
-            }
-        }
-        if (showAOETiles) {
-            if (actAOETiles != null && actAOETiles.Count > 0) {
-                foreach (Pos tile in actAOETiles) {
-                    Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), selectableTilesMaterial, 0);
-                }
-            }
-        }
+		clear_path_line();
+        switch (mode) {
+			case "MOVE":
+				// render path line
+				if (grid_position != null) {
+					Path line_path = getSelectableTilePath(grid_position);
+					if (line_path != null) {
+						path_render.startColor = Color.white;
+						path_render.endColor = Color.white;
+						render_path_line(line_path);
+					}
+					else {
+						Path alt = map_manager.get_path(player_main.grid_pos, grid_position);
+						if (alt != null && !alt.empty()) {
+							path_render.startColor = Color.red;
+							path_render.endColor = Color.red;
+							render_path_line(alt);
+						}
+					}
+				}
+				// render selectable tile indicators
+				foreach (Path path in selectableMovementTiles) {
+					Pos tile = path.endPos();
+					Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), moveableTilesMaterial, 0);
+				}
+				break;
+			case "ACT":
+				foreach (Pos tile in selectableActTiles) {
+					Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), selectableTilesMaterial, 0);
+				}
+				foreach (Pos tile in nonselectableActTiles) {
+					Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), nonselectableTilesMaterial, 0);
+				}
+				break;
+			case "AOE":
+				if (actAOETiles != null && actAOETiles.Count > 0) {
+					foreach (Pos tile in actAOETiles) {
+						Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), selectableTilesMaterial, 0);
+					}
+				}
+				break;
+		}
     }
 }
-/*=======
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-using MapUtils;
-using static MapUtils.MapConstants;
-
-public class TileSelector : MonoBehaviour
-{
-	private class Path
-	{
-		List<Pos> path_raw;
-		
-		public Path(List<Pos> _path)
-		{
-			this.path_raw = _path;
-		}
-		
-		public List<Pos> getPath() {
-			return path_raw;
-		}
-		
-		public Pos startPos() {
-			return path_raw[0];
-		}
-		
-		public Pos endPos() {
-			return path_raw[path_raw.Count - 1];
-		}
-		
-		// Gets the distance of the shortest path to the tiles
-		public int distance() 
-		{
-			int distance = 0;
-			for (int i = 1; i < path_raw.Count; i++)
-				distance += Pos.abs_dist(path_raw[i], path_raw[i-1]);
-			return distance;
-		}
-	}
-	
-	private int width;
-	private int height;
-	private float cell_size;
-	private Vector3 offset;
-
-    private Transform select_square;
-	private MapManager map_manager;
-	private LineRenderer path_render;
-	private Player player_main;
-
-    private List<Path> selectableMovementTiles;
-    private List<Pos> selectableActTiles;
-    private List<Pos> nonselectableActTiles;
-    private List<Pos> actAOETiles;
-
-    private int[,] map;
-
-    public bool showPathLine = false;
-    public bool showSelectableMoveTiles = false;
-    public bool showSelectableActTiles = false;
-    public bool showAOETiles = false;
-
-    public Vector3 hover_position;
-	public Pos grid_position;
-	
-	public Mesh tileMesh;
-	public Material moveableTilesMaterial;
-	public Material selectableTilesMaterial;
-    public Material nonselectableTilesMaterial;
-    
-    // called by the mapGenerator script
-    public void init_tile_selector(int[,] map)
-	{
-		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
-		cell_size = config.cell_size;
-		width = config.width;
-		height = config.height;
-		offset = config.GetOffset();
-		
-		this.map = map;
-		this.map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
-		this.path_render = GetComponent<LineRenderer>();
-		
-		Vector3 collider_size = new Vector3(width * cell_size, 0.1f, height * cell_size);
-		BoxCollider selection_collider = GetComponent<BoxCollider>();
-		selection_collider.size = collider_size;
-		
-		select_square = transform.Find("Selector");
-    }
-
-    // called by the Player script
-    public void setPlayer(Player p) 
-	{
-		this.player_main = p;
-		grid_position = p.grid_pos;
-	}
-	
-	void Update()
-	{
-		DrawTiles();
-		
-		RaycastHit hit;
-		Pos hitp = new Pos(-1, -1);
-		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		
-		if (Physics.Raycast(ray, out hit)) {
-			
-			Vector3 diff = hit.point + offset;
-			hitp = new Pos((int)(diff.x / cell_size), (int)(diff.z / cell_size));
-			
-			if (map_manager.IsTraversable(hitp) && Pos.in_bounds(hitp, width, height)) {
-				
-				if (hitp != grid_position) {
-					
-					hover_position = map_manager.grid_to_world(hitp);
-					grid_position = hitp;
-					select_square.gameObject.SetActive(true);
-					select_square.position = hover_position;
-
-                    if (showAOETiles) {
-                        CreateActAOETiles(hitp);
-                    }
-					
-					if (showSelectableMoveTiles) {
-						
-						Path hit_path = getSelectableTilePath(hitp);
-						
-						if (hit_path != null && hitp != player_main.grid_pos && !player_main.moving && showPathLine)
-							render_path_line(hit_path);
-					} 
-				} else {
-                    // allow to be able to select the player's tile
-                    if (showAOETiles) {
-                        hover_position = map_manager.grid_to_world(hitp);
-                        grid_position = hitp;
-                        select_square.gameObject.SetActive(true);
-                        select_square.position = hover_position;
-
-                        CreateActAOETiles(hitp);
-                    }
-                }
-			}
-			else {
-				select_square.gameObject.SetActive(false);
-			}
-		}
-    }
-	
-	void render_path_line(Path path)
-	{
-		List<Pos> path_raw = path.getPath();
-		Vector3[] path_verts = new Vector3[path_raw.Count];
-		
-		for(int i = 0; i < path_raw.Count; i++) {
-			path_verts[i] = map_manager.grid_to_world(path_raw[i]) + Vector3.up * 0.2f;
-		}
-		
-		path_render.positionCount = path_raw.Count;
-		path_render.SetPositions(path_verts);
-	}
-	
-	public void clear_path_line()
-	{
-		path_render.positionCount = 0;
-		
-		Vector3[] blank = new Vector3[0];
-		path_render.SetPositions(blank);
-	}
-	
-    // Creates a list of all selectable tiles within a given radius of a position
-    // Consider turning this static for enemy AI if this is the only method they need from this class
-    public void CreateListOfSelectableMovementTiles(Pos position, int move_budget, GameAgentAction action) 
-	{	
-        selectableMovementTiles = new List<Path>();
-		
-		int startx 	= position.x - move_budget >= 0 ? position.x - move_budget : 0;
-		int endx	= position.x + move_budget < width ? position.x + move_budget : width - 1;
-		
-		int starty 	= position.y - move_budget >= 0 ? position.y - move_budget : 0;
-		int endy	= position.y + move_budget < height ? position.y + move_budget : height - 1;
-
-		List<Pos> candidates = new List<Pos>();
-        if (action == GameAgentAction.Move) {
-            for (int x = startx; x <= endx; x++) {
-			    for (int y = starty; y <= endy; y++) {
-				
-				    Pos candidate = new Pos(x, y);
-                    if (map_manager.IsTraversable(candidate) && candidate != position && Pos.abs_dist(position, candidate) <= move_budget) {
-						candidates.Add(candidate);
-                    }
-                }
-			}
-		}
-		
-		List<List<Pos>> paths = map_manager.get_paths(position, candidates);
-		foreach (List<Pos> rawPath in paths) {
-			Path path = new Path(rawPath);
-			if (path.distance() <= move_budget)
-				selectableMovementTiles.Add(path);
-		}
-    }
-	
-	public bool hoveringValidMoveTile()
-	{
-		return getSelectableTilePath(grid_position) != null;
-	}
-
-    
-}
->>>>>>> dev:Assets/Scripts/TileSelector.cs*/

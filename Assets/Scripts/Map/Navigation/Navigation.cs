@@ -174,6 +174,8 @@ public class NavigationHandler
 			Vertex source = vertex_map[p_origin.x, p_origin.y];
 			Vertex target = vertex_map[p_target.x, p_target.y];
 			
+			if (source == null || target == null) return null;
+			
 			// maximum range we will need to search
 			int maxDistance = Pos.abs_dist(source.pos, target.pos);
 			

@@ -5,6 +5,7 @@ using UnityEngine;
 
 using static MapUtils.Dir;
 using static MapUtils.Type;
+using static GameAgentAction;
 
 namespace MapUtils 
 {
@@ -73,6 +74,40 @@ namespace MapUtils
 				case DOWN  : return Pos.DOWN;
 			}
 			return Pos.NONE;
+		}
+		public static string GetString(this GameAgentAction action)
+		{
+			switch (action) {
+				case Move: return "MOVE";
+				case Wait: return "WAIT";
+				case Potion: return "POTION";
+				case MeleeAttack: return "ATTACK";
+				case Taunt: return "TAUNT";
+				case RangedAttack: return "SHOOT";
+				case RangedAttackMultiShot: return "MULTISHOT";
+				case MagicAttackSingleTarget: return "BOLT";
+				case MagicAttackAOE: return "STORM";
+				case Heal: return "HEAL";
+				case Neutral: return "NEUTRAL";
+			}
+			return "NONE";
+		}
+		public static string GetMode(this GameAgentAction action)
+		{
+			switch (action) {
+				case Move: return "MOVE";
+				case Wait: return "NONE";
+				case Potion: return "NONE";
+				case MeleeAttack: return "ACT";
+				case Taunt: return "ACT";
+				case RangedAttack: return "ACT";
+				case RangedAttackMultiShot: return "ACT";
+				case MagicAttackSingleTarget: return "ACT";
+				case MagicAttackAOE: return "AOE";
+				case Heal: return "ACT";
+				case Neutral: return "NONE";
+			}
+			return "NONE";
 		}
 	}
 	
