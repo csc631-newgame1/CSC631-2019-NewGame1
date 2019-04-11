@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 using MapUtils;
-using System;
+using static MapUtils.EnumUtils;
 
 public class Player : GameAgent
 {	
@@ -11,12 +13,7 @@ public class Player : GameAgent
     private MapConfiguration config;
 	private TileSelector tile_selector; // reference to map tile selector
     private List<Pos> selectableTiles;
-
-	// private reference to position in map grid
-    public bool hoveringMovementTileSelector = false;
-	public bool moving = false;
-    public bool hoveringActionTileSelector = false;
-    public bool isAttacking = false;
+	
 	public bool godMode = false;
 
     // player turn options
@@ -53,27 +50,20 @@ public class Player : GameAgent
         this.name = name;
 
         this.stats = stats;
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
-        currentHealth = maxHealth;
-        range = stats.range;
-        _speed = stats.speed;
-		move_budget = 10;
         UpdateViewableEditorPlayerStats();
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
-		
-		PlayerActMenu.init();
 
         selectableTiles = new List<Pos>();
 
-		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
+		tile_selector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
 		tile_selector.setPlayer(this);
 
         currentState = GameAgentState.Alive;
+		animating = false;
 		
 		// AI init
 		team = 0;
@@ -81,8 +71,282 @@ public class Player : GameAgent
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
 
+	public void RespondToKeyboardInput(char key)
+	{
+		switch (key) {
+		    case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
+		    case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
+		    case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
+		    case '4': StartCoroutine(animator.PlayHitAnimation()); break;
+		    case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
+		    case '6': StartCoroutine(animator.PlayKilledAimation()); break;
+            case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
+            case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
+            case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
+            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;
+        }
+    }
+	
+	private bool attacking = false;
+	
+	public override IEnumerator animate_attack(GameAgent target)
+	{
+		//Debug.Log("Starting attack");
+		animating = true;
+		attacking = true;
+		
+		// get target position, and distance between us and the enemy
+		Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
+		Vector3 ownPos = map_manager.grid_to_world(grid_pos);
+		float distance = Vector3.Distance(ownPos, targetPos);
+		
+		// look at enemy and start attack animation
+		transform.LookAt(targetPos);
+		StartCoroutine(animator.PlayAttackAnimation());
+		
+		// wait for animation trigger
+		while (attacking) yield return null;
+		// wait a little longer based on projectile distance
+		yield return new WaitForSeconds(distance / 10f);
+		
+		target.take_damage(stats.DealDamage());
+		transform.position = ownPos; // reset position after animation, which sometimes offsets it
+		
+		animating = false;
+		//Debug.Log("Ended attack");
+	}
+	
+	public void Hit(){ attacking = false; }
+	public void Shoot(){ attacking = false; }
+	
+	public override void take_damage(int amount)
+	{
+        if (stats.currentState == GameAgentState.Alive) {
+            if (!godMode) stats.TakeDamage(amount);
+
+            if (stats.currentState == GameAgentState.Unconscious) {
+                StartCoroutine(animator.PlayKilledAimation());
+            } else {
+                StartCoroutine(animator.PlayHitAnimation());
+            }
+			//StartCoroutine(wait_to_reset_position());
+        }
+
+        UpdateViewableEditorPlayerStats();
+    }
+	
+	/*private IEnumerator slide_to_position()
+	{
+		Vector3 originalPos = transform.position;
+		yield return new WaitForSeconds(1f);
+		transform.position = pos;
+	}*/
+
+    public override void GetHealed(int amount) {
+        if (stats.currentState == GameAgentState.Alive) {
+            if (!godMode) stats.GetHealed(amount);
+
+            StartCoroutine(animator.PlayUseItemAnimation());
+        }
+
+        UpdateViewableEditorPlayerStats();
+    }
+
+    public override void take_turn()
+	{
+        if (stats.currentState == GameAgentState.Alive) {
+            playerMovedThisTurn = false;
+            playerActedThisTurn = false;
+            playerUsedPotionThisTurn = false;
+            playerWaitingThisTurn = false;
+        }
+
+        UpdateViewableEditorPlayerStats();
+    }
+
+    private void UpdateViewableEditorPlayerStats() {
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = stats.currentHealth;
+        range = stats.range;
+        _speed = stats.speed;
+        level = stats.level;
+
+        switch (stats.currentState) {
+            case GameAgentState.Alive:
+                viewableState = "Alive";
+                break;
+            case GameAgentState.Unconscious:
+                viewableState = "Unconscious";
+                break;
+            case GameAgentState.Dead:
+                viewableState = "Dead";
+                break;
+        }
+    }
+
+    public override IEnumerator smooth_movement(List<Pos> path)
+	{
+		grid_pos = path.Last();
+		animating = true;
+        StartCoroutine(animator.StartMovementAnimation());
+
+			Vector3 origin, target;
+			foreach(Pos step in path) {
+
+				origin = transform.position;
+				target = map_manager.grid_to_world(step);
+				float dist = Vector3.Distance(origin, target);
+				float time = 0f;
+
+				transform.LookAt(target);
+
+					while(time < 1f && dist > 0f) {
+						time += (Time.deltaTime * speed) / dist;
+						transform.position = Vector3.Lerp(origin, target, time);
+						yield return null;
+					}
+			}
+			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+
+        StartCoroutine(animator.StopMovementAnimation());
+        animating = false;
+		
+        playerMovedThisTurn = true;
+	}
+
+	/*** UNUSED ANIMATION RECEIVERS ***/
+	public void FootR(){}
+	public void FootL(){}
+	public void WeaponSwitch(){}
+	/*** END ANIMATION RECEIVERS ***/
+	
+	public string[] getActions()
+	{
+		List<string> actionNames = new List<string>();
+		foreach (GameAgentAction act in stats.playerCharacterClass.GetAvailableActs())
+			actionNames.Add(act.GetString());
+		return actionNames.ToArray();
+	}
+	
+	public override void wait() { playerWaitingThisTurn = true; }
+	public override void potion() { playerUsedPotionThisTurn = true; }
+	public override void move() { playerMovedThisTurn = true; }
+	public override void act() { playerActedThisTurn = true; }
+	public override bool turn_over() {
+		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
+    }
+	
+	public bool can_take_action() { return !animating && !turn_over(); }
+	
+	public void TestCharacterClass(int characterClassToTest) {
+        int weapon = CharacterClassOptions.RandomClassWeapon;
+        if (characterClassToTest == CharacterClassOptions.Knight) {
+            weapon = CharacterClassOptions.Sword;
+        }
+
+        stats = new GameAgentStats(CharacterRaceOptions.Human, characterClassToTest, 1, weapon);
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = maxHealth;
+        range = stats.range;
+        _speed = stats.speed;
+
+        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
+    }
+	
+	
+	// VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
+	// 			INTRUDERS WILL BE EXECUTED			  //
+	
+	// disabling this for now while I test changes
+	/*public string getActionMode(int action)
+	{
+		GameAgentAction[] actions = stats.playerCharacterClass.GetAvailableActs();
+		return actions[action].GetMode(); // mode can be ACT or AOE
+	}*/
+	
+	// a lot of the WaitForXXX functions seemed redundant... we can add this functionality back later if necessary
+	/*IEnumerator WaitForAttackEnd(Pos attackPos)
+	{
+		isAttacking = true;
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
+        this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
+
+        while (isAttacking) yield return null;
+        map_manager.attack(attackPos, stats.DealDamage());
+
+        playerActedThisTurn = true;
+    }
+
+    IEnumerator WaitForRangedAttackMultiShotEnd(Pos attackPos, int multiShotCount) {
+        isAttacking = true;
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
+        this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
+
+        while (isAttacking) yield return null;
+        map_manager.attack(this, attackPos, stats.GetMultiShotDamage());
+
+        // Stop attacking if target is dead
+        if (map_manager.GetGameAgentState(attackPos) != GameAgentState.Alive) {
+            multiShotCount = 0;
+        }
+
+        if (multiShotCount > 0) {
+            while (animator.AnimatorIsPlaying()) yield return null;
+            StartCoroutine(animator.PlayAttackAnimation());
+            StartCoroutine(WaitForRangedAttackMultiShotEnd(attackPos, --multiShotCount));
+        } else {
+            playerActedThisTurn = true;
+        }
+
+        //PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
+    }
+
+    IEnumerator WaitForTauntEnd() {
+        isAttacking = true;
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
+        Transform lookDirection = map_manager.GetNearestUnitTransform(grid_pos, tile_selector.GetPositionOfAgentsInNonselectableActTiles());
+        if (lookDirection != null) {
+            this.transform.LookAt(lookDirection);
+        }
+         //&& map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive
+        while (animator.AnimatorIsPlaying()) yield return null;
+        isAttacking = false;
+
+        playerActedThisTurn = true;
+    }
+
+    IEnumerator WaitForAOEEnd(List<Pos> targetTiles) {
+        // Have player look at the target it's attacking
+        // Consider making this a smooth movement
+        Transform lookDirection = map_manager.GetNearestUnitTransform(grid_pos, tile_selector.GetPositionOfAgentsInActAOETiles());
+        if (lookDirection != null) {
+            this.transform.LookAt(lookDirection);
+        }
+
+        if (currentAction == GameAgentAction.MagicAttackAOE) {
+            isAttacking = true;
+            while (isAttacking) yield return null;
+            foreach (Pos tile in targetTiles) {
+                map_manager.attack(tile, stats.DealDamage());
+            }
+        } else if (currentAction == GameAgentAction.Heal) {
+            isAttacking = true;
+            while (isAttacking) yield return null;
+            foreach (Pos tile in targetTiles) {
+                map_manager.GetHealed(tile, stats.GetHealAmount());
+            }
+        }
+
+        playerActedThisTurn = true;
+    }*/
+
 	// if right mouse button is pressed, move player model to hover position
-    public void RespondToMouseClick()
+    /*public void RespondToMouseClick()
     {
 		if (!moving && !isAttacking && hoveringActionTileSelector) {
 			switch (currentAction) {
@@ -127,228 +391,9 @@ public class Player : GameAgent
                     break;
             }
 		}
-	}
-
-	public void RespondToKeyboardInput(char key)
-	{
-		switch (key) {
-		    case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
-		    case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
-		    case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
-		    case '4': StartCoroutine(animator.PlayHitAnimation()); break;
-		    case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
-		    case '6': StartCoroutine(animator.PlayKilledAimation()); break;
-            case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
-            case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
-            case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
-            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;
-        }
-    }
-
-	IEnumerator WaitForAttackEnd(Pos attackPos)
-	{
-		isAttacking = true;
-        // Have player look at the target it's attacking
-        // Consider making this a smooth movement
-        this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
-
-        while (isAttacking) yield return null;
-        map_manager.attack(attackPos, stats.DealDamage());
-
-        TurnOffSelectors();
-        action4();
-        playerActedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
-    }
-
-    IEnumerator WaitForRangedAttackMultiShotEnd(Pos attackPos, int multiShotCount) {
-        isAttacking = true;
-        // Have player look at the target it's attacking
-        // Consider making this a smooth movement
-        this.transform.LookAt(map_manager.GetUnitTransform(attackPos));
-
-        while (isAttacking) yield return null;
-        map_manager.attack(attackPos, stats.GetMultiShotDamage());
-
-        // Stop attacking if target is dead
-        if (map_manager.GetGameAgentState(attackPos) != GameAgentState.Alive) {
-            multiShotCount = 0;
-        }
-
-        if (multiShotCount > 0) {
-            while (animator.AnimatorIsPlaying()) yield return null;
-            StartCoroutine(animator.PlayAttackAnimation());
-            StartCoroutine(WaitForRangedAttackMultiShotEnd(attackPos, --multiShotCount));
-        } else {
-            playerActedThisTurn = true;
-        }
-
-        TurnOffSelectors();
-        action4();
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
-
-    }
-
-    IEnumerator WaitForTauntEnd() {
-        isAttacking = true;
-        // Have player look at the target it's attacking
-        // Consider making this a smooth movement
-        Transform lookDirection = map_manager.GetNearestUnitTransform(grid_pos, tile_selector.GetPositionOfAgentsInNonselectableActTiles());
-        if (lookDirection != null) {
-            this.transform.LookAt(lookDirection);
-        }
-         //&& map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive
-        while (animator.AnimatorIsPlaying()) yield return null;
-        isAttacking = false;
-
-        TurnOffSelectors();
-        action4();
-        playerActedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
-    }
-
-    IEnumerator WaitForAOEEnd(List<Pos> targetTiles) {
-        // Have player look at the target it's attacking
-        // Consider making this a smooth movement
-        Transform lookDirection = map_manager.GetNearestUnitTransform(grid_pos, tile_selector.GetPositionOfAgentsInActAOETiles());
-        if (lookDirection != null) {
-            this.transform.LookAt(lookDirection);
-        }
-
-        if (currentAction == GameAgentAction.MagicAttackAOE) {
-            isAttacking = true;
-            while (isAttacking) yield return null;
-            foreach (Pos tile in targetTiles) {
-                map_manager.attack(tile, stats.DealDamage());
-            }
-        } else if (currentAction == GameAgentAction.Heal) {
-            isAttacking = true;
-            while (isAttacking) yield return null;
-            foreach (Pos tile in targetTiles) {
-                map_manager.GetHealed(tile, stats.GetHealAmount());
-            }
-        }
-
-        TurnOffSelectors();
-        action4();
-        playerActedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
-    }
-
-    public override void take_damage(int amount)
-	{
-        if (stats.currentState == GameAgentState.Alive) {
-            if (!godMode) stats.TakeDamage(amount);
-
-            if (stats.currentState == GameAgentState.Unconscious) {
-                StartCoroutine(animator.PlayKilledAimation());
-            } else {
-                StartCoroutine(animator.PlayHitAnimation());
-            }
-        }
-
-        UpdateViewableEditorPlayerStats();
-    }
-
-    public override void GetHealed(int amount) {
-        if (stats.currentState == GameAgentState.Alive) {
-            if (!godMode) stats.GetHealed(amount);
-
-            StartCoroutine(animator.PlayUseItemAnimation());
-        }
-
-        UpdateViewableEditorPlayerStats();
-    }
-
-    public override void take_turn()
-	{
-        if (stats.currentState == GameAgentState.Alive) {
-            playerMovedThisTurn = false;
-            playerActedThisTurn = false;
-            playerUsedPotionThisTurn = false;
-            playerWaitingThisTurn = false;
-		    PlayerActMenu.MakeAllButtonsInteractable(true);
-        }
-
-        UpdateViewableEditorPlayerStats();
-    }
-
-    private void UpdateViewableEditorPlayerStats() {
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
-        currentHealth = stats.currentHealth;
-        range = stats.range;
-        _speed = stats.speed;
-        level = stats.level;
-
-        switch (stats.currentState) {
-            case GameAgentState.Alive:
-                viewableState = "Alive";
-                break;
-            case GameAgentState.Unconscious:
-                viewableState = "Unconscious";
-                break;
-            case GameAgentState.Dead:
-                viewableState = "Dead";
-                break;
-        }
-    }
-
-    public override IEnumerator smooth_movement(List<Pos> path)
-	{
-		grid_pos = path.Last();
-		moving = true;
-        StartCoroutine(animator.StartMovementAnimation());
-
-			Vector3 origin, target;
-			foreach(Pos step in path) {
-
-				origin = transform.position;
-				target = map_manager.grid_to_world(step);
-				float dist = Vector3.Distance(origin, target);
-				float time = 0f;
-
-				transform.LookAt(target);
-
-					while(time < 1f && dist > 0f) {
-						time += (Time.deltaTime * speed) / dist;
-						transform.position = Vector3.Lerp(origin, target, time);
-						yield return null;
-					}
-			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
-
-        StartCoroutine(animator.StopMovementAnimation());
-        moving = false;
-		tile_selector.clear_path_line();
-        playerMovedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.MOVE);
-	}
-
-	public void FootR(){}
-	public void FootL(){}
-
-    // Signal end of attack once hit animation has completed
-	public void Hit(){
-		if (isAttacking) isAttacking = false;
-    }
-
-	public void Shoot(){
-        if (isAttacking) isAttacking = false;
-    }
-
-	public void WeaponSwitch(){}
-
-    public void TurnOffSelectors() {
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableMoveTiles = false;
-        tile_selector.showSelectableActTiles = false;
-        tile_selector.showPathLine = false;
-        tile_selector.showAOETiles = false;
-        tile_selector.clear_path_line();
-    }
-
-    public override void move() {
+	}*/
+	
+    /*public override void move() {
 		if (playerMovedThisTurn || turn_over())
             return;
 		
@@ -483,43 +528,6 @@ public class Player : GameAgent
 		PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.POTION);
     }
 
-    public void TestCharacterClass(int characterClassToTest) {
-        int weapon = CharacterClassOptions.RandomClassWeapon;
-        if (characterClassToTest == CharacterClassOptions.Knight) {
-            weapon = CharacterClassOptions.Sword;
-        }
-
-        stats = new GameAgentStats(CharacterRaceOptions.Human, characterClassToTest, 1, weapon);
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
-        currentHealth = maxHealth;
-        range = stats.range;
-        _speed = stats.speed;
-
-        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
-
-        if (playersForTestingPurposes != null) {
-            UpdatePlayerStatsMenu(playersForTestingPurposes);
-        }
-    }
-
-    public override bool turn_over() {
-        // Player chose to wait
-        if (playerWaitingThisTurn) {
-            PlayerActMenu.MakeAllButtonsInteractable(false);
-            return true;
-        // Player used Act and used a Potion
-        } else if (playerActedThisTurn) {
-            PlayerActMenu.MakeAllButtonsInteractable(false);
-            return true;
-        // Player moved and either used Act or used a Potion
-        } else if (playerMovedThisTurn && playerUsedPotionThisTurn) {
-            PlayerActMenu.MakeAllButtonsInteractable(false);
-            return true;
-        }
-        return false;
-    }
-
     public void UpdatePlayerStatsMenu(List<Player> players) {
         // Get rid of this when you get rid of using keys to change player class
         playersForTestingPurposes = players;
@@ -569,7 +577,7 @@ public class Player : GameAgent
         }
 
         return sortedPlayersIndex;
-    }
+    }*/
 
    
 }

@@ -8,11 +8,7 @@ using UnityEngine;
 public class Enemy : GameAgent
 {
     private MapManager map_manager; // reference to MapManager instance with map data
-    private TileSelector tile_selector; // reference to map tile selector
 
-    // private reference to position in map grid
-    private bool moving;
-	
 	private bool enemy_turn = false;
 
     private CharacterAnimator animator;
@@ -32,7 +28,6 @@ public class Enemy : GameAgent
 
     public override void init_agent(Pos position, GameAgentStats stats, string name = null) 
 	{
-        tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
         map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 
@@ -62,9 +57,11 @@ public class Enemy : GameAgent
 		TurnManager.instance.addToRoster(this);
     }
 
-    public override IEnumerator smooth_movement(List<Pos> path) {
+    public override IEnumerator smooth_movement(List<Pos> path) 
+	{
+		//Debug.Log("started...");
 		grid_pos = path.Last();
-        moving = true;
+        animating = true;
         StartCoroutine(animator.StartMovementAnimation());
 
 			Vector3 origin, target;
@@ -77,7 +74,6 @@ public class Enemy : GameAgent
 
 				transform.LookAt(target);
 
-//<<<<<<< HEAD
 					while(time < 1f && dist > 0f) {
 						time += (Time.deltaTime * speed) / dist;
 						transform.position = Vector3.Lerp(origin, target, time);
@@ -87,30 +83,63 @@ public class Enemy : GameAgent
 			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
 
         StartCoroutine(animator.StopMovementAnimation());
-        moving = false;
+        animating = false;
+		//Debug.Log("ended...");
     }
 	
-/*	public override void take_damage(int amount) {
-        stats.currentHealth -= amount;
-        if (stats.currentHealth <= 0) {
-			
-            stats.currentHealth = 0;
-            StartCoroutine(animator.PlayKilledAimation());
-			
-=======*/
-    public override void take_damage(int amount) {
+	private bool attacking = false;
+	
+	public override IEnumerator animate_attack(GameAgent target)
+	{
+		//Debug.Log("started...");
+		animating = true;
+		attacking = true;
+		
+		// get target position, and distance between us and the enemy
+		Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
+		Vector3 ownPos = map_manager.grid_to_world(grid_pos);
+		float distance = Math.Max(1, Vector3.Distance(ownPos, targetPos));
+		
+		// look at enemy and start attack animation
+		transform.LookAt(targetPos);
+		StartCoroutine(animator.PlayAttackAnimation());
+		
+		// wait for animation trigger
+		while (attacking) yield return null;
+		// wait a little longer based on projectile distance
+		yield return new WaitForSeconds(distance / 10f);
+		
+		target.take_damage(stats.DealDamage());
+		transform.position = ownPos; // reset to previous position after animation
+		
+		//Debug.Log("ended...");
+		animating = false;
+	}
+	
+    public void Hit() { attacking = false; }
+    public void Shoot() { attacking = false; }
+	
+    public override void take_damage(int amount) 
+	{	
         stats.TakeDamage(amount);
 
         if (stats.currentState == GameAgentState.Unconscious) {
             StartCoroutine(animator.PlayKilledAimation());
             stats.currentState = GameAgentState.Dead;
-//>>>>>>> dev
         } else {
             StartCoroutine(animator.PlayHitAnimation());
         }
-
+		
+		//StartCoroutine(wait_to_reset_position());
         currentHealth = stats.currentHealth;
     }
+	
+	/*private IEnumerator wait_to_reset_position()
+	{
+		Vector3 pos = transform.position;
+		yield return new WaitForSeconds(1f);
+		transform.position = pos;
+	}*/
 
     public override void GetHealed(int amount) 
 	{
@@ -119,25 +148,17 @@ public class Enemy : GameAgent
 
             StartCoroutine(animator.PlayUseItemAnimation());
         }
-
         currentHealth = stats.currentHealth;
     }
 
     public override void take_turn() 
 	{	
-		if (stats.currentState == GameAgentState.Alive) {
-			enemy_turn = true;
-			AI.advance();
-			StartCoroutine(animator.PlayAttackAnimation());
-			enemy_turn = false;
-        }
-		else enemy_turn = false;
+		StartCoroutine(AI.advance());
     }
 	
 	public override bool turn_over() {
-		return !enemy_turn;
+		return AI.finished;
 	}
-
 
     public override void move() {
     }
@@ -153,7 +174,5 @@ public class Enemy : GameAgent
 
     public void FootR() { }
     public void FootL() { }
-    public void Hit() { }
-    public void Shoot() { }
     public void WeaponSwitch() { }
 }

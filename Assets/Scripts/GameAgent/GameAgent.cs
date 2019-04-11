@@ -6,7 +6,6 @@ using MapUtils;
 
 public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
 
-
 public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;
@@ -20,8 +19,11 @@ public abstract class GameAgent : MonoBehaviour
 	public int move_budget;
 
     public Inventory inventory = new Inventory();
+	public bool animating;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
+	
+	public abstract IEnumerator animate_attack(GameAgent target);
 	
 	public abstract void take_damage(int amount);
 

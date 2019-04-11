@@ -10,6 +10,7 @@
 		_BaseIntensity ("Base Light Intensity", Range(0, 1)) = 0
 		_Flow ("Fluid Flowing Speed", Range(0, 10)) = 1
 		_Height ("Fluid height", Range(0, 25)) = 10
+		_BaseLightColor ("Base Light Color", Color) = (1, 1, 1, 1)
 	}
 
     SubShader {
@@ -34,6 +35,7 @@
 			half _BaseIntensity;
 			half _Flow;
 			half _Height;
+			float4 _BaseLightColor;
 			
 			struct i2v {
 				float4 pos : POSITION;
@@ -45,7 +47,7 @@
                 float4 pos : POSITION;
                 half2 uv1 : TEXCOORD0;
 				half2 uv2 : TEXCOORD1;
-				half4 light : COLOR;
+				//half4 light : COLOR;
 				UNITY_FOG_COORDS(2)
 				half height : TEXCOORD2;
             };
@@ -62,9 +64,9 @@
 				o.uv1 = TRANSFORM_TEX(v.uv, _MainTex);
 				o.uv2 = TRANSFORM_TEX(half2(v.pos.x, v.pos.z), _FluidTex);
 				
-				half3 world_normal = UnityObjectToWorldNormal(v.normal);
-				half intensity = _BaseIntensity + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) * (1 - _BaseIntensity);
-                o.light = _LightColor0 * intensity;
+				//half3 world_normal = UnityObjectToWorldNormal(v.normal);
+				//half intensity = _BaseIntensity + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) * (1 - _BaseIntensity);
+                //o.light = _LightColor0 * intensity;
 				
 				o.height = abs(v.pos.y / _Height);
 				
@@ -82,7 +84,7 @@
 				half4 grd_col = tex2D(_FluidGradient, half2(weight, 0));
 				half4 tex_col = tex2D(_MainTex, i.uv1);
 				
-				half4 col = lerp(grd_col, tex_col, 1 - (grd_col.a)) * i.light;
+				half4 col = lerp(grd_col, tex_col * _BaseLightColor, 1 - (grd_col.a));
 				
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				
