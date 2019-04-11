@@ -213,7 +213,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 1
-  m_Color: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
+  m_Color: {r: 1, g: 0.8294825, b: 0.7783019, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -492,7 +492,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+  m_BackGroundColor: {r: 0.9245283, g: 0.9245283, b: 0.9245283, a: 1}
   m_projectionMatrixMode: 1
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
@@ -507,8 +507,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 100
   field of view: 45
-  orthographic: 0
-  orthographic size: 25
+  orthographic: 1
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -554,8 +554,8 @@ MonoBehaviour:
   pitch: 2
   currentZoom: 9
   zoomSpeed: 4
-  minZoom: 1
-  maxZoom: 50
+  minZoom: 10
+  maxZoom: 25
 --- !u!45 &1867890180
 Skybox:
   m_ObjectHideFlags: 0
@@ -905,6 +905,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3348429512346625142, guid: 1210833020d932640923c8daf1a1d3ab,
+        type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 3348429512346625142, guid: 1210833020d932640923c8daf1a1d3ab,
+        type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 673046482604077798, guid: 1210833020d932640923c8daf1a1d3ab,
         type: 3}
