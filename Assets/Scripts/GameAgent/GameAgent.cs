@@ -6,7 +6,6 @@ using MapUtils;
 
 public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
 
-
 public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;

@@ -82,7 +82,7 @@
 				half4 grd_col = tex2D(_FluidGradient, half2(weight, 0));
 				half4 tex_col = tex2D(_MainTex, i.uv1);
 				
-				half4 col = lerp(grd_col, tex_col, 1 - (grd_col.a)) * i.light;
+				half4 col = lerp(grd_col, tex_col * i.light, 1 - (grd_col.a));
 				
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				

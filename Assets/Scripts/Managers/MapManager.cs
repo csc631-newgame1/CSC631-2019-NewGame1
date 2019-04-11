@@ -58,9 +58,6 @@ public class MapManager : MonoBehaviour
 				map[x, y] = new MapCell(traversable(map_raw[x, y]));
 			}
 		}
-
-		tileSelector = mapObject.transform.Find("TileSelector").GetComponent<TileSelector>();
-		tileSelector.init_tile_selector(map_raw);
 	}
 	
 	// set all map configuration variables
@@ -181,6 +178,8 @@ public class MapManager : MonoBehaviour
 	// get a single path from source to dest
 	public Path get_path(Pos source, Pos dest)
 	{
+		if (source == null || dest == null || source == dest) return null;
+		
 		if (!IsWalkable(source)) nav_map.insertTraversableTile(source);
 		
 		Path result = new Path(nav_map.shortestPath(source, dest));

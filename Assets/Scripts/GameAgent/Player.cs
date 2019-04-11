@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 using MapUtils;
-using System;
+using static MapUtils.EnumUtils;
 
 public class Player : GameAgent
 {	
@@ -13,9 +15,7 @@ public class Player : GameAgent
     private List<Pos> selectableTiles;
 
 	// private reference to position in map grid
-    public bool hoveringMovementTileSelector = false;
 	public bool moving = false;
-    public bool hoveringActionTileSelector = false;
     public bool isAttacking = false;
 	public bool godMode = false;
 
@@ -65,12 +65,10 @@ public class Player : GameAgent
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
-		
-		PlayerActMenu.init();
 
         selectableTiles = new List<Pos>();
 
-		tile_selector = GameObject.FindGameObjectWithTag("Map").transform.Find("TileSelector").GetComponent<TileSelector>();
+		tile_selector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
 		tile_selector.setPlayer(this);
 
         currentState = GameAgentState.Alive;
@@ -80,54 +78,6 @@ public class Player : GameAgent
 		AI = null; // players don't have AI
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
-
-	// if right mouse button is pressed, move player model to hover position
-    public void RespondToMouseClick()
-    {
-		if (!moving && !isAttacking && hoveringActionTileSelector) {
-			switch (currentAction) {
-			    case GameAgentAction.Move:
-				    if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
-
-                        hoveringActionTileSelector = false;
-                        tile_selector.showSelectableMoveTiles = false;
-                        tile_selector.showPathLine = false;
-                    }
-				    break;
-			    case GameAgentAction.MeleeAttack:
-                case GameAgentAction.MagicAttackSingleTarget:
-                case GameAgentAction.RangedAttack:
-				    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position) && map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive) {
-
-					    Pos attackPos = tile_selector.grid_position;
-                        StartCoroutine(animator.PlayAttackAnimation());
-					    StartCoroutine(WaitForAttackEnd(attackPos));
-                    }
-                    break;
-                case GameAgentAction.RangedAttackMultiShot:
-                    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position) && map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive) {
-
-                        Pos attackPos = tile_selector.grid_position;
-                        StartCoroutine(animator.PlayAttackAnimation());
-                        StartCoroutine(WaitForRangedAttackMultiShotEnd(attackPos, stats.GetMultiShotCount()));
-                    }
-                    break;
-                case GameAgentAction.Taunt:
-                    StartCoroutine(animator.PlayTauntAnimation());
-                    StartCoroutine(WaitForTauntEnd());
-                    break;
-                case GameAgentAction.MagicAttackAOE:
-                case GameAgentAction.Heal:
-                    if (tile_selector.hoveringValidActAOETile() || godMode) {
-
-                        Pos attackPos = tile_selector.grid_position;
-                        StartCoroutine(animator.PlayAttackAnimation());
-                        StartCoroutine(WaitForAOEEnd(tile_selector.GetPositionOfAgentsInActAOETiles()));
-                    }
-                    break;
-            }
-		}
-	}
 
 	public void RespondToKeyboardInput(char key)
 	{
@@ -155,10 +105,7 @@ public class Player : GameAgent
         while (isAttacking) yield return null;
         map_manager.attack(attackPos, stats.DealDamage());
 
-        TurnOffSelectors();
-        action4();
         playerActedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
     }
 
     IEnumerator WaitForRangedAttackMultiShotEnd(Pos attackPos, int multiShotCount) {
@@ -183,10 +130,7 @@ public class Player : GameAgent
             playerActedThisTurn = true;
         }
 
-        TurnOffSelectors();
-        action4();
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
-
+        //PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
     }
 
     IEnumerator WaitForTauntEnd() {
@@ -201,10 +145,7 @@ public class Player : GameAgent
         while (animator.AnimatorIsPlaying()) yield return null;
         isAttacking = false;
 
-        TurnOffSelectors();
-        action4();
         playerActedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
     }
 
     IEnumerator WaitForAOEEnd(List<Pos> targetTiles) {
@@ -229,10 +170,7 @@ public class Player : GameAgent
             }
         }
 
-        TurnOffSelectors();
-        action4();
         playerActedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.ACT);
     }
 
     public override void take_damage(int amount)
@@ -267,11 +205,15 @@ public class Player : GameAgent
             playerActedThisTurn = false;
             playerUsedPotionThisTurn = false;
             playerWaitingThisTurn = false;
-		    PlayerActMenu.MakeAllButtonsInteractable(true);
         }
 
         UpdateViewableEditorPlayerStats();
     }
+	
+	public bool taking_action()
+	{
+		return moving || isAttacking;
+	}
 
     private void UpdateViewableEditorPlayerStats() {
         attack = stats.attack;
@@ -322,33 +264,113 @@ public class Player : GameAgent
         moving = false;
 		tile_selector.clear_path_line();
         playerMovedThisTurn = true;
-        PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.MOVE);
 	}
 
+	/*** ANIMATION RECEIVERS ***/
 	public void FootR(){}
 	public void FootL(){}
-
     // Signal end of attack once hit animation has completed
 	public void Hit(){
 		if (isAttacking) isAttacking = false;
     }
-
 	public void Shoot(){
         if (isAttacking) isAttacking = false;
     }
-
 	public void WeaponSwitch(){}
-
-    public void TurnOffSelectors() {
-        hoveringActionTileSelector = false;
-        tile_selector.showSelectableMoveTiles = false;
-        tile_selector.showSelectableActTiles = false;
-        tile_selector.showPathLine = false;
-        tile_selector.showAOETiles = false;
-        tile_selector.clear_path_line();
+	/*** END ANIMATION RECEIVERS ***/
+	
+	public string[] getActions()
+	{
+		List<string> actionNames = new List<string>();
+		foreach (GameAgentAction act in stats.playerCharacterClass.GetAvailableActs())
+			actionNames.Add(act.GetString());
+		return actionNames.ToArray();
+	}
+	
+	// disabling this for now while I test changes
+	/*public string getActionMode(int action)
+	{
+		GameAgentAction[] actions = stats.playerCharacterClass.GetAvailableActs();
+		return actions[action].GetMode(); // mode can be ACT or AOE
+	}*/
+	
+	public override void wait() { playerWaitingThisTurn = true; }
+	public override void potion() { playerUsedPotionThisTurn = true; }
+	public override void move() { playerMovedThisTurn = true; }
+	public override void act() { playerActedThisTurn = true; }
+	public override bool turn_over() {
+		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
     }
+	
+	public void TestCharacterClass(int characterClassToTest) {
+        int weapon = CharacterClassOptions.RandomClassWeapon;
+        if (characterClassToTest == CharacterClassOptions.Knight) {
+            weapon = CharacterClassOptions.Sword;
+        }
 
-    public override void move() {
+        stats = new GameAgentStats(CharacterRaceOptions.Human, characterClassToTest, 1, weapon);
+        attack = stats.attack;
+        maxHealth = stats.maxHealth;
+        currentHealth = maxHealth;
+        range = stats.range;
+        _speed = stats.speed;
+
+        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
+    }
+	
+	
+	// VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
+	// 			INTRUDERS WILL BE EXECUTED			  //
+
+	// if right mouse button is pressed, move player model to hover position
+    /*public void RespondToMouseClick()
+    {
+		if (!moving && !isAttacking && hoveringActionTileSelector) {
+			switch (currentAction) {
+			    case GameAgentAction.Move:
+				    if ((tile_selector.hoveringValidMoveTile() || godMode) && map_manager.move(grid_pos, tile_selector.grid_position)) {
+
+                        hoveringActionTileSelector = false;
+                        tile_selector.showSelectableMoveTiles = false;
+                        tile_selector.showPathLine = false;
+                    }
+				    break;
+			    case GameAgentAction.MeleeAttack:
+                case GameAgentAction.MagicAttackSingleTarget:
+                case GameAgentAction.RangedAttack:
+				    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position) && map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive) {
+
+					    Pos attackPos = tile_selector.grid_position;
+                        StartCoroutine(animator.PlayAttackAnimation());
+					    StartCoroutine(WaitForAttackEnd(attackPos));
+                    }
+                    break;
+                case GameAgentAction.RangedAttackMultiShot:
+                    if ((tile_selector.hoveringValidSelectTile() || godMode) && map_manager.IsOccupied(tile_selector.grid_position) && map_manager.GetGameAgentState(tile_selector.grid_position) == GameAgentState.Alive) {
+
+                        Pos attackPos = tile_selector.grid_position;
+                        StartCoroutine(animator.PlayAttackAnimation());
+                        StartCoroutine(WaitForRangedAttackMultiShotEnd(attackPos, stats.GetMultiShotCount()));
+                    }
+                    break;
+                case GameAgentAction.Taunt:
+                    StartCoroutine(animator.PlayTauntAnimation());
+                    StartCoroutine(WaitForTauntEnd());
+                    break;
+                case GameAgentAction.MagicAttackAOE:
+                case GameAgentAction.Heal:
+                    if (tile_selector.hoveringValidActAOETile() || godMode) {
+
+                        Pos attackPos = tile_selector.grid_position;
+                        StartCoroutine(animator.PlayAttackAnimation());
+                        StartCoroutine(WaitForAOEEnd(tile_selector.GetPositionOfAgentsInActAOETiles()));
+                    }
+                    break;
+            }
+		}
+	}*/
+	
+    /*public override void move() {
 		if (playerMovedThisTurn || turn_over())
             return;
 		
@@ -483,43 +505,6 @@ public class Player : GameAgent
 		PlayerActMenu.MakeButtonNoninteractable(ActMenuButtons.POTION);
     }
 
-    public void TestCharacterClass(int characterClassToTest) {
-        int weapon = CharacterClassOptions.RandomClassWeapon;
-        if (characterClassToTest == CharacterClassOptions.Knight) {
-            weapon = CharacterClassOptions.Sword;
-        }
-
-        stats = new GameAgentStats(CharacterRaceOptions.Human, characterClassToTest, 1, weapon);
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
-        currentHealth = maxHealth;
-        range = stats.range;
-        _speed = stats.speed;
-
-        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
-
-        if (playersForTestingPurposes != null) {
-            UpdatePlayerStatsMenu(playersForTestingPurposes);
-        }
-    }
-
-    public override bool turn_over() {
-        // Player chose to wait
-        if (playerWaitingThisTurn) {
-            PlayerActMenu.MakeAllButtonsInteractable(false);
-            return true;
-        // Player used Act and used a Potion
-        } else if (playerActedThisTurn) {
-            PlayerActMenu.MakeAllButtonsInteractable(false);
-            return true;
-        // Player moved and either used Act or used a Potion
-        } else if (playerMovedThisTurn && playerUsedPotionThisTurn) {
-            PlayerActMenu.MakeAllButtonsInteractable(false);
-            return true;
-        }
-        return false;
-    }
-
     public void UpdatePlayerStatsMenu(List<Player> players) {
         // Get rid of this when you get rid of using keys to change player class
         playersForTestingPurposes = players;
@@ -569,7 +554,7 @@ public class Player : GameAgent
         }
 
         return sortedPlayersIndex;
-    }
+    }*/
 
    
 }

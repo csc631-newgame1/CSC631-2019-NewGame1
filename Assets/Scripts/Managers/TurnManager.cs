@@ -8,15 +8,14 @@ public class TurnManager : MonoBehaviour
     public static TurnManager instance = null;
 	
     //boolean to check if it's player's turn
-    [HideInInspector] public bool playersTurn = true;
-	[HideInInspector] public bool enemiesTurn = false;
+    //[HideInInspector] public bool playersTurn = true;
+	//[HideInInspector] public bool enemiesTurn = false;
 
     // lists of all active players/enemies
     private List<GameAgent>[] teamRoster = new List<GameAgent>[16];
 	
 	private GameManager parentManager = null;
 	private IEnumerator mainLoop = null;
-	private bool loopOver = false;
 	
 	void Awake()
 	{

@@ -14,13 +14,12 @@ public class GameManager : MonoBehaviour
     private EnemySpawner enemySpawner;
 	private EnvironmentSpawner environmentSpawner;
     private Player localPlayer;
+	private TileSelector tileSelector;
 
     private TurnManager turn_manager;
 
     private List<SpawnZone> spawnZones;
-    [SerializeField]
-    // Consider moving this to a different location for better handling of turn based gameplay
-    private GameObject BattleMenu;
+	
     public GameObject playerPrefab;
 
     public static GameManager instance; //static so we can carry oour levels and st
@@ -37,13 +36,16 @@ public class GameManager : MonoBehaviour
 		map_manager = GetComponent<MapManager>();
 		enemySpawner = GetComponent<EnemySpawner>();
 		environmentSpawner = GetComponent<EnvironmentSpawner>();
+		tileSelector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
 
 		map_manager.Init(this);
         enemySpawner.Init(map_manager);
+		tileSelector.Init(map_manager);
         //environmentSpawner.Init(map_manager);
 
 		localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
+		UI_BattleMenu.SetActButtons(localPlayer.getActions());
 
 		turn_manager = GetComponent<TurnManager>();
 		turn_manager.Init(this);
@@ -66,53 +68,69 @@ public class GameManager : MonoBehaviour
 				DeInit();
 				Init();
 				break;
-			case 'm':
-				ShowPlayerActionMenu();
-				break;
 			}
         }
 
 		if (Input.GetMouseButtonDown(1)) {
-			localPlayer.RespondToMouseClick();
+			switch (tileSelector.mode) {
+				case "MOVE":
+					if (tileSelector.hoveringValidMoveTile()) {
+						map_manager.move(
+							localPlayer.grid_pos, tileSelector.grid_position);
+						tileSelector.mode = "NONE";
+					}
+					break;
+				case "ACT":
+					if (tileSelector.hoveringValidActTile()) {
+						map_manager.attack(
+							tileSelector.grid_position, localPlayer.stats.DealDamage());
+						tileSelector.mode = "NONE";
+					}
+					break;
+				case "NONE": 
+					break;
+			}
 		}
 	}
-
-    public void ShowPlayerActionMenu() {
-        BattleMenu.SetActive(!BattleMenu.activeSelf);
+	
+    public static void MovePlayer() {
+		if (instance.localPlayer.taking_action()) return;
+		
+		if (instance.tileSelector.mode == "MOVE")
+			instance.tileSelector.mode = "NONE";
+		else
+			instance.tileSelector.mode = "MOVE";
     }
 
-    public void MovePlayer() {
-        localPlayer.move();
+	private static int last_action = -1;
+	public static void ActionPlayer(int action) {
+		if (instance.localPlayer.taking_action()) return;
+		
+        //instance.tileSelector.setMode(instance.localPlayer.getActionMode(action));
+		if (instance.tileSelector.mode == "ACT" && action == last_action)
+			instance.tileSelector.mode = "NONE";
+		else
+			instance.tileSelector.mode = "ACT";
+		
+		last_action = action;
+    }
+	
+	public static void ClearPlayerAction() {
+		instance.tileSelector.mode = "NONE";
+	}
+	
+	public static void WaitPlayer() {
+		if (instance.localPlayer.taking_action()) return;
+		
+        instance.localPlayer.wait();
     }
 
-	public void ActPlayer() {
-        localPlayer.act();
+    public static void PotionPlayer() {
+		if (instance.localPlayer.taking_action()) return;
+		
+        instance.localPlayer.potion();
     }
-
-    public void Action1Player() {
-        localPlayer.action1();
-    }
-
-    public void Action2Player() {
-        localPlayer.action2();
-    }
-
-    public void Action3Player() {
-        localPlayer.action3();
-    }
-
-    public void Action4Player() {
-        localPlayer.action4();
-    }
-
-    public void WaitPlayer() {
-        localPlayer.wait();
-    }
-
-    public void PotionPlayer() {
-        localPlayer.potion();
-    }
-
+	
 	public void kill(GameAgent character)
 	{
 		map_manager.de_instantiate(character.grid_pos);
