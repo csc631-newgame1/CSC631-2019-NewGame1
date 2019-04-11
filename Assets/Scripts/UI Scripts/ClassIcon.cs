@@ -36,11 +36,11 @@ public class ClassIcon : MonoBehaviour
 		}
 	}
 	
-	public void SetTint(Color color)
+	/*public void SetTint(Color color)
 	{
 		mage.GetComponent<Image>().color = color;
 		warrior.GetComponent<Image>().color = color;
 		hunter.GetComponent<Image>().color = color;
 		healer.GetComponent<Image>().color = color;
-	}
+	}*/
 }

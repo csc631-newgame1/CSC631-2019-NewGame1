@@ -87,7 +87,7 @@ public class AIComponent
 			}
 			else if (result == 1) {
 				while (parent.animating) yield return null; // waits for move animation to finish before moving on
-				mapManager.attack(parent, attacking.grid_pos); // attack enemy
+				mapManager.attack(parent.grid_pos, attacking.grid_pos); // attack enemy
 				while (parent.animating) yield return null; // waits for attack animation to finish
 			}
 			else if (result == 2) {
