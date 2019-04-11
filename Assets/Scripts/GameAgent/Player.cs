@@ -61,8 +61,8 @@ public class Player : GameAgent
 
         selectableTiles = new List<Pos>();
 
-		tile_selector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
-		tile_selector.setPlayer(this);
+		//tile_selector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
+		//tile_selector.setPlayer(this);
 
         currentState = GameAgentState.Alive;
 		animating = false;
