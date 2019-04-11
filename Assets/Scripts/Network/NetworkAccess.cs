@@ -9,8 +9,8 @@ public class Client
 {
 	public int ID;
 	public Player playerObject = null;
-	public string nickname = "";
-	public string classname = "";
+	public string nickname;
+	public string classname;
 	public bool ready = false;
 	public Client(int ID) { this.ID = ID; nickname = "Client" + ID; classname = "Warrior"; }
 }

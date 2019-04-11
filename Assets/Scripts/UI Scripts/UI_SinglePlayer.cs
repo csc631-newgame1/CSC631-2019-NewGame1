@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UI_SinglePlayer : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class UI_SinglePlayer : MonoBehaviour
 	
     public void StartGame()
 	{
-		
+		Network.setPeer(0);
+		SceneManager.LoadScene("Procedural");
 	}
 	
 	public void Back()

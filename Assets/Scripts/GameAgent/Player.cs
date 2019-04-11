@@ -51,6 +51,8 @@ public class Player : GameAgent
 
         this.stats = stats;
         UpdateViewableEditorPlayerStats();
+		move_budget = 25;
+		speed = 100;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -225,7 +227,7 @@ public class Player : GameAgent
 	{
 		List<string> actionNames = new List<string>();
 		foreach (GameAgentAction act in stats.playerCharacterClass.GetAvailableActs())
-			actionNames.Add(act.GetString());
+			actionNames.Add(act.GetString()); // GetString() defined in MapUtils.EnumUtils
 		return actionNames.ToArray();
 	}
 	
