@@ -1,21 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
-    public GameObject EnemyHealthBar;
-    Transform target;
+    public Slider healthbar;
 
-    // Start is called before the first frame update
-    void Start()
+    public void SetSliderValue(float value)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        healthbar.value = value;
     }
 }
