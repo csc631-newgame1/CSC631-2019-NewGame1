@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class HealthBar : MonoBehaviour
 {
+    public GameObject EnemyHealthBar;
+    Transform target;
+
     // Start is called before the first frame update
     void Start()
     {
