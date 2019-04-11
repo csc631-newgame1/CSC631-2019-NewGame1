@@ -32,4 +32,9 @@ public class HealthBarController : MonoBehaviour
         Vector3 wantedPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position) + offset;
         instance.transform.position = wantedPosition;
     }
+
+    private void OnDestroy()
+    {
+        Destroy(instance);
+    }
 }
