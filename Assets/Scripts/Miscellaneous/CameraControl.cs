@@ -11,6 +11,7 @@ public class CameraControl : MonoBehaviour
     public float pitch = 2f;
     Vector3 lastoffset;
     bool isTopDownView = false;
+	Camera camera;
 
     // Zoom variables.
     public float currentZoom = 9f;
@@ -21,7 +22,7 @@ public class CameraControl : MonoBehaviour
     public void SetTarget(GameObject target)
     {
 		//Debug.Log("set target");
-		
+		camera = GetComponent<Camera>();
         target_transform = target.transform;
     }
 
@@ -55,9 +56,14 @@ public class CameraControl : MonoBehaviour
     {
         // Basic camera follow; updates the camera transform a certain position
         // away from the player.
-		if (target_transform != null) {
+		if (target_transform != null && !camera.orthographic) {
 			transform.position = target_transform.position - offset * currentZoom;
 			transform.LookAt(target_transform.position + Vector3.up * pitch);
+		}
+		else if (camera.orthographic) {
+			transform.position = target_transform.position - offset * 10;
+			transform.LookAt(target_transform.position + Vector3.up * pitch);
+			camera.orthographicSize = currentZoom;
 		}
     }
 }

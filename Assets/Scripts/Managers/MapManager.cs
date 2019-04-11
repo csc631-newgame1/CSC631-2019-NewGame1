@@ -132,42 +132,28 @@ public class MapManager : MonoBehaviour
 	}
 	
 	// move a character from source to dest
-	// truncates the path to the character's move_budget, if necessary
-	public bool move(Pos source, Pos dest)
+	public void move(Pos source, Pos dest)
 	{
-		if (!map[source.x, source.y].occupied) return false;
-		
 		GameAgent agent = map[source.x, source.y].resident;
 		Path path = get_path(source, dest);
 		
-		if (!path.empty()) {
-			
-			path.truncateTo(agent.move_budget);
-			Pos destPos = path.endPos();
-			if (!IsWalkable(destPos)) return false;
-			
-			nav_map.removeTraversableTile(destPos);
-			map[destPos.x, destPos.y].occupied = true;
-			map[destPos.x, destPos.y].resident = agent;
-			
-			nav_map.insertTraversableTile(source);
-			map[source.x, source.y].occupied = false;
-			map[source.x, source.y].resident = null;
-			
-			StartCoroutine(agent.smooth_movement(path.getPositions()));
-			return true;
-		}
-		else return false;
+		nav_map.removeTraversableTile(dest);
+		map[dest.x, dest.y].occupied = true;
+		map[dest.x, dest.y].resident = agent;
+		
+		nav_map.insertTraversableTile(source);
+		map[source.x, source.y].occupied = false;
+		map[source.x, source.y].resident = null;
+		
+		StartCoroutine(agent.smooth_movement(path.getPositions()));
 	}
 	
 	// applies damage to agent at position, if one is there
-	public bool attack(Pos dest, int damage_amount)
+	public void attack(GameAgent attacker, Pos dest)
 	{
-		if (!IsOccupied(dest))
-			return false;
-
-		map[dest.x, dest.y].resident.take_damage(damage_amount);
-		return true;
+		//map[dest.x, dest.y].resident.take_damage(damage_amount);
+		StartCoroutine(attacker.animate_attack(map[dest.x, dest.y].resident));
+		//return true;
 	}
 	
 	/*************************/

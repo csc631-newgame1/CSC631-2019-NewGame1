@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
 				case "ACT":
 					if (tileSelector.hoveringValidActTile()) {
 						map_manager.attack(
-							tileSelector.grid_position, localPlayer.stats.DealDamage());
+							localPlayer, tileSelector.grid_position);
 						tileSelector.mode = "NONE";
 					}
 					break;
@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
 	}
 	
     public static void MovePlayer() {
-		if (instance.localPlayer.taking_action()) return;
+		if (!instance.localPlayer.can_take_action()) return;
 		
 		if (instance.tileSelector.mode == "MOVE")
 			instance.tileSelector.mode = "NONE";
@@ -104,7 +104,7 @@ public class GameManager : MonoBehaviour
 
 	private static int last_action = -1;
 	public static void ActionPlayer(int action) {
-		if (instance.localPlayer.taking_action()) return;
+		if (!instance.localPlayer.can_take_action()) return;
 		
         //instance.tileSelector.setMode(instance.localPlayer.getActionMode(action));
 		if (instance.tileSelector.mode == "ACT" && action == last_action)
@@ -120,13 +120,13 @@ public class GameManager : MonoBehaviour
 	}
 	
 	public static void WaitPlayer() {
-		if (instance.localPlayer.taking_action()) return;
+		if (!instance.localPlayer.can_take_action()) return;
 		
         instance.localPlayer.wait();
     }
 
     public static void PotionPlayer() {
-		if (instance.localPlayer.taking_action()) return;
+		if (!instance.localPlayer.can_take_action()) return;
 		
         instance.localPlayer.potion();
     }

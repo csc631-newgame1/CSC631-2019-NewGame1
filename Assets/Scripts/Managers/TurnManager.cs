@@ -33,8 +33,6 @@ public class TurnManager : MonoBehaviour
 		mainLoop = TurnLoop();
 		StartCoroutine(mainLoop);
 	}
-	
-	
 
     IEnumerator TurnLoop()
 	{	
@@ -43,7 +41,7 @@ public class TurnManager : MonoBehaviour
 			yield return null;
 			for (int team = 0; team < 16; team++) {
 				
-				AIManager.update(team);
+				StartCoroutine(AIManager.update(team));
 				while (!AIManager.turnOver(team)) yield return null;
 				ClearDead();
 			}

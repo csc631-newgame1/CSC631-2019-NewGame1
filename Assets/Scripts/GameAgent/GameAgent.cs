@@ -17,8 +17,11 @@ public abstract class GameAgent : MonoBehaviour
 	public AIComponent AI;
 	public int team;
 	public int move_budget;
+	public bool animating;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
+	
+	public abstract IEnumerator animate_attack(GameAgent target);
 	
 	public abstract void take_damage(int amount);
 
