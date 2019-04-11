@@ -9,7 +9,6 @@ public class HealthBarController : MonoBehaviour
     private static GameObject canvas;
     GameObject instance;
     GameAgent parent;
-    Vector3 offset = new Vector3(0, 20);
 
     void Start()
     {
@@ -29,6 +28,7 @@ public class HealthBarController : MonoBehaviour
     void Update()
     {
         bar.SetSliderValue(parent.stats.currentHealth / parent.stats.maxHealth);
+        Vector3 offset = new Vector3(0, 20, 0);
         Vector3 wantedPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position) + offset;
         instance.transform.position = wantedPosition;
     }
