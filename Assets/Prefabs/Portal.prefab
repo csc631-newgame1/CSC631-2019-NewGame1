@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 196133168663575026}
   - component: {fileID: 196133168664378370}
   - component: {fileID: 196133168665451756}
+  - component: {fileID: 8003731031414461238}
   m_Layer: 0
-  m_Name: Exit
+  m_Name: Portal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,6 +79,18 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &8003731031414461238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196133168663474486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee00067e0e1e8e4418c410fb1693cf36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8524564469570597456
 PrefabInstance:
   m_ObjectHideFlags: 0
