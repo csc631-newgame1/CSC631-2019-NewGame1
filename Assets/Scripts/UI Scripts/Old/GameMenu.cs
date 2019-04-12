@@ -14,7 +14,7 @@ public class GameMenu : MonoBehaviour
 
     public GameObject itemCharChoiceMenu;
     public Text[] itemCharChoiceNames;
-
+    //private CharStats[] playerStats;
 
     public static GameMenu instance; //Make it an instance of itself so we call it on for other scripts
 
@@ -46,6 +46,34 @@ public class GameMenu : MonoBehaviour
 
         }
     }
+
+    //public void UpdateMainStats()
+    //{
+    //    playerStats = GameManager.instance.playerStats;
+
+    //    for (int i = 0; i < playerStats.Length; i++)
+    //    {
+    //        if (playerStats[i].gameObject.activeInHierarchy)
+    //        {
+    //            charStatHolder[i].SetActive(true);
+
+    //            nameText[i].text = playerStats[i].charName;
+    //            hpText[i].text = "HP: " + playerStats[i].currentHP + "/" + playerStats[i].maxHP;
+    //            mpText[i].text = "MP: " + playerStats[i].currentMP + "/" + playerStats[i].maxMP;
+    //            lvlText[i].text = "Lvl: " + playerStats[i].playerLevel;
+    //            expText[i].text = "" + playerStats[i].currentEXP + "/" + playerStats[i].expToNextLevel[playerStats[i].playerLevel];
+    //            expSlider[i].maxValue = playerStats[i].expToNextLevel[playerStats[i].playerLevel];
+    //            expSlider[i].value = playerStats[i].currentEXP;
+    //            charImage[i].sprite = playerStats[i].charIamge;
+    //        }
+    //        else
+    //        {
+    //            charStatHolder[i].SetActive(false);
+    //        }
+    //    }
+
+    //    goldText.text = GameManager.instance.currentGold.ToString() + "g";
+    //}
 
     public void TogglePanel(int panelNumber)
     {
