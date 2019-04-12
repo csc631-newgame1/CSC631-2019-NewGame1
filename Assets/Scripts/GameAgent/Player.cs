@@ -22,14 +22,31 @@ public class Player : GameAgent
     private bool playerUsedPotionThisTurn = false;
     private bool playerWaitingThisTurn = false;
 
+
     [Header("Player Stats")]
     public string name;
-    public float attack;
-    public float maxHealth;
+    public int level;
+    public int currentEXP;
+    public int[] expToNextLevel;
+    public int maxLevel = 100;
+    public int baseEXP = 100;
+
     public float currentHealth;
+    public float maxHealth= 100;
+    public int currentMP;
+    public int maxMP = 30;
+    public int[] mpLvlBonus;
+    public float attack;
+    public int defence;
+    public int wpnPwr;
+    public int armrPwr;
+    public string equippedWpn;
+    public string equippedArmr;
     public float range;
     public float _speed;
-    public int level;
+    public Sprite charImage;
+
+
     public string viewableState;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
@@ -38,8 +55,70 @@ public class Player : GameAgent
 	CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
 
-    // Get rid of this when you get rid of using keys to change player class
-    List<Player> playersForTestingPurposes;
+    
+
+    // Use this for initialization
+    void Start()
+    {   
+        expToNextLevel = new int[maxLevel];                                            /// <summary>
+                                                                                        /// LEVELING SYSTEM
+                                                                                       /// </summary>
+        expToNextLevel[1] = baseEXP;
+
+        for (int i = 2; i < expToNextLevel.Length; i++)
+        {
+            expToNextLevel[i] = Mathf.FloorToInt(expToNextLevel[i - 1] * 1.05f);
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            AddExp(1000);
+        }
+    }
+
+    public void AddExp(int expToAdd)
+    {
+        currentEXP += expToAdd;
+
+        if (level < maxLevel)
+        {
+            if (currentEXP > expToNextLevel[level])
+            {
+                currentEXP -= expToNextLevel[level];
+
+                level++;
+
+                //determine whether to add to str or def based on odd or even
+                if (level % 2 == 0)
+                {
+                    attack++;
+                }
+                else
+                {
+                    defence++;
+                }
+
+                maxHealth = Mathf.FloorToInt(maxHealth * 1.05f);
+                currentHealth = maxHealth;
+
+                maxMP += mpLvlBonus[level];
+                currentMP = maxMP;
+            }
+        }
+        if (level >= maxLevel)
+        {
+            currentEXP = 0;
+        }
+    }
+
+
+        // Get rid of this when you get rid of using keys to change player class
+        List<Player> playersForTestingPurposes;
 
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)

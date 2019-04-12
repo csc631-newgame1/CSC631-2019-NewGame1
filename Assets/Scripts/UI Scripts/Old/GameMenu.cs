@@ -14,7 +14,20 @@ public class GameMenu : MonoBehaviour
 
     public GameObject itemCharChoiceMenu;
     public Text[] itemCharChoiceNames;
-    //private CharStats[] playerStats;
+    private Player[] playerStats;
+
+    public Text[] nameText, hpText, mpText, lvlText, expText;
+    public Slider[] expSlider;
+    public Image[] charImage;
+    public GameObject[] charStatHolder;
+
+    public GameObject[] statusButtons;
+    public Text statusName, statusHP, statusMP, statusStr, statusDef, statusWpnEqpd, statusWpnPwr, statusArmrEqpd, statusArmrPwr, statusExp;
+    public Image statusImage;
+
+  
+
+
 
     public static GameMenu instance; //Make it an instance of itself so we call it on for other scripts
 
@@ -39,7 +52,7 @@ public class GameMenu : MonoBehaviour
             else
             {
               theMenu.SetActive(true);
-
+                UpdateMainStats();
             }
             
 
@@ -47,33 +60,33 @@ public class GameMenu : MonoBehaviour
         }
     }
 
-    //public void UpdateMainStats()
-    //{
-    //    playerStats = GameManager.instance.playerStats;
+    public void UpdateMainStats()
+    {
+        playerStats = StatsManager.instance.playerStats;
 
-    //    for (int i = 0; i < playerStats.Length; i++)
-    //    {
-    //        if (playerStats[i].gameObject.activeInHierarchy)
-    //        {
-    //            charStatHolder[i].SetActive(true);
+        for (int i = 0; i < playerStats.Length; i++)
+        {
+            if (playerStats[i].gameObject.activeInHierarchy)
+            {
+                charStatHolder[i].SetActive(true);
 
-    //            nameText[i].text = playerStats[i].charName;
-    //            hpText[i].text = "HP: " + playerStats[i].currentHP + "/" + playerStats[i].maxHP;
-    //            mpText[i].text = "MP: " + playerStats[i].currentMP + "/" + playerStats[i].maxMP;
-    //            lvlText[i].text = "Lvl: " + playerStats[i].playerLevel;
-    //            expText[i].text = "" + playerStats[i].currentEXP + "/" + playerStats[i].expToNextLevel[playerStats[i].playerLevel];
-    //            expSlider[i].maxValue = playerStats[i].expToNextLevel[playerStats[i].playerLevel];
-    //            expSlider[i].value = playerStats[i].currentEXP;
-    //            charImage[i].sprite = playerStats[i].charIamge;
-    //        }
-    //        else
-    //        {
-    //            charStatHolder[i].SetActive(false);
-    //        }
-    //    }
+                nameText[i].text = playerStats[i].name;
+                hpText[i].text = "HP: " + playerStats[i].currentHealth + "/" + playerStats[i].currentHealth;
+                mpText[i].text = "MP: " + playerStats[i].currentMP + "/" + playerStats[i].maxMP;
+                lvlText[i].text = "Lvl: " + playerStats[i].level;
+                expText[i].text = "" + playerStats[i].currentEXP + "/" + playerStats[i].expToNextLevel[playerStats[i].level];
+                expSlider[i].maxValue = playerStats[i].expToNextLevel[playerStats[i].level];
+                expSlider[i].value = playerStats[i].currentEXP;
+                charImage[i].sprite = playerStats[i].charImage;
+            }
+            else
+            {
+                charStatHolder[i].SetActive(false);
+            }
+        }
 
-    //    goldText.text = GameManager.instance.currentGold.ToString() + "g";
-    //}
+      
+    }
 
     public void TogglePanel(int panelNumber)
     {
@@ -90,7 +103,7 @@ public class GameMenu : MonoBehaviour
                 panels[i].SetActive(false);
             }
         }
-       
+        itemCharChoiceMenu.SetActive(false);
 
     }
 
@@ -103,7 +116,7 @@ public void CloseMenu()
       }
  theMenu.SetActive(false);
 
-   
+        itemCharChoiceMenu.SetActive(false);
     }
 
 
@@ -148,7 +161,11 @@ public void CloseMenu()
         itemDescription.text = activeItem.description;
     }
 
-
+    public void UseItem(int selectChar)
+    {
+        activeItem.Use(selectChar);
+        CloseItemCharChoice();
+    }
 
     public void DiscardItem()
     {
@@ -165,9 +182,55 @@ public void CloseMenu()
 
         for (int i = 0; i < itemCharChoiceNames.Length; i++)
         {
-         //   itemCharChoiceNames[i].text = InventuryManager2.instance.playerStats[i].charName;
-           // itemCharChoiceNames[i].transform.parent.gameObject.SetActive(InventuryManager2.instance.playerStats[i].gameObject.activeInHierarchy);
+            itemCharChoiceNames[i].text = StatsManager.instance.playerStats[i].name;
+            itemCharChoiceNames[i].transform.parent.gameObject.SetActive(StatsManager.instance.playerStats[i].gameObject.activeInHierarchy);
         }
     }
+
+    public void CloseItemCharChoice()
+    {
+        itemCharChoiceMenu.SetActive(false);
+    }
+
+   
+
+    public void OpenStatus()
+    {
+        UpdateMainStats();
+
+        //update the information that is shown
+       StatusChar(0);
+
+        for (int i = 0; i < statusButtons.Length; i++)
+        {
+            statusButtons[i].SetActive(playerStats[i].gameObject.activeInHierarchy);
+            statusButtons[i].GetComponentInChildren<Text>().text = playerStats[i].name;
+        }
+    }
+
+    public void StatusChar(int selected)
+    {
+        statusName.text = playerStats[selected].name;
+        statusHP.text = "" + playerStats[selected].currentHealth + "/" + playerStats[selected].currentHealth;
+        statusMP.text = "" + playerStats[selected].currentMP + "/" + playerStats[selected].maxMP;
+        statusStr.text = playerStats[selected].attack.ToString();
+        statusDef.text = playerStats[selected].defence.ToString();
+        if (playerStats[selected].equippedWpn != "")
+        {
+            statusWpnEqpd.text = playerStats[selected].equippedWpn;
+        }
+        statusWpnPwr.text = playerStats[selected].wpnPwr.ToString();
+        if (playerStats[selected].equippedArmr != "")
+        {
+            statusArmrEqpd.text = playerStats[selected].equippedArmr;
+        }
+        statusArmrPwr.text = playerStats[selected].armrPwr.ToString();
+        statusExp.text = (playerStats[selected].expToNextLevel[playerStats[selected].level] - playerStats[selected].currentEXP).ToString();
+        statusImage.sprite = playerStats[selected].charImage;
+
+    }
+
+
+
 
 }///CLASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs
