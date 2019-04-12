@@ -10,7 +10,6 @@ public class EnvironmentSpawner : MonoBehaviour
     // Referenced conponents.
     MapManager mapManager;
     MapConfiguration mapConfiguration;
-    MapManager.MapCell[,] map;
 
     // Map variables.
     float cell_size;
@@ -46,7 +45,6 @@ public class EnvironmentSpawner : MonoBehaviour
         this.height = config.height;
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
-        this.map = mapManager.map;
         spawnPortals();
         spawnEnvironment();
     }
@@ -155,16 +153,14 @@ public class EnvironmentSpawner : MonoBehaviour
     void spawnRandomNonTraversableObject(environmentType type, Pos position)
     {
         allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(type), mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
-        map[position.x, position.x].occupied = true;
-        map[position.x, position.x].traversable = false;
+        mapManager.removeTraversableTile(position);
         return;
     }
 
     void spawNonTraversableObject(GameObject type, Pos position)
     {
         allEnvironmentObject.Add(Instantiate(type, mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
-        map[position.x, position.x].occupied = true;
-        map[position.x, position.x].traversable = false;
+        mapManager.removeTraversableTile(position);
         return;
     }
 
