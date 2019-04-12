@@ -136,8 +136,9 @@ public class EnemySpawner : MonoBehaviour {
 
             // Removes spawn zones until the max is in reach
             while (numOfZonesToRemove > 0) {
-
                 if (!oneSpawnZoneLeftInEveryRegion) {
+                    zoneRemoved = false;
+
                     // Checks through all the regions
                     for (int i = 0; i < regions.Count; i++) {
                         // All the spawn zones needed have been removed
