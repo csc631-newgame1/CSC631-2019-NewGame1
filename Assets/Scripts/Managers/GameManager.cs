@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 using MapUtils;
 
@@ -79,6 +81,12 @@ public class GameManager : MonoBehaviour
 			localPlayer.RespondToMouseClick();
 		}
 	}
+
+    public void rebuild()
+    {
+        DeInit();
+        Init();
+    }
 
     public void ShowPlayerActionMenu() {
         BattleMenu.SetActive(!BattleMenu.activeSelf);

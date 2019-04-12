@@ -84,14 +84,14 @@ public class EnvironmentSpawner : MonoBehaviour
             randomY = Random.Range(0, (int)(height * portalMargin));
             position = new Pos(randomX, randomY);
         } while (!mapManager.IsTraversable(position));
-        spawNonTraversableObject(portal, position);
+        spawnTraversableObject(portal, position);
         do
         {
             randomX = Random.Range((int)(width - width * portalMargin), width);
             randomY = Random.Range((int)(width - width * portalMargin), height);
             position = new Pos(randomX, randomY);
         } while (!mapManager.IsTraversable(position));
-        spawNonTraversableObject(portal, position);
+        spawnTraversableObject(portal, position);
     }
 
     void spawnEnvironmentObject(Pos position)
@@ -157,7 +157,13 @@ public class EnvironmentSpawner : MonoBehaviour
         return;
     }
 
-    void spawNonTraversableObject(GameObject type, Pos position)
+    void spawnTraversableObject(GameObject type, Pos position)
+    {
+        allEnvironmentObject.Add(Instantiate(type, mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
+        return;
+    }
+
+    void spawnNonTraversableObject(GameObject type, Pos position)
     {
         allEnvironmentObject.Add(Instantiate(type, mapManager.grid_to_world(position), Quaternion.identity) as GameObject);
         mapManager.removeTraversableTile(position);
