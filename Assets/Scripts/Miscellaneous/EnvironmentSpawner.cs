@@ -26,8 +26,15 @@ public class EnvironmentSpawner : MonoBehaviour
     public float traversableStructureDensity = 0.0f;
     public float nonTraversableStructureDensity = 0.0f;
     public float particleDensity = 0.0f;
-    public float portalMargin = 0.30f;
-    public GameObject portal;
+
+    [Header("Portal Settings")]
+    public GameObject startPortal;
+    public GameObject exitPortal;
+    public float portalMargin = 0.50f;
+    public int spawnAreaRadius = 3;
+    public int reserveAreaRadius = 3;
+
+    [Header("Environment Prefabs")]
     public GameObject[] traversableFolliageObject;
     public GameObject[] nonTraversableFolliageObject;
     public GameObject[] traversableObjectObject;
@@ -58,7 +65,7 @@ public class EnvironmentSpawner : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 Pos position = new Pos(x, y);
-                if (mapManager.IsTraversable(position)) {
+                if (mapManager.IsWalkable(position) && !mapManager.IsReserved(position)) {
                     spawnEnvironmentObject(position);
                 }
             }
@@ -80,18 +87,52 @@ public class EnvironmentSpawner : MonoBehaviour
         Pos position;
         do
         {
-            randomX = Random.Range(0, (int)(width * portalMargin));
-            randomY = Random.Range(0, (int)(height * portalMargin));
+            randomX = Random.Range(0, (int)(width * portalMargin) + 1);
+            randomY = Random.Range(0, (int)(height * portalMargin) + 1);
             position = new Pos(randomX, randomY);
         } while (!mapManager.IsTraversable(position));
-        spawnTraversableObject(portal, position);
+        spawnTraversableObject(startPortal, position);
+        setAreaSpawn(position, spawnAreaRadius);
+        reserveAreaAroundPoistion(position, reserveAreaRadius);
         do
         {
-            randomX = Random.Range((int)(width - width * portalMargin), width);
-            randomY = Random.Range((int)(width - width * portalMargin), height);
+            randomX = Random.Range((int)(width - width * portalMargin) - 1, width);
+            randomY = Random.Range((int)(height - height * portalMargin) - 1, height);
             position = new Pos(randomX, randomY);
         } while (!mapManager.IsTraversable(position));
-        spawnTraversableObject(portal, position);
+        spawnTraversableObject(exitPortal, position);
+    }
+
+    void reserveAreaAroundPoistion(Pos position, int radius)
+    {
+        int diameter = radius * 2;
+        for (int x = position.x - radius; x < position.x + diameter; x++)
+        {
+            for (int y = position.y - radius; y < position.y + diameter; y++)
+            {
+                Pos currentPos = new Pos(x, y);
+                if (mapManager.IsTraversable(currentPos))
+                {
+                    mapManager.setTileReserved(currentPos);
+                }
+            }
+        }
+    }
+
+    void setAreaSpawn(Pos position, int radius)
+    {
+        int diameter = radius * 2;
+        for (int x = position.x - radius; x < position.x + diameter; x++)
+        {
+            for (int y = position.y - radius; y < position.y + diameter; y++)
+            {
+                Pos currentPos = new Pos(x, y);
+                if (mapManager.IsTraversable(currentPos))
+                {
+                    mapManager.setTileSpawn(currentPos);
+                }
+            }
+        }
     }
 
     void spawnEnvironmentObject(Pos position)

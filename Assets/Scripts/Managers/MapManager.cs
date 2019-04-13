@@ -12,10 +12,13 @@ public class MapManager : MonoBehaviour
 	private class MapCell {
         public bool traversable;
         public bool occupied;
+        public bool reserved;
+        public bool spawn;
         public GameAgent resident;
         public MapCell(bool traversable) {
             this.traversable = traversable;
             occupied = false;
+            reserved = false;
             resident = null;
         }
     }
@@ -87,6 +90,34 @@ public class MapManager : MonoBehaviour
         nav_map.insertTraversableTile(position);
     }
 
+    public void setTileReserved(Pos position)
+    {
+        map[position.x, position.y].reserved = true;
+    }
+
+    public void setTileSpawn(Pos position)
+    {
+        map[position.x, position.y].reserved = true;
+        map[position.x, position.y].spawn = true;
+    }
+
+    // instantiates an agent into the map at a random position
+    public GameObject instantiate_randomly_spawn(GameObject type)
+    {
+        System.Random rng = new System.Random(1);
+
+        int x = rng.Next(0, width - 1);
+        int y = rng.Next(0, height - 1);
+
+        while (!IsSpawnPoint(new Pos(x, y)))
+        {
+            x = rng.Next(0, width - 1);
+            y = rng.Next(0, height - 1);
+        }
+
+        return instantiate(type, new Pos(x, y));
+    }
+
     // instantiates an agent into the map at a random position
     public GameObject instantiate_randomly(GameObject type)
 	{
@@ -140,7 +171,7 @@ public class MapManager : MonoBehaviour
 	{
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)
-				if (map[x, y].resident != null)
+				if (map[x, y].resident != null && map[x, y].resident.tag != "Player")
 					Destroy(map[x, y].resident.gameObject);
 	}
 	
@@ -283,12 +314,28 @@ public class MapManager : MonoBehaviour
 		}
 		return distances;
 	}
-	
-	/*********************/
-	/* UTILITY FUNCTIONS */
-	/*********************/
 
-	// returns true if tile terrain at position is traversable
+    /*********************/
+    /* UTILITY FUNCTIONS */
+    /*********************/
+
+    // returns true if tile terrain at position is a spawn point.
+    public bool IsSpawnPoint(Pos pos)
+    {
+        if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+            return false;
+        return map[pos.x, pos.y].spawn;
+    }
+
+    // returns true if tile terrain at position is reserved.
+    public bool IsReserved(Pos pos)
+    {
+        if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+            return false;
+        return map[pos.x, pos.y].reserved;
+    }
+
+    // returns true if tile terrain at position is traversable
     public bool IsTraversable(Pos pos)
 	{
 		if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)

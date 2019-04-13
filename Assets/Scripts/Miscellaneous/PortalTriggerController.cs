@@ -5,18 +5,21 @@ using UnityEngine;
 public class PortalTriggerController : MonoBehaviour
 {
 
-    private GameManager manager;
+    private GameManager gameManager;
+    private MapManager mapManager;
 
     void Start()
     {
-        manager = FindObjectOfType<GameManager>();
+        gameManager = FindObjectOfType<GameManager>();
+        mapManager = FindObjectOfType<MapManager>();
     }
 
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.tag == "Player")
         {
-            manager.rebuild();
+            mapManager.clear_map();
+            mapManager.Init(gameManager);
         }
     }
 

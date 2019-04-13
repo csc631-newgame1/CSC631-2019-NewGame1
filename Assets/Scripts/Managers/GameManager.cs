@@ -34,8 +34,6 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
- 
-
     void Init()
     {
 		map_manager = GetComponent<MapManager>();
@@ -46,7 +44,7 @@ public class GameManager : MonoBehaviour
         enemySpawner.Init(map_manager);
         environmentSpawner.Init(map_manager);
 
-		localPlayer = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
+		localPlayer = map_manager.instantiate_randomly_spawn(playerPrefab).GetComponent<Player>();
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
 
 		turn_manager = GetComponent<TurnManager>();
@@ -81,12 +79,6 @@ public class GameManager : MonoBehaviour
 			localPlayer.RespondToMouseClick();
 		}
 	}
-
-    public void rebuild()
-    {
-        DeInit();
-        Init();
-    }
 
     public void ShowPlayerActionMenu() {
         BattleMenu.SetActive(!BattleMenu.activeSelf);

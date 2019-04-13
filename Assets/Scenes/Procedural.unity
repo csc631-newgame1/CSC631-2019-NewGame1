@@ -384,7 +384,13 @@ MonoBehaviour:
   traversableStructureDensity: 0.01
   nonTraversableStructureDensity: 0.02
   particleDensity: 0.02
-  portal: {fileID: 196133168663474486, guid: affd42cd44d823643ab0473e87227e46, type: 3}
+  startPortal: {fileID: 5804952943807008338, guid: 26786f60b93765140a41551d66bc4adb,
+    type: 3}
+  exitPortal: {fileID: 196133168663474486, guid: affd42cd44d823643ab0473e87227e46,
+    type: 3}
+  portalMargin: 0.5
+  spawnAreaRadius: 1
+  reserveAreaRadius: 3
   traversableFolliageObject:
   - {fileID: 168602, guid: 3e0f6b0ee51e6eb42a731a26210989b9, type: 3}
   - {fileID: 113888, guid: 6b8ef567fab8aae4fb47c66e41111903, type: 3}
