@@ -54,8 +54,8 @@ public class Player : GameAgent
 
 	CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
-
-    
+    //////////////////////////////////////////////////////////////////////////////////////////// LEVELING SYSTEM
+   ///// http://wiki.unity3d.com/index.php/LevelUp
 
     // Use this for initialization
     void Start()
@@ -80,6 +80,9 @@ public class Player : GameAgent
             AddExp(1000);
         }
     }
+
+
+
 
     public void AddExp(int expToAdd)
     {
@@ -117,8 +120,11 @@ public class Player : GameAgent
     }
 
 
-        // Get rid of this when you get rid of using keys to change player class
-        List<Player> playersForTestingPurposes;
+    ////////////////////////////////////////////////////////////////////////////////////////////LEVELING SYSTEM
+
+
+    // Get rid of this when you get rid of using keys to change player class
+    List<Player> playersForTestingPurposes;
 
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
