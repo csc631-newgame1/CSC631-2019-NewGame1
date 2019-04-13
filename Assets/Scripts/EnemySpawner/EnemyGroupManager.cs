@@ -118,6 +118,25 @@ public class EnemyGroupManager
         return enemies;
     }
 
+    /* 
+     * This takes all the regions and distributes them into a bell curve over the different difficulties
+     * This method decides how many regions of each difficulty to make
+     * 
+     *  ex. 12 regions into 4 different difficulties
+     *  
+     * 
+     *                        1
+     *              1         1           
+     *              1         1            
+     *              1         1           1
+     *     1        1         1           1
+     * [Trivial][Average][Difficult][Impossible]
+     * 
+     * DistributedGroupsIntoRegions[0] = 1
+     * DistributedGroupsIntoRegions[1] = 4
+     * DistributedGroupsIntoRegions[2] = 5
+     * DistributedGroupsIntoRegions[3] = 2
+    */
     private int[] DistributeGroupsIntoRegions() {
         int numOfRegions = mapGenerator.getRegions().Count;
         int[] countOfGroupsInRegions = new int[EnemyGroupDifficulty.count];
