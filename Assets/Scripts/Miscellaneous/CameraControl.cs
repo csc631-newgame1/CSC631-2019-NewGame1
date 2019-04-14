@@ -13,10 +13,10 @@ public class CameraControl : MonoBehaviour
 	Camera camera;
 
     // Zoom variables.
-    public float currentZoom = 9f;
+    public static float currentZoom = 9f;
     public float zoomSpeed = 4f;
     public float minZoom = 1f;
-    public float maxZoom = 50f;
+    public static float maxZoom = 50f;
 
     public void SetTarget(GameObject target)
     {
