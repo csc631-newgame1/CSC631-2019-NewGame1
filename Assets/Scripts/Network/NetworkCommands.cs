@@ -166,7 +166,7 @@ public class AttackCommand : NetworkCommand
 {
 	public const int ID = 7;
 	
-	Pos a, b;
+	public Pos a, b;
 	public AttackCommand(Pos a, Pos b)
 	{
 		this.directive = Directive.ECHO;
@@ -178,7 +178,41 @@ public class AttackCommand : NetworkCommand
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
 		int[] pts = Array.ConvertAll(cmdString.Split(','), int.Parse);
-		return new MoveCommand(new Pos(pts[0], pts[1]), new Pos(pts[2], pts[3]));
+		return new AttackCommand(new Pos(pts[0], pts[1]), new Pos(pts[2], pts[3]));
+	}
+}
+
+public class SetSeedCommand : NetworkCommand
+{
+	public const int ID = 8;
+	
+	public int seed;
+	public SetSeedCommand(int seed)
+	{
+		this.directive = Directive.ECHO;
+		this.seed = seed;
+	}
+	public override string getString() { return ID + "$" + seed; }
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		return new SetSeedCommand(int.Parse(cmdString));
+	}
+}
+
+public class WaitCommand : NetworkCommand
+{
+	public const int ID = 9;
+	
+	public int clientID;
+	public WaitCommand(int clientID)
+	{
+		this.directive = Directive.ECHO;
+		this.clientID = clientID;
+	}
+	public override string getString() { return ID + "$" + clientID; }
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		return new WaitCommand(int.Parse(cmdString));
 	}
 }
 

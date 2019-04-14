@@ -19,7 +19,7 @@ public class MapGenerator : MonoBehaviour
 	private int region_cull_threshold;
 	private float cell_size;
     private float object_size_scale;
-	private string seed;
+	private int seed;
 	private Vector3 offset;
 	
 	[HideInInspector]
@@ -28,7 +28,9 @@ public class MapGenerator : MonoBehaviour
 	private List<List<Cmd>> cmds;
 	private Region main_region;
 	
+	// debug stuff
 	private List<Connection> debug_connections;
+	private MapManager map_manager;
 	
 	void set_variables()
 	{
@@ -42,6 +44,8 @@ public class MapGenerator : MonoBehaviour
         this.object_size_scale = config.object_size_scale;
 		this.seed = config.seed;
 		this.offset = config.GetOffset();
+		
+		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 	}
 
     public int[,] generate_map()
@@ -70,6 +74,7 @@ public class MapGenerator : MonoBehaviour
 		bridge_mesh_gen.generateBridgeMesh(map);
 		
 		Debug.Log("Mesh generation complete!");
+		//print_region_tree();
 
         return map;
 	}
@@ -80,13 +85,6 @@ public class MapGenerator : MonoBehaviour
 	
 	void random_fill()
 	{
-		int seed = 0;
-		if (this.seed == string.Empty) {
-			seed = Time.time.ToString().GetHashCode();
-		}
-		else {
-			seed = this.seed.GetHashCode();
-		}
 		System.Random rng = new System.Random(seed);
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
@@ -334,6 +332,11 @@ public class MapGenerator : MonoBehaviour
 	{
 		return regions;
 	}
+	
+	public Region getMainRegion()
+	{
+		return main_region;
+	}
 
     public int GetRegionSize(int ID) {
         foreach (Region region in regions) {
@@ -374,14 +377,45 @@ public class MapGenerator : MonoBehaviour
 	void print_region_connections()
 	{
 		for(int i = 0; i < regions.Count; i++) {
-			Debug.Log("REGION " + (i+2).ToString());
-			foreach(Connection c in regions[i].closest) {
+			//Debug.Log("REGION " + (i+2).ToString());
+			/*foreach(Connection c in regions[i].closest) {
 				Debug.Log(
 				   c.endpt1.ToString() + " => " + c.endpt2.ToString() + " "
 				+ "[ " + Pos.abs_dist(c.endpt1, c.endpt2).ToString() + " ] "
 				+ "{ " + c.ID_1.ID.ToString() + " => " + c.ID_2.ID.ToString() + " }");
+			}*/
+			//Connection closest = regions[i].closest[0];
+			//map_manager.DrawLine(closest.endpt1, closest.endpt2);
+		}
+	}
+	
+	void print_region_tree()
+	{
+		Stack<Region> tree = new Stack<Region>();
+		tree.Push(main_region);
+		System.Random rng = new System.Random(0);
+		while (tree.Count > 0) {
+			Region curr = tree.Pop();
+			Pos a = getRegionPoint(curr.ID);
+			foreach (Region child in curr.connections) {
+				Pos b = getRegionPoint(child.ID);
+				Debug.DrawLine(to_vector3(a), to_vector3(b), new Color(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255)), 60f);
+				tree.Push(child);
 			}
 		}
+	}
+	
+	private Vector3 to_vector3(Pos p)
+	{
+		return new Vector3(p.x, 0f, p.y) - offset;
+	}
+	
+	Pos getRegionPoint(int ID)
+	{
+		for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+				if (map[x, y] == ID) return new Pos(x, y);
+		return new Pos(0, 0);
 	}
 	
 	void print_cmds()
@@ -407,6 +441,9 @@ public class MapGenerator : MonoBehaviour
         if (map != null && debug) {
             for (int x = 0; x < width; x ++) {
                 for (int y = 0; y < height; y++) {
+					if (map[x, y] == main_region.ID)
+						Gizmos.color = Color.cyan;
+					else
 					switch (map[x, y]) {
 						case -3: Gizmos.color = Color.grey; break;
 						case -2: Gizmos.color = Color.red; break;
@@ -417,7 +454,7 @@ public class MapGenerator : MonoBehaviour
 						case 3 : Gizmos.color = Color.blue; break;
 						case 4 : Gizmos.color = Color.green; break;
 						case 5 : Gizmos.color = Color.magenta; break;
-						case 6 : Gizmos.color = Color.cyan; break;
+						//case 6 : Gizmos.color = Color.cyan; break;
 						default : Gizmos.color = Color.black; break;
 					}
                     Vector3 pos = new Vector3(-width/2 + x + .5f, 0f, -height/2 + y + .5f);

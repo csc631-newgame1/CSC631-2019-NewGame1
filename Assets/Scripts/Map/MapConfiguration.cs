@@ -25,20 +25,14 @@ public class MapConfiguration : MonoBehaviour
 	public float floor_texture_scale;
     public float object_size_scale;
 	
-	public string seed;
+	public int seed { get { return Settings.Seed; } }
 
     public Vector3 GetOffset() {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
     }
 
     public System.Random GetRNG() {
-        int seedHashed;
-        if (this.seed == string.Empty) {
-            seedHashed = Time.time.ToString().GetHashCode();
-        } else {
-            seedHashed = this.seed.GetHashCode();
-        }
-        return new System.Random(seedHashed);
+        return new System.Random(seed);
     }
 	
 	public Vector3 gridToWorld(Pos pos) {

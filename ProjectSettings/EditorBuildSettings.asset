@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu2.unity
     guid: f489c3d9b19d2e446aae2c3e278af97e
   - enabled: 1
+    path: Assets/Scenes/Procedural.unity
+    guid: b632c59b0f9108243a8ba4de811e0bfe
+  - enabled: 1
     path: Assets/Scenes/NewMenu.unity
     guid: da451a5ac45906c4189290de1939ca94
   m_configObjects: {}

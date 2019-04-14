@@ -9,6 +9,7 @@ using MapUtils;
 public class NetworkManager : MonoBehaviour
 {
 	public static int clientID = 0;
+	public static MapManager mapManager = null; // networkmanager needs to interface with the map
 	
     void Awake()
     {
@@ -23,10 +24,27 @@ public class NetworkManager : MonoBehaviour
 		if (cmds != null) {
 			foreach (NetworkCommand cmd in cmds) {
 				
+				/*** IN-GAME ACTIONS ***/
 				if (cmd is MoveCommand) {
 					MoveCommand move = (MoveCommand) cmd;
 					Debug.Log("Move received! From " + move.a + " to " + move.b);
+					
+					mapManager.move(move.a, move.b);
 				}
+				if (cmd is AttackCommand) {
+					AttackCommand attack = (AttackCommand) cmd;
+					Debug.Log("Attack received! From " + attack.a + " to " + attack.b);
+					
+					mapManager.attack(attack.a, attack.b);
+				}
+				if (cmd is WaitCommand) {
+					WaitCommand wait = (WaitCommand) cmd;
+					Debug.Log("Wait received! From client#" + wait.clientID);
+					
+					Client waitingClient = Network.getPeer(wait.clientID);
+					waitingClient.playerObject.wait();
+				}
+				/*** LOBBY ACTIONS ***/
 				if (cmd is ReadyCommand) {
 					ReadyCommand ready = (ReadyCommand) cmd;
 					Debug.Log("Received READY");
@@ -73,6 +91,13 @@ public class NetworkManager : MonoBehaviour
 					client.classname = update.classname;
 					client.ready = update.ready;
 				}
+				if (cmd is SetSeedCommand) {
+					SetSeedCommand seed = (SetSeedCommand) cmd;
+					Debug.Log("Received seed!");
+					
+					Settings.Seed = seed.seed;
+				}
+				/*** NETWORK ACTIONS ***/
 				if (cmd is JoinCommand) {
 					JoinCommand _join = (JoinCommand) cmd; // to avoid conflict with 'join' keyword
 					if (clientID == 0) {
@@ -81,13 +106,14 @@ public class NetworkManager : MonoBehaviour
 					} else {
 						Debug.Log("New player with client ID #" + _join.clientID + " joined!");
 						Network.submitCommand(new UpdateClientInfoCommand(Network.getPeer(clientID)));
+						Network.submitCommand(new SetSeedCommand(Settings.Seed));
 					}
 					Network.setPeer(_join.clientID);
 				}
 				if (cmd is StartCommand) {
 					StartCommand start = (StartCommand) cmd;
 					Debug.Log("Received START");
-					if (SceneManager.GetActiveScene().name == "NewMenu") {
+					if (SceneManager.GetActiveScene().name == "NewMenu") { // only loads new scene if we're in the lobby
 						SceneManager.LoadScene("Procedural");
 					}
 				}

@@ -14,7 +14,7 @@ using UnityEngine;
 
 public class NetworkBase
 {
-	protected static bool networkEnabled = true;
+	protected static bool networkEnabled = false;
 	
 	static TcpClient client = null;
 	static Thread listenThread = null;
@@ -105,6 +105,7 @@ public class NetworkBase
 		}
 		else { // if network is disabled (i.e singleplayer) immediately receive submitted messages
 			// remove the directive & length bytes in the command
+			//Debug.Log("Submitting command [NetworkBase]");
 			byte[] moddedCmd = new byte[command.Length - 3];
 			Array.Copy(command, 3, moddedCmd, 0, command.Length - 3);
 			received.Enqueue(moddedCmd);

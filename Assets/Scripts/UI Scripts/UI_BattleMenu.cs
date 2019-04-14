@@ -67,7 +67,7 @@ public class UI_BattleMenu : MonoBehaviour
 	
 	public void Wait()
 	{
-		// gamemanager wait
+		// network wait
 		GameManager.WaitPlayer();
 	}
 	

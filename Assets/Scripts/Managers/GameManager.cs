@@ -7,7 +7,6 @@ using MapUtils;
 
 public class GameManager : MonoBehaviour
 {
-	private GameObject map;
 	private MapGenerator map_gen;
 	private MapManager map_manager;
 
@@ -20,7 +19,7 @@ public class GameManager : MonoBehaviour
 
     private List<SpawnZone> spawnZones;
 	
-    public GameObject playerPrefab;
+    public GameObject playerPrefab, endportal;
 
     public static GameManager instance; //static so we can carry oour levels and st
     
@@ -39,15 +38,22 @@ public class GameManager : MonoBehaviour
 		tileSelector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
 
 		map_manager.Init(this);
-        enemySpawner.Init(map_manager);
 		tileSelector.Init(map_manager);
         //environmentSpawner.Init(map_manager);
 		
-		foreach (Client player in Network.getPeers()) {
-			Player instance = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
-			player.playerObject = instance;
-			if (player.ID == NetworkManager.clientID) localPlayer = instance;
+		List<Client> players = Network.getPeers();
+		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
+		
+		Pos level_end = spawn_locations[0];
+		map_manager.instantiate_environment(endportal, level_end);
+		// spawn players
+		for (int i = 0; i < players.Count; i++) {
+			Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1]).GetComponent<Player>();
+			players[i].playerObject = instance;
+			if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
 		}
+		// spawn enemies
+		enemySpawner.Init(map_manager);
 
 		tileSelector.setPlayer(localPlayer);
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
@@ -56,7 +62,7 @@ public class GameManager : MonoBehaviour
 		turn_manager = GetComponent<TurnManager>();
 		turn_manager.Init(this);
     }
-
+	
 	void DeInit()
 	{
 		turn_manager.Terminate();
@@ -81,17 +87,18 @@ public class GameManager : MonoBehaviour
 			switch (tileSelector.mode) {
 				case "MOVE":
 					if (tileSelector.hoveringValidMoveTile()) {
-						// Network.submitCommand(new MoveCommand(localPlayer.grid_pos, tileSelector.grid_position));
-						map_manager.move(
-							localPlayer.grid_pos, tileSelector.grid_position);
+						//Debug.Log("submitting command...");
+						Network.submitCommand(new MoveCommand(localPlayer.grid_pos, tileSelector.grid_position));
+						/*map_manager.move(
+							localPlayer.grid_pos, tileSelector.grid_position);*/
 						tileSelector.mode = "NONE";
 					}
 					break;
 				case "ACT":
 					if (tileSelector.hoveringValidActTile()) {
-						// Network.submitCommand(new AttackCommand(localPlayer.grid_pos, tileSelector.grid_position));
-						map_manager.attack(
-							localPlayer.grid_pos, tileSelector.grid_position);
+						Network.submitCommand(new AttackCommand(localPlayer.grid_pos, tileSelector.grid_position));
+						/*map_manager.attack(
+							localPlayer.grid_pos, tileSelector.grid_position);*/
 						tileSelector.mode = "NONE";
 					}
 					break;
@@ -130,7 +137,7 @@ public class GameManager : MonoBehaviour
 	public static void WaitPlayer() {
 		if (!instance.localPlayer.can_take_action()) return;
 		
-        instance.localPlayer.wait();
+        Network.submitCommand(new WaitCommand(NetworkManager.clientID));
     }
 
     public static void PotionPlayer() {

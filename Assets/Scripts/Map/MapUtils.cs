@@ -118,6 +118,7 @@ namespace MapUtils
 		public static Pos RIGHT = new Pos(1, 0);
 		public static Pos DOWN = new Pos(0, 1);
 		public static Pos NONE = new Pos(0, 0);
+		public static Pos[] Directions = new Pos[] { Pos.LEFT, Pos.UP, Pos.RIGHT, Pos.DOWN };
 		
 		public int x;
 		public int y;
