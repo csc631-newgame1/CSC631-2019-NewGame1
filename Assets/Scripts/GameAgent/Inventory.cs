@@ -3,69 +3,107 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Inventory : MonoBehaviour
+public class Inventory
 {
 
     public Item[] items = new Item[numItemSlots];
-    public const int numItemSlots = 4;
+    public const int numItemSlots = 10;
 
-    /*
-     * Adds an item to the items array. Returns true if success, false if fail  
-     */  
-    public bool AddItem(Item addItem)
+    public EquipItem helmet;
+    public EquipItem armor;
+    public EquipItem gloves;
+    public EquipItem boots;
+    public EquipItem weapon;
+
+    public int AddItem(Item item)
     {
-        for (int i = 0; i < items.Length; i++)
+        int count = 0;
+        for (int i = 0; i < numItemSlots; i++)
+        {
+            if (items[i].ID == item.ID)
+            {
+                int maxInsert = items[i].maxAmount - items[i].Amount;
+                if (item.Amount - maxInsert > 0)
+                {
+                    items[i].Amount = items[i].maxAmount;
+                    item.Amount -= maxInsert;
+                    count += maxInsert;
+                }
+                else
+                {
+                    items[i].Amount += item.Amount;
+                    count += item.Amount;
+                    return count;
+                }
+            }
+            else if (items[i] == null)
+            {
+                count += item.Amount;
+                items[i] = item;
+                return count;
+            }
+        }
+
+        return count;
+    }
+
+    //used to remove item completely from inventory
+    //used for throwing away items (not using them)
+    public void RemoveItemFromSlot(int slot)
+    {
+        if (slot >= numItemSlots)
+        {
+            return; //out of bounds
+        }
+        items[slot] = null;
+        RearrangeSlots();
+    }
+
+    //returns item in slot
+    public Item GetItemFromSlot(int slot)
+    {
+        if (slot >= numItemSlots)
+        {
+            return null; //out of bounds
+        }
+        return items[slot];
+    }
+
+    public void IncrementItemAtSlot(int slot)
+    {
+        if (slot >= numItemSlots)
+        {
+            return;
+        }
+        items[slot].Amount++;
+    }
+
+    //decreases amount of item by 1
+    //used when item is being used, i.e. potion consumed
+    public void DecrementItemAtSlot(int slot)
+    {
+        if (slot >= numItemSlots)
+        {
+            return; //out of bounds
+        }
+        if ((--items[slot].Amount) <= 0)
+        {
+            items[slot] = null; //remove item if amount is zero
+            RearrangeSlots();
+        }
+    }
+
+    private void RearrangeSlots()
+    {
+        for (int i = 0; i < numItemSlots; i++)
         {
             if (items[i] == null)
             {
-                items[i] = addItem;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /*
-     * TODO: create a method for adding more of one item? but Item class already
-     * comes with amount field, so maybe not needed   
-     */
-
-    /*
-     * Removes an item from the items array. Returns true if success, false if fail  
-     */  
-    public bool RemoveItem(Item removeItem)
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (items[i] == removeItem)
-            {
-                items[i] = null;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /*
-     *   Removes a designated amount of an item. Returns true if success, false
-     * if fail.
-     *   NOTE: Doesn't account for if attempting to remove more than amount of 
-     * item player has yet. Need to handle this case somehow.
-     */  
-    public bool RemoveAmtofItem(Item removeItem, int amount)
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (items[i].ID == removeItem.ID)
-            {
-                items[i].Amount -= amount;
-                if (items[i].Amount <= 0)
+                for (int j = i + 1; j < numItemSlots; j++)
                 {
-                    items[i] = null;
+                    items[j - 1] = items[j];
                 }
-                return true;
             }
         }
-        return false;
     }
 }

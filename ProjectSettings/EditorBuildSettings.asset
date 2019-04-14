@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/NewMenu.unity
     guid: da451a5ac45906c4189290de1939ca94
+  - enabled: 1
+    path: Assets/Scenes/Procedural.unity
+    guid: b632c59b0f9108243a8ba4de811e0bfe
   m_configObjects: {}
