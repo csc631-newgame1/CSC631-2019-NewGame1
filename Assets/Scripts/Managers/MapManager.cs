@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using MapUtils;
+using RegionUtils;
 using static MapUtils.MapConstants;
 using System;
+
 
 public class MapManager : MonoBehaviour
 {
@@ -35,8 +37,10 @@ public class MapManager : MonoBehaviour
 	private int[,] map_raw;
     private MapCell[,] map;
 	private NavigationHandler nav_map;
+    Region region_tree_root;
 
-	private GameManager parentManager = null;
+
+    private GameManager parentManager = null;
 	private TileSelector tileSelector = null;
 
     // called by gamemanager, initializes map components
@@ -50,8 +54,9 @@ public class MapManager : MonoBehaviour
 			mapObject = Instantiate(mapPrefab, Vector3.zero, Quaternion.identity);
 
 		map_raw = mapObject.GetComponent<MapGenerator>().generate_map();
+        region_tree_root = mapObject.GetComponent<MapGenerator>().getMainRegion();
 
-		nav_map = new NavigationHandler(map_raw);
+        nav_map = new NavigationHandler(map_raw);
 
 		set_config_variables();
 		map = new MapCell[width, height];
@@ -422,4 +427,99 @@ public class MapManager : MonoBehaviour
 		
 		Debug.DrawLine(origin, destination, color, time);
 	}
+
+    /*******************/
+    /* DEBUG FUNCTIONS */
+    /*******************/
+
+    private class RegionNode
+    {
+        public Region region;
+        public int height = 0;
+        public List<RegionNode> children;
+        // constructs the entire tree
+        public RegionNode(Region region)
+        {
+            this.region = region;
+            this.children = new List<RegionNode>();
+            foreach (Region child in region.connections)
+            {
+                children.Add(new RegionNode(child));
+            }
+        }
+        // assumes the region children have been sorted by height in findSpawnpoints()
+        public Region find_nth_furthest_region(int n)
+        {
+            if (children.Count <= n)
+                return region;
+            else return children[n].find_nth_furthest_region(0);
+        }
+    }
+
+    // finds <amount> spawnpoints + 1 endpoint, for initial placement of players/level end. endpoint is always at 0th position in list
+    // traverses region tree to find the two furthest away regions
+    public Region[] findFurthestRegions(int amount)
+    {
+        RegionNode root = new RegionNode(region_tree_root);
+        Stack<RegionNode> bottom = new Stack<RegionNode>();
+        Stack<RegionNode> top = new Stack<RegionNode>();
+
+        // traverses tree from bottom->top, pushing nodes to a stack so we can traverse them top->bottom later
+        bottom.Push(root);
+        while (bottom.Count > 0)
+        {
+            RegionNode curr = bottom.Pop();
+            top.Push(curr);
+            foreach (RegionNode child in curr.children)
+            {
+                bottom.Push(child);
+            }
+        }
+
+        RegionNode diameterNode = null; // root node of the subtree with the largest diameter
+        int maxDiameter = 0;
+        // gets the node in the region tree where the two furthest-most leaf nodes are from one another
+        while (top.Count > 0)
+        {
+            RegionNode curr = top.Pop();
+            int diameter;
+            // if this node is a leaf node, set height/diameter to 1
+            if (curr.children.Count == 0)
+            {
+                curr.height = 1;
+                diameter = 1;
+            }
+            // if this node only has one child, set height/diameter to child height + 1
+            else if (curr.children.Count == 1)
+            {
+                curr.height = curr.children[0].height + 1;
+                diameter = curr.height;
+            }
+            // otherwise, find the two tallest children, set height to the height of the tallest child, and set diameter to the sum of the tallest children + 1
+            else
+            {
+                curr.children.Sort( // sorts children by height
+                    delegate (RegionNode a, RegionNode b) {
+                        return a.height.CompareTo(b.height);
+                    });
+                curr.children.Reverse(); // sorts from tallest->smallest
+
+                curr.height = curr.children[0].height + 1;
+                diameter = curr.children[0].height + curr.children[1].height + 1;
+                Debug.Log("diameter:" + diameter);
+            }
+            if (diameter > maxDiameter)
+            {
+                maxDiameter = diameter;
+                diameterNode = curr;
+            }
+        }
+
+        Debug.Log("Max diameter: " + maxDiameter);
+        // once the diameter root has been found, get the farthest-most regions
+        Region spawnRegion = diameterNode.find_nth_furthest_region(0);
+        Region endRegion = diameterNode.find_nth_furthest_region(1);
+
+        return new Region[] { spawnRegion, endRegion };
+    }
 }

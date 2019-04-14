@@ -138,12 +138,18 @@ public class MapGenerator : MonoBehaviour
 			map[width-1,y] = EMPTY;
 		}
 	}
-	
-	/************************/
-	/* MAP POST-PROCESSING */
-	/************************/
-	
-	void extract_regions()
+
+    /************************/
+    /* MAP POST-PROCESSING */
+    /************************/
+
+    public Region getMainRegion()
+    {
+        return main_region;
+    }
+
+
+    void extract_regions()
 	{
 		// inner regions, or pools, are regions of empty space within other regions.
 		// since these pools are not actually distinct regions, only their wall geometries are extracted so that they can be properly rendered
