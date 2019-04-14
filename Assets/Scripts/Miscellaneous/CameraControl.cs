@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-
     // Camera follow variables.
     Transform target_transform;
     public Vector3 offset = new Vector3(2f, -2f, 2f);

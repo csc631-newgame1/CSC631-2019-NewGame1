@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using MapUtils;
+using RegionUtils;
 using static MapUtils.MapConstants;
 using System;
 
@@ -30,16 +31,20 @@ public class MapManager : MonoBehaviour
 
 	// map data
 	private int[,] map_raw;
+	private Region region_tree_root; // the root node of the region tree for the map
     private MapCell[,] map;
 	private NavigationHandler nav_map;
 
 	private GameManager parentManager = null;
 	private TileSelector tileSelector = null;
+	private System.Random rng;
+	private List<GameObject> environmentObjects;
 
     // called by gamemanager, initializes map components
     public void Init(GameManager parent)
 	{
 		parentManager = parent;
+		NetworkManager.mapManager = this;
 
 		// begin component init
 		GameObject mapObject = GameObject.FindGameObjectWithTag("Map");
@@ -47,6 +52,7 @@ public class MapManager : MonoBehaviour
 			mapObject = Instantiate(mapPrefab, Vector3.zero, Quaternion.identity);
 
 		map_raw = mapObject.GetComponent<MapGenerator>().generate_map();
+		region_tree_root = mapObject.GetComponent<MapGenerator>().getMainRegion();
 
 		nav_map = new NavigationHandler(map_raw);
 
@@ -58,6 +64,9 @@ public class MapManager : MonoBehaviour
 				map[x, y] = new MapCell(traversable(map_raw[x, y]));
 			}
 		}
+		
+		rng = new System.Random(Settings.Seed);
+		environmentObjects = new List<GameObject>();
 	}
 	
 	// set all map configuration variables
@@ -77,8 +86,6 @@ public class MapManager : MonoBehaviour
 	// instantiates an agent into the map at a random position
 	public GameObject instantiate_randomly(GameObject type)
 	{
-		System.Random rng = new System.Random(1);
-
 		int x = rng.Next(0, width - 1);
 		int y = rng.Next(0, height - 1);
 
@@ -111,6 +118,19 @@ public class MapManager : MonoBehaviour
 		map[pos.x, pos.y].occupied = true;
 		return clone;
 	}
+	
+	public GameObject instantiate_environment(GameObject prefab, Pos pos, bool traversable = true)
+	{
+		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
+		environmentObjects.Add(clone);
+		
+		if (!traversable) {
+			nav_map.removeTraversableTile(pos);
+			map[pos.x, pos.y].traversable = false;
+		}
+		
+		return clone;
+	}
 
 	// removes an agent from the map, destroying it's game object
 	public void de_instantiate(Pos pos)
@@ -125,10 +145,16 @@ public class MapManager : MonoBehaviour
 	// destroys all game objects currently on the map
 	public void clear_map()
 	{
+		foreach (GameObject environment in environmentObjects) {
+			Destroy(environment);
+		}
 		for (int x = 0; x < width; x++)
-			for (int y = 0; y < height; y++)
-				if (map[x, y].resident != null)
+			for (int y = 0; y < height; y++) 
+				if (map[x, y].occupied) {
 					Destroy(map[x, y].resident.gameObject);
+					map[x, y].occupied = false;
+					map[x, y].resident = null;
+				}
 	}
 	
 	// move a character from source to dest
@@ -264,6 +290,107 @@ public class MapManager : MonoBehaviour
 	/*********************/
 	/* UTILITY FUNCTIONS */
 	/*********************/
+	
+	private class RegionNode
+	{
+		public Region region;
+		public int height = 0;
+		public List<RegionNode> children;
+		// constructs the entire tree
+		public RegionNode(Region region)
+		{
+			this.region = region;
+			this.children = new List<RegionNode>();
+			foreach (Region child in region.connections) {
+				children.Add(new RegionNode(child));
+			}
+		}
+		// assumes the region children have been sorted by height in findSpawnpoints()
+		public Region find_nth_furthest_region(int n)
+		{
+			if (children.Count <= n)
+				return region;
+			else return children[n].find_nth_furthest_region(0);
+		}
+	}
+	
+	// finds <amount> spawnpoints + 1 endpoint, for initial placement of players/level end. endpoint is always at 0th position in list
+	// traverses region tree to find the two furthest away regions
+	public List<Pos> findSpawnpoints(int amount)
+	{
+		RegionNode root = new RegionNode(region_tree_root);
+		Stack<RegionNode> bottom = new Stack<RegionNode>();
+		Stack<RegionNode> top = new Stack<RegionNode>();
+		
+		// traverses tree from bottom->top, pushing nodes to a stack so we can traverse them top->bottom later
+		bottom.Push(root);
+		while (bottom.Count > 0) {
+			RegionNode curr = bottom.Pop();
+			top.Push(curr);
+			foreach (RegionNode child in curr.children) {
+				bottom.Push(child);
+			}
+		}
+		
+		RegionNode diameterNode = null; // root node of the subtree with the largest diameter
+		int maxDiameter = 0;
+		// gets the node in the region tree where the two furthest-most leaf nodes are from one another
+		while (top.Count > 0) {
+			RegionNode curr = top.Pop();
+			int diameter;
+			// if this node is a leaf node, set height/diameter to 1
+			if (curr.children.Count == 0) {
+				curr.height = 1;
+				diameter = 1;
+			}
+			// if this node only has one child, set height/diameter to child height + 1
+			else if (curr.children.Count == 1) {
+				curr.height = curr.children[0].height + 1;
+				diameter = curr.height;
+			}
+			// otherwise, find the two tallest children, set height to the height of the tallest child, and set diameter to the sum of the tallest children + 1
+			else {
+				curr.children.Sort( // sorts children by height
+					delegate(RegionNode a, RegionNode b) {
+						return a.height.CompareTo(b.height); } );
+				curr.children.Reverse(); // sorts from tallest->smallest
+				
+				curr.height = curr.children[0].height + 1;
+				diameter = curr.children[0].height + curr.children[1].height + 1;
+				Debug.Log("diameter:"+diameter);
+			}
+			if (diameter > maxDiameter) {
+				maxDiameter = diameter;
+				diameterNode = curr;
+			}
+		}
+		
+		Debug.Log("Max diameter: " + maxDiameter);
+		// once the diameter root has been found, get the farthest-most regions
+		Region spawnRegion = diameterNode.find_nth_furthest_region(0);
+		Region endRegion   = diameterNode.find_nth_furthest_region(1);
+		
+		// throws random locations at the map until all suitable player spawn/level end locations are found
+		List<Pos> spawnPositions = new List<Pos>();
+		int x, y;
+		// gets all spawn positions
+		while (spawnPositions.Count < amount) {
+			do {
+				x = rng.Next(0, width - 1);
+				y = rng.Next(0, height - 1);
+			} while (map_raw[x, y] != spawnRegion.ID);
+			
+			spawnPositions.Add(new Pos(x, y));
+		}
+		// gets end point
+		do {
+			x = rng.Next(0, width - 1);
+			y = rng.Next(0, height - 1);
+		} while (map_raw[x, y] != endRegion.ID);
+		spawnPositions.Insert(0, new Pos(x, y));
+		
+		return spawnPositions;
+	}
 
 	// returns true if tile terrain at position is traversable
     public bool IsTraversable(Pos pos)

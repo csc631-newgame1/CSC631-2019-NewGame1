@@ -440,6 +440,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
+  endportal: {fileID: 1506806999855239151, guid: 6762552eb0acbb7488318c5b2aaadac7,
+    type: 3}
+  startportal: {fileID: 7046041667564820321, guid: ef50db0dbbe2ce84aa4de6a3de25be58,
+    type: 3}
 --- !u!114 &1591538342
 MonoBehaviour:
   m_ObjectHideFlags: 0

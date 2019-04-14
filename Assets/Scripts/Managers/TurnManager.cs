@@ -7,10 +7,6 @@ public class TurnManager : MonoBehaviour
     //static instance of game manager which allows it to be accessed by any other script
     public static TurnManager instance = null;
 	
-    //boolean to check if it's player's turn
-    //[HideInInspector] public bool playersTurn = true;
-	//[HideInInspector] public bool enemiesTurn = false;
-
     // lists of all active players/enemies
     private List<GameAgent>[] teamRoster = new List<GameAgent>[16];
 	
@@ -33,7 +29,7 @@ public class TurnManager : MonoBehaviour
 		mainLoop = TurnLoop();
 		StartCoroutine(mainLoop);
 	}
-
+	
     IEnumerator TurnLoop()
 	{	
 		while (true) {
@@ -42,7 +38,9 @@ public class TurnManager : MonoBehaviour
 			for (int team = 0; team < 16; team++) {
 				
 				StartCoroutine(AIManager.update(team));
-				while (!AIManager.turnOver(team)) yield return null;
+				while (!AIManager.turnOver(team)) {
+					yield return null;
+				}
 				ClearDead();
 			}
 		}
@@ -60,24 +58,6 @@ public class TurnManager : MonoBehaviour
 		}
 	}
 
-    /*bool playerTurnOver()
-    {
-        foreach (Player player in players) {
-            player.CheckIfPlayerTurnHasEnded();
-            if (player.player_turn) return false;
-        }
-
-        return true;
-    }
-
-    void UpdatePlayerStats() {
-        if (players.Count > 0) {
-            foreach (Player player in players) {
-                player.UpdatePlayerStatsMenu(players);
-            }
-        }
-    }*/
-	
 	public void addToRoster(GameAgent agent)
 	{
 		teamRoster[agent.team].Add(agent);
@@ -87,6 +67,6 @@ public class TurnManager : MonoBehaviour
 	{
 		foreach (List<GameAgent> faction in teamRoster)
 			faction.Clear();
-		StopCoroutine(mainLoop);
+		StopAllCoroutines(); // terminate any running coroutines
 	}
 }

@@ -12,8 +12,6 @@ public class EnemySpawner : MonoBehaviour {
     private Vector3 offset;
     private Vector3 regionSize;
     private float radius;
-    private string seed;
-    private int seedHashed;
     private MapManager mapManager;
     private MapGenerator mapGenerator;
     private System.Random rng;
@@ -52,7 +50,6 @@ public class EnemySpawner : MonoBehaviour {
         offset = config.GetOffset();
         this.mapManager = mapManager;
         mapConfiguration = config;
-        seed = config.seed;
         rng = config.GetRNG();
 
         spawnZones = new List<SpawnZone>();
@@ -134,8 +131,11 @@ public class EnemySpawner : MonoBehaviour {
             bool zoneRemoved = false;
             List<int> exclude = new List<int>();
 
+			int forceTermination = 10000;
+			int iterationCount = 0;
             // Removes spawn zones until the max is in reach
             while (numOfZonesToRemove > 0) {
+				if (iterationCount++ >= forceTermination) { Debug.Log("Forced loop to terminate"); break; }
 
                 if (!oneSpawnZoneLeftInEveryRegion) {
                     // Checks through all the regions

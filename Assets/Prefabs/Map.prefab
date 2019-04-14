@@ -179,8 +179,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e200e9a9eb6534f918eb71dcac6113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 50
-  height: 50
+  width: 100
+  height: 100
   fill_percent: 51
   smoothness: 8
   region_cull_threshold: 16
@@ -191,7 +191,6 @@ MonoBehaviour:
   bridge_texture_scale: 1
   floor_texture_scale: 1
   object_size_scale: 0
-  seed: 
 --- !u!1 &3944264687251142841
 GameObject:
   m_ObjectHideFlags: 0

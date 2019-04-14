@@ -27,8 +27,9 @@ public class AIManager
 			agent.AI.calcAttack();
 			agent.AI.calcReinforce();
 			agent.take_turn();
-			while (!agent.turn_over())
+			while (!agent.turn_over()) {
 				yield return null;
+			}
 		}
 		
 		foreach (GameAgent agent in HumanPool)
