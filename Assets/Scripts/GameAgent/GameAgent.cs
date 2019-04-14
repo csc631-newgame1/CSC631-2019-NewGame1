@@ -17,6 +17,8 @@ public abstract class GameAgent : MonoBehaviour
 	public AIComponent AI;
 	public int team;
 	public int move_budget;
+
+    public Inventory inventory = new Inventory();
 	public bool animating;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
@@ -40,4 +42,11 @@ public abstract class GameAgent : MonoBehaviour
     public abstract void act();
     public abstract void wait();
     public abstract void potion();
+
+    public void UseItemOnSelf(int slot)
+    {
+        Item item = inventory.GetItemFromSlot(slot);
+        InventoryManager.instance.UseItem(item, this);
+        inventory.DecrementItemAtSlot(slot);
+    }
 }
