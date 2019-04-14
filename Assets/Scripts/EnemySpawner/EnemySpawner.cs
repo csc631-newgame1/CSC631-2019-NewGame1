@@ -135,11 +135,8 @@ public class EnemySpawner : MonoBehaviour {
 			int iterationCount = 0;
             // Removes spawn zones until the max is in reach
             while (numOfZonesToRemove > 0) {
-<<<<<<< HEAD
 				if (iterationCount++ >= forceTermination) { Debug.Log("Forced loop to terminate"); break; }
-
-=======
->>>>>>> 7398bc1816149339ac3114ab98dc078d92eaf7d4
+				
                 if (!oneSpawnZoneLeftInEveryRegion) {
                     zoneRemoved = false;
 

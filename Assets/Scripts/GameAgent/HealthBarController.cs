@@ -14,7 +14,7 @@ public class HealthBarController : MonoBehaviour
     {
         canvas = GameObject.Find("UICanvas"); //get canvas ref
 
-        Debug.Log("I am an upset child");
+        //Debug.Log("I am an upset child");
         instance = Instantiate(healthbar); //instantiate prefab
         Vector2 screenPos = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         parent = GetComponent<GameAgent>();
@@ -29,8 +29,10 @@ public class HealthBarController : MonoBehaviour
     void Update()
     {
         bar.SetSliderValue(parent.stats.currentHealth / parent.stats.maxHealth);
-        Vector3 offset = new Vector3(0, 20, 0);
+		float camera_zoom_ratio = 10 / CameraControl.currentZoom;
+        Vector3 offset = new Vector3(0, 40, 0) * camera_zoom_ratio;
         Vector3 wantedPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position) + offset;
+		bar.transform.localScale = Vector3.one * camera_zoom_ratio;
         instance.transform.position = wantedPosition;
     }
 
