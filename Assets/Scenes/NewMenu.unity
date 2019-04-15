@@ -1301,7 +1301,7 @@ GameObject:
   - component: {fileID: 393001820}
   - component: {fileID: 393001819}
   m_Layer: 5
-  m_Name: Archer
+  m_Name: Hunter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1374,7 +1374,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Archer
+          m_StringArgument: Hunter
           m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
@@ -1412,7 +1412,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Archer
+  m_Text: Hunter
 --- !u!222 &393001821
 CanvasRenderer:
   m_ObjectHideFlags: 2
@@ -4318,7 +4318,7 @@ GameObject:
   - component: {fileID: 1653532487}
   - component: {fileID: 1653532486}
   m_Layer: 5
-  m_Name: Rogue
+  m_Name: Healer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4391,7 +4391,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Rogue
+          m_StringArgument: Healer
           m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
@@ -4429,7 +4429,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Rogue
+  m_Text: Healer
 --- !u!222 &1653532488
 CanvasRenderer:
   m_ObjectHideFlags: 2

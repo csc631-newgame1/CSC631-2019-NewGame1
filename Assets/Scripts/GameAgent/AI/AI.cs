@@ -50,7 +50,7 @@ public class AIComponent
 		attacking = null;
 		reinforcing = null;
 		state = STATE.IDLE;
-		finished = false;
+		finished = true;
 		
 		mapManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 		enemyPool = new List<GameAgent>();

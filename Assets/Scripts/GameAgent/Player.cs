@@ -47,12 +47,11 @@ public class Player : GameAgent
 		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 
-        this.name = name;
-
         this.stats = stats;
         UpdateViewableEditorPlayerStats();
 		move_budget = 25;
 		speed = 100;
+		this.nickname = name;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -60,9 +59,6 @@ public class Player : GameAgent
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
 
         selectableTiles = new List<Pos>();
-
-		//tile_selector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
-		//tile_selector.setPlayer(this);
 
         currentState = GameAgentState.Alive;
 		animating = false;
@@ -82,10 +78,10 @@ public class Player : GameAgent
 		    case '4': StartCoroutine(animator.PlayHitAnimation()); break;
 		    case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
 		    case '6': StartCoroutine(animator.PlayKilledAimation()); break;
-            case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
+            /*case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
             case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
             case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
-            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;
+            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;*/
         }
     }
 	
@@ -241,13 +237,33 @@ public class Player : GameAgent
 	
 	public bool can_take_action() { return !animating && !turn_over(); }
 	
-	public void TestCharacterClass(int characterClassToTest) {
-        int weapon = CharacterClassOptions.RandomClassWeapon;
-        if (characterClassToTest == CharacterClassOptions.Knight) {
-            weapon = CharacterClassOptions.Sword;
-        }
+	public void SetCharacterClass(string classname) {
+		
+        int weapon, classID;
+        switch (classname) {
+			case "Warrior":
+				classID = CharacterClassOptions.Knight;
+				weapon = CharacterClassOptions.Sword;
+				break;
+			case "Mage":
+				classID = CharacterClassOptions.Mage;
+				weapon = CharacterClassOptions.Staff;
+				break;
+			case "Hunter":
+				classID = CharacterClassOptions.Hunter;
+				weapon = CharacterClassOptions.Bow;
+				break;
+			case "Healer":
+				classID = CharacterClassOptions.Healer;
+				weapon = CharacterClassOptions.Staff;
+				break;
+			default:
+				classID = CharacterClassOptions.Knight;
+				weapon = CharacterClassOptions.Sword;
+				break;
+		}
 
-        stats = new GameAgentStats(CharacterRaceOptions.Human, characterClassToTest, 1, weapon);
+        stats = new GameAgentStats(CharacterRaceOptions.Human, classID, 1, weapon);
         attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = maxHealth;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using MapUtils;
 
@@ -48,7 +49,8 @@ public class GameManager : MonoBehaviour
 		map_manager.instantiate_environment(endportal, level_end);
 		// spawn players
 		for (int i = 0; i < players.Count; i++) {
-			Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1]).GetComponent<Player>();
+			Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
+			instance.SetCharacterClass(players[i].classname);
 			players[i].playerObject = instance;
 			if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
 		}
@@ -68,37 +70,44 @@ public class GameManager : MonoBehaviour
 		turn_manager.Terminate();
 		map_manager.clear_map();
 	}
+	
+	public static void NextLevel()
+	{
+		instance.DeInit();
+		instance.Init();
+	}
 
     void Update()
 	{
+		if (Input.GetKeyDown("escape")) {
+			Network.disconnectFromServer();
+			DeInit();
+			SceneManager.LoadScene("NewMenu");
+		}
+		
 		foreach (char key in Input.inputString) {
 
 			localPlayer.RespondToKeyboardInput(key);
 
 			switch (key) {
 			case 'r':
-				DeInit();
-				Init();
+				NextLevel();
 				break;
 			}
+			
         }
 
 		if (Input.GetMouseButtonDown(1)) {
 			switch (tileSelector.mode) {
 				case "MOVE":
 					if (tileSelector.hoveringValidMoveTile()) {
-						//Debug.Log("submitting command...");
 						Network.submitCommand(new MoveCommand(localPlayer.grid_pos, tileSelector.grid_position));
-						/*map_manager.move(
-							localPlayer.grid_pos, tileSelector.grid_position);*/
 						tileSelector.mode = "NONE";
 					}
 					break;
 				case "ACT":
 					if (tileSelector.hoveringValidActTile()) {
 						Network.submitCommand(new AttackCommand(localPlayer.grid_pos, tileSelector.grid_position));
-						/*map_manager.attack(
-							localPlayer.grid_pos, tileSelector.grid_position);*/
 						tileSelector.mode = "NONE";
 					}
 					break;
