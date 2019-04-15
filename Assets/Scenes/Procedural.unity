@@ -366,9 +366,17 @@ MonoBehaviour:
   traversableEnvironmentDensity: 0.1
   nonTraversableEnvironmentDensity: 0
   particleEnvironmentDensity: 0
-  traversableEnvironmentObject: []
-  nonTraversableEnvironmentObject: []
-  particleEnvironmentObject: []
+  traversableEnvironmentObject:
+  - {fileID: 190188, guid: 87874848711c372419e6cf6ca05d9ea1, type: 3}
+  - {fileID: 122248, guid: c55ee685bfc996649b14f14e08783def, type: 3}
+  - {fileID: 157244, guid: 7271a03a849e78a419f3c572eaea346d, type: 3}
+  - {fileID: 124028, guid: 30d00bb7fb067de4c99cc3b87f401945, type: 3}
+  - {fileID: 151472, guid: fd119028d2a0bc64c860463357262b1c, type: 3}
+  nonTraversableEnvironmentObject:
+  - {fileID: 173134, guid: 0a40fb4ee1314fc4892f4cb8b77576d4, type: 3}
+  - {fileID: 172248, guid: 741f1739761e2d64f8da104d700a2180, type: 3}
+  particleEnvironmentObject:
+  - {fileID: 127426, guid: ea41b4418e01f504d8548256ce387570, type: 3}
 --- !u!4 &1591538337
 Transform:
   m_ObjectHideFlags: 0

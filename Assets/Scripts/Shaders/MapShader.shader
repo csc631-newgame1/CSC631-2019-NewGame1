@@ -1,7 +1,9 @@
 ﻿Shader "Unlit/MapShader" {
 
 	Properties {
-		_MainTex ("Texture", 2D) = "white" {}
+		_XTex ("Texture", 2D) = "white" {}
+		_YTex ("Texture", 2D) = "white" {}
+		_ZTex ("Texture", 2D) = "white" {}
 		_FluidGradient ("Fluid Gradient Color", 2D) = "white" {}
 		_FluidTex ("Fluid Detail", 2D) = "white" {}
 		_Oscillation ("Fluid Oscillation Level", Range(0, 1)) = 0
@@ -26,7 +28,9 @@
             #include "UnityCG.cginc"
 			#include "UnityLightingCommon.cginc"
 			
-			sampler2D _MainTex;
+			sampler2D _XTex;
+			sampler2D _YTex;
+			sampler2D _ZTex;
 			sampler2D _FluidGradient;
 			sampler2D _FluidTex;
 			half _Oscillation;
@@ -39,54 +43,60 @@
 			
 			struct i2v {
 				float4 pos : POSITION;
-				half2 uv : TEXCOORD0;
 				half3 normal : NORMAL;
 			};
-         
+			
             struct v2f {
                 float4 pos : POSITION;
-                half2 uv1 : TEXCOORD0;
-				half2 uv2 : TEXCOORD1;
-				//half4 light : COLOR;
-				UNITY_FOG_COORDS(2)
-				half height : TEXCOORD2;
+				half3 normal : NORMAL;
+				half3 world : TEXCOORD0;
+				//UNITY_FOG_COORDS(3)
             };
 			
-			float4 _MainTex_ST;
+			float4 _XTex_ST;
+			float4 _YTex_ST;
+			float4 _ZTex_ST;
 			float4 _FluidTex_ST;
 			float4 _FluidGradient_ST;
             
             v2f vert (i2v v)
             {
                 v2f o;
+				o.world = v.pos.xyz;
                 o.pos = UnityObjectToClipPos(v.pos);
+				o.normal = v.normal;
 				
-				o.uv1 = TRANSFORM_TEX(v.uv, _MainTex);
-				o.uv2 = TRANSFORM_TEX(half2(v.pos.x, v.pos.z), _FluidTex);
+				//o.uv1 = TRANSFORM_TEX(v.uv, _MainTex);
+				//o.uv2 = TRANSFORM_TEX(half2(v.pos.x, v.pos.z), _FluidTex);
 				
 				//half3 world_normal = UnityObjectToWorldNormal(v.normal);
 				//half intensity = _BaseIntensity + (max(0.4, dot(world_normal, _WorldSpaceLightPos0.xyz))) * (1 - _BaseIntensity);
                 //o.light = _LightColor0 * intensity;
 				
-				o.height = abs(v.pos.y / _Height);
+				//o.height = abs(v.pos.y / _Height);
 				
-				UNITY_TRANSFER_FOG(o, o.pos);
+				//UNITY_TRANSFER_FOG(o, o.pos);
                 return o;
             }
 
-            half4 frag (v2f i) : SV_Target 
+            float4 frag (v2f i) : SV_Target 
 			{
-				half detail = (tex2D(_FluidTex, (_Flow * (_Time[0] * half2(1, 1))) + i.uv2).r - 0.5) * 2 * _Detail;
+				half detail = (tex2D(_FluidTex, (_Flow * (_Time[0] * half2(1, 1))) + i.world.xz / 8).r - 0.5) * 2 * _Detail;
 				half time_osc = _SinTime[3] * _Oscillation;
 				
-				half weight = clamp(i.height + time_osc + detail + _Bias, 0.01, 0.99);
+				half height = abs(i.world.y / _Height);
+				half weight = clamp(height + time_osc + detail + _Bias, 0.01, 0.99);
 				
-				half4 grd_col = tex2D(_FluidGradient, half2(weight, 0));
-				half4 tex_col = tex2D(_MainTex, i.uv1);
+				float4 grd_col = tex2D(_FluidGradient, half2(weight, 0));
 				
-				half4 col = lerp(grd_col, tex_col * _BaseLightColor, 1 - (grd_col.a));
+				float3 norm = abs(i.normal);
+				norm = norm / (norm.x + norm.y + norm.z);
+				float4 colX = tex2D(_XTex, i.world.zy / 4);
+				float4 colY = tex2D(_YTex, i.world.xz / 4);
+				float4 colZ = tex2D(_ZTex, i.world.xy / 4);
+				float4 tex_col = (colX * norm.x + colY * norm.y + colZ * norm.z);
 				
-				UNITY_APPLY_FOG(i.fogCoord, col);
+				float4 col = lerp(grd_col, tex_col * _BaseLightColor, 1 - (grd_col.a));
 				
 				return col;
 			}

@@ -9291,17 +9291,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 956bb2b40f257e843a228735ecea6524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showPathLine: 0
-  showSelectableMoveTiles: 0
-  showSelectableActTiles: 0
-  showAOETiles: 0
   hover_position: {x: 0, y: 0, z: 0}
   tileMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   moveableTilesMaterial: {fileID: 2100000, guid: 9c4bdd583bc376444a09f7eb6675cbab,
     type: 2}
-  selectableTilesMaterial: {fileID: 2100000, guid: 9f34070364e48d24297908866dd6762f,
+  selectableTilesMaterial: {fileID: 2100000, guid: d8ea5eb07e67c10429856345b655f14f,
     type: 2}
-  nonselectableTilesMaterial: {fileID: 2100000, guid: b0345d6b496b88744a4fe169db3b58c0,
+  nonselectableTilesMaterial: {fileID: 2100000, guid: d4ce8c5b7a4e4f0419b8958d7ce70419,
     type: 2}
 --- !u!65 &1074917814717613528
 BoxCollider:
