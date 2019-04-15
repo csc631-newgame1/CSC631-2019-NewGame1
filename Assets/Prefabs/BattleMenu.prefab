@@ -157,7 +157,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: ACT
+  m_Text: ACT [S]
 --- !u!1 &145839507
 GameObject:
   m_ObjectHideFlags: 0
@@ -555,7 +555,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 3.48
-  m_Text: ACTION 2
+  m_Text: ACTION 2 [S]
 --- !u!1 &585753993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1115,7 +1115,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: POTION
+  m_Text: POTION [D]
 --- !u!1 &858160246
 GameObject:
   m_ObjectHideFlags: 0
@@ -1722,7 +1722,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: WAIT
+  m_Text: WAIT [F]
 --- !u!1 &1039354509
 GameObject:
   m_ObjectHideFlags: 0
@@ -2040,7 +2040,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 3.48
-  m_Text: MOVE
+  m_Text: MOVE [A]
 --- !u!1 &1399957036
 GameObject:
   m_ObjectHideFlags: 0
@@ -2404,7 +2404,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 3.48
-  m_Text: ACTION 1
+  m_Text: ACTION 1 [A]
 --- !u!1 &1504410638
 GameObject:
   m_ObjectHideFlags: 0
@@ -3008,7 +3008,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 3.48
-  m_Text: ACTION 3
+  m_Text: ACTION 3 [D]
 --- !u!1 &1620252456
 GameObject:
   m_ObjectHideFlags: 0
@@ -3554,7 +3554,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 3.48
-  m_Text: BACK
+  m_Text: BACK [F]
 --- !u!1 &1889906430
 GameObject:
   m_ObjectHideFlags: 0

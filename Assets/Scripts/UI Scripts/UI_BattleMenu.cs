@@ -36,6 +36,21 @@ public class UI_BattleMenu : MonoBehaviour
 		actionMenu.SetActive(false);
 	}
 	
+	void Update()
+	{
+		if (defaultMenu.activeSelf) {
+			if (Input.GetKeyDown("a")) Move();
+			if (Input.GetKeyDown("s")) ActMenu();
+			if (Input.GetKeyDown("d")) Potion();
+			if (Input.GetKeyDown("f")) Wait();
+		} else if (actionMenu.activeSelf) {
+			if (Input.GetKeyDown("a")) Action(0);
+			if (Input.GetKeyDown("s")) Action(1);
+			if (Input.GetKeyDown("d")) Action(2);
+			if (Input.GetKeyDown("f")) ActMenuBack();
+		}
+	}
+	
 	public static void SetActButtons(string[] actionNames)
 	{
 		for (int i = 0; i < 3; i++) {

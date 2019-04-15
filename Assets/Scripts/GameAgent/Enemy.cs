@@ -39,6 +39,7 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+		this.nickname = CharacterRaceOptions.getString(stats.characterRace);
 		
 		speed = 100;
 		move_budget = 10;

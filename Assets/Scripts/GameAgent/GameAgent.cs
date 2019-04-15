@@ -10,6 +10,7 @@ public abstract class GameAgent : MonoBehaviour
 {
 	public Pos grid_pos;
     public float speed;
+	public string nickname;
     public GameAgentStats stats;
     public GameAgentAction currentAction;
 	

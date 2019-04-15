@@ -105,10 +105,10 @@ public class MapManager : MonoBehaviour
 		
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
 		GameAgent agent = clone.GetComponent<GameAgent>();
-        string[] names = new string[] { "Keawa", "Benjamin", "Diana", "Jerry", "Joe" };
+        //string[] names = new string[] { "Keawa", "Benjamin", "Diana", "Jerry", "Joe" };
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), names[UnityEngine.Random.Range(0, names.Length)]);
+            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), name);
         } else {
             agent.init_agent(pos, stats);
         }
@@ -161,6 +161,8 @@ public class MapManager : MonoBehaviour
 	public void move(Pos source, Pos dest)
 	{
 		GameAgent agent = map[source.x, source.y].resident;
+		if (agent == null) { Debug.Log("Move command was invalid!"); return; }
+		
 		Path path = get_path(source, dest);
 		
 		nav_map.removeTraversableTile(dest);
@@ -177,11 +179,10 @@ public class MapManager : MonoBehaviour
 	// applies damage to agent at position, if one is there
 	public void attack(Pos source, Pos dest)
 	{
-		//map[dest.x, dest.y].resident.take_damage(damage_amount);
 		GameAgent attacker = map[source.x, source.y].resident;
 		GameAgent target = map[dest.x, dest.y].resident;
+		if (target == null || attacker == null) { Debug.Log("Attack command was invalid!"); return; }
 		StartCoroutine(attacker.animate_attack(target));
-		//return true;
 	}
 	
 	/*************************/

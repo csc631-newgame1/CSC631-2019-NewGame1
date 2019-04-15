@@ -17,6 +17,14 @@ public static class CharacterRaceOptions {
     public const int Human = 1;
     public const int Orc = 4;
     public const int Skeleton = 5;
+	public static string getString(int race) {
+		switch (race) {
+			case Human: return "Human";
+			case Orc: return "Orc";
+			case Skeleton: return "Skeleton";
+			default: return "Cryptid";
+		}
+	}
 };
 
 public abstract class CharacterClass

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -443,8 +443,6 @@ MonoBehaviour:
   playerPrefab: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
   endportal: {fileID: 1506806999855239151, guid: 6762552eb0acbb7488318c5b2aaadac7,
     type: 3}
-  startportal: {fileID: 7046041667564820321, guid: ef50db0dbbe2ce84aa4de6a3de25be58,
-    type: 3}
 --- !u!114 &1591538342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -568,12 +566,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d546559bc8eed1d4883416b315e1fd35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 2, y: -2, z: 2}
+  offset: {x: 4, y: -4, z: 4}
   pitch: 2
-  currentZoom: 9
   zoomSpeed: 4
-  minZoom: 10
-  maxZoom: 25
+  minZoom: 5
 --- !u!45 &1867890180
 Skybox:
   m_ObjectHideFlags: 0
@@ -780,11 +776,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: UICanvas
       objectReference: {fileID: 0}
-    - target: {fileID: 3348429513676436965, guid: 1210833020d932640923c8daf1a1d3ab,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3348429512346625140, guid: 1210833020d932640923c8daf1a1d3ab,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -889,6 +880,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3348429513676436965, guid: 1210833020d932640923c8daf1a1d3ab,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3348429512346625143, guid: 1210833020d932640923c8daf1a1d3ab,
         type: 3}
@@ -1024,6 +1020,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 673046482604077798, guid: 1210833020d932640923c8daf1a1d3ab,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 673046482604077798, guid: 1210833020d932640923c8daf1a1d3ab,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 309763496625986401, guid: 1210833020d932640923c8daf1a1d3ab,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 309763496625986401, guid: 1210833020d932640923c8daf1a1d3ab,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8377741775118683967, guid: 1210833020d932640923c8daf1a1d3ab,
         type: 3}
@@ -1224,26 +1240,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -0.8999996
-      objectReference: {fileID: 0}
-    - target: {fileID: 673046482604077798, guid: 1210833020d932640923c8daf1a1d3ab,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 673046482604077798, guid: 1210833020d932640923c8daf1a1d3ab,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 309763496625986401, guid: 1210833020d932640923c8daf1a1d3ab,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 309763496625986401, guid: 1210833020d932640923c8daf1a1d3ab,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1210833020d932640923c8daf1a1d3ab, type: 3}
