@@ -71,6 +71,18 @@ Material:
         m_Texture: {fileID: 2800000, guid: 31006f3b862b3874b9386ac851893799, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _XTex:
+        m_Texture: {fileID: 2800000, guid: c86dc5bee4723f941a8330e4863dfd2e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _YTex:
+        m_Texture: {fileID: 2800000, guid: b40c6f45738791c4a9febb0c740f5c0a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ZTex:
+        m_Texture: {fileID: 2800000, guid: e4dcd35cc6d9528439d65808e3705af9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BaseIntensity: 1
     - _Bias: -0.033
@@ -113,7 +125,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseLightColor: {r: 0.5754717, g: 0.5754717, b: 0.5754717, a: 1}
+    - _BaseLightColor: {r: 1, g: 1, b: 1, a: 1}
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
     - _Color: {r: 0.24545696, g: 0.5, b: 0.18632075, a: 1}
     - _EmisColor: {r: 0.2, g: 0.2, b: 0.2, a: 0}

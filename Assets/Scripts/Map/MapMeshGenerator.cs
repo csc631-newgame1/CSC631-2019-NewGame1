@@ -142,30 +142,34 @@ public class MapMeshGenerator : MonoBehaviour
 			}
 			
 			// finish up around the edges
-			vertex_map[0, 0].y = height_map[0, 0];
+			vertex_map[0, 0].y = -wall_height;//height_map[0, 0];
 			
 			for(int x = 1; x < width * 2 + 1; x+=2) {
 				
-				float center_tile, right_tile;
+				/*float center_tile, right_tile;
 				right_tile = center_tile = height_map[(x - 1) / 2, 0];
 				
 				if (x < width * 2 - 1)
-					right_tile  = height_map[(x + 1) / 2, 0];
+					right_tile  = height_map[(x + 1) / 2, 0];*/
 				
-				vertex_map[x, 0].y		= (center_tile) / 1f;
-				vertex_map[x + 1, 0].y 	= (center_tile + right_tile) / 2f;
+				//vertex_map[x, 0].y		= (center_tile) / 1f;
+				//vertex_map[x + 1, 0].y 	= (center_tile + right_tile) / 2f;
+				vertex_map[x, 0].y = -wall_height;
+				vertex_map[x + 1, 0].y = -wall_height;
 			}
 			
 			for(int y = 1; y < height * 2 + 1; y+=2) {
 				
-				float center_tile, lower_tile;
+				/*float center_tile, lower_tile;
 				lower_tile = center_tile = height_map[0, (y - 1) / 2];
 				
 				if (y < height * 2 - 1)
-					lower_tile  = height_map[0, (y + 1) / 2];
+					lower_tile  = height_map[0, (y + 1) / 2];*/
 				
-				vertex_map[0, y].y		= (center_tile) / 1f;
-				vertex_map[0, y + 1].y 	= (center_tile + lower_tile) / 2f;
+				//vertex_map[0, y].y		= (center_tile) / 1f;
+				//vertex_map[0, y + 1].y 	= (center_tile + lower_tile) / 2f;
+				vertex_map[0, y].y		= -wall_height;
+				vertex_map[0, y + 1].y 	= -wall_height;
 			}
 			
 			// anchor all vertices that touch walkable tiles to height 0
