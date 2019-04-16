@@ -34,6 +34,7 @@ public class MapManager : MonoBehaviour
 	private Region region_tree_root; // the root node of the region tree for the map
     private MapCell[,] map;
 	private NavigationHandler nav_map;
+	public static Pos endPos;
 
 	private GameManager parentManager = null;
 	private TileSelector tileSelector = null;
@@ -234,6 +235,8 @@ public class MapManager : MonoBehaviour
 				results = nav_map.shortestPathBatchedInRange(source, destinations, maxDistance);
 		if (!IsWalkable(source)) nav_map.removeTraversableTile(source);
 		
+		if (results == null) return null;
+		
 		if (preserve_null) {
 			List<List<Pos>> new_results = new List<List<Pos>>();
 			int i = 0, j = 0;
@@ -279,7 +282,7 @@ public class MapManager : MonoBehaviour
 		
 		foreach (Pos dest in destinations) { if (!IsWalkable(dest)) nav_map.removeTraversableTile(dest); }
 		
-		if (paths.Count == 0) return null;
+		if (paths == null || paths.Count == 0) return null;
 		
 		List<int> distances = new List<int>();
 		foreach (Path path in paths) {
@@ -391,6 +394,11 @@ public class MapManager : MonoBehaviour
 		spawnPositions.Insert(0, new Pos(x, y));
 		
 		return spawnPositions;
+	}
+	
+	public void setEndPos(Pos endpos)
+	{
+		this.endPos = endpos;
 	}
 
 	// returns true if tile terrain at position is traversable

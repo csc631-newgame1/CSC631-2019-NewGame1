@@ -15,6 +15,7 @@ public class Player : GameAgent
     private List<Pos> selectableTiles;
 	
 	public bool godMode = false;
+	public int clientID = 0;
 
     // player turn options
     private bool playerMovedThisTurn = false;
@@ -43,11 +44,14 @@ public class Player : GameAgent
 
     //sound effects
     private AudioSource source;
-    public AudioClip swordSwing;
-    public AudioClip axeSwing;
-    public AudioClip bowShot;
-    public AudioClip fireSpell;
-    public AudioClip footsteps;
+    public AudioClip[] swordSwing;
+    public AudioClip[] axeSwing;
+    public AudioClip[] bowShot;
+    public AudioClip[] fireSpell;
+    public AudioClip[] footsteps;
+	public AudioClip[] deathRattle;
+	public AudioClip[] hitNoise;
+	public AudioClip[] armorHitNoise;
 
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
@@ -58,7 +62,7 @@ public class Player : GameAgent
         this.stats = stats;
         UpdateViewableEditorPlayerStats();
 		move_budget = 25;
-		speed = 100;
+		speed = 10;
 		this.nickname = name;
 
         animator = GetComponent<CharacterAnimator>();
@@ -106,15 +110,16 @@ public class Player : GameAgent
         switch (weapon)
         {
             case 1:
-                source.PlayOneShot(swordSwing);
+                source.PlayOneShot(randomSFX(swordSwing));
                 break;
             case 2:
-                source.PlayOneShot(bowShot);
+                source.PlayOneShot(randomSFX(bowShot));
                 break;
             case 3:
-                source.PlayOneShot(fireSpell);
+                source.PlayOneShot(randomSFX(fireSpell));
                 break;
             default:
+				source.PlayOneShot(randomSFX(axeSwing));
                 break;
         }
         // get target position, and distance between us and the enemy
@@ -150,6 +155,8 @@ public class Player : GameAgent
                 StartCoroutine(animator.PlayKilledAimation());
             } else {
                 StartCoroutine(animator.PlayHitAnimation());
+				source.PlayOneShot(randomSFX(hitNoise));
+				source.PlayOneShot(randomSFX(armorHitNoise));
             }
 			//StartCoroutine(wait_to_reset_position());
         }
@@ -213,7 +220,7 @@ public class Player : GameAgent
 		animating = true;
 
         StartCoroutine(animator.StartMovementAnimation());
-        source.PlayOneShot(footsteps);
+        //source.PlayOneShot(footsteps);
 			Vector3 origin, target;
 			foreach(Pos step in path) {
 
@@ -297,6 +304,12 @@ public class Player : GameAgent
 
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
     }
+	
+	private static int nextSFX = 0;
+	private AudioClip randomSFX(AudioClip[] library)
+	{
+		return library[nextSFX++%library.Length];
+	}
 	
 	
 	// VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //

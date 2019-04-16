@@ -222,6 +222,7 @@ public class AIComponent
 	public void calcReinforce()
 	{
 		if (state == STATE.ATTACK) return;
+		if (alliedDistances == null) return;
 		
 		GameAgent mostDesireable = null;
 		float bestRating = -1;

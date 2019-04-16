@@ -46,16 +46,18 @@ public class GameManager : MonoBehaviour
 		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
 		
 		Pos level_end = spawn_locations[0];
+		map_manager.setEndPos(level_end);
 		map_manager.instantiate_environment(endportal, level_end);
 		// spawn players
 		for (int i = 0; i < players.Count; i++) {
 			Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
 			instance.SetCharacterClass(players[i].classname);
 			players[i].playerObject = instance;
+			instance.clientID = players[i].ID;
 			if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
 		}
 		// spawn enemies
-		enemySpawner.Init(map_manager);
+		//enemySpawner.Init(map_manager);
 
 		tileSelector.setPlayer(localPlayer);
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
