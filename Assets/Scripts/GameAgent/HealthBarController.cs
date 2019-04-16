@@ -37,7 +37,7 @@ public class HealthBarController : MonoBehaviour
     {
         bar.SetSliderValue(parent.stats.currentHealth / parent.stats.maxHealth);
 		float camera_zoom_ratio = 10 / CameraControl.currentZoom;
-        Vector3 offset = new Vector3(0, 80, 0) * camera_zoom_ratio;
+        Vector3 offset = new Vector3(0, 50, 0) * camera_zoom_ratio;
         Vector3 wantedPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position) + offset;
 		bar.transform.localScale = Vector3.one * camera_zoom_ratio;
         instance.transform.position = wantedPosition;
