@@ -180,8 +180,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e200e9a9eb6534f918eb71dcac6113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 25
-  height: 25
+  width: 50
+  height: 50
   fill_percent: 51
   smoothness: 8
   region_cull_threshold: 16
