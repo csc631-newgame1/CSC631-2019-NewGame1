@@ -26,6 +26,14 @@ public class Enemy : GameAgent
     public int level;
     public GameAgentState viewableState;
 
+    //sound effects
+    private AudioSource source;
+    public AudioClip swordSwing;
+    public AudioClip axeSwing;
+    public AudioClip bowShot;
+    public AudioClip fireSpell;
+    public AudioClip footsteps;
+
     public override void init_agent(Pos position, GameAgentStats stats, string name = null) 
 	{
         map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
@@ -51,9 +59,11 @@ public class Enemy : GameAgent
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
-		
-		// AI init
-		team = 1;
+
+        source = GetComponent<AudioSource>();
+
+        // AI init
+        team = 1;
 		AI = new AIComponent(this); // AI component that decides the actions for this enemy to take
 		TurnManager.instance.addToRoster(this);
     }
@@ -64,6 +74,8 @@ public class Enemy : GameAgent
 		grid_pos = path.Last();
         animating = true;
         StartCoroutine(animator.StartMovementAnimation());
+
+        source.PlayOneShot(footsteps);
 
 			Vector3 origin, target;
 			foreach(Pos step in path) {
@@ -95,9 +107,25 @@ public class Enemy : GameAgent
 		//Debug.Log("started...");
 		animating = true;
 		attacking = true;
-		
-		// get target position, and distance between us and the enemy
-		Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
+
+        switch (classDefiner.weaponNum)
+        {
+            case 1:
+                source.PlayOneShot(swordSwing);
+                break;
+            case 4:
+                source.PlayOneShot(bowShot);
+                break;
+            case 6:
+                source.PlayOneShot(fireSpell);
+                break;
+            default:
+                source.PlayOneShot(bowShot);
+                break;
+        }
+
+        // get target position, and distance between us and the enemy
+        Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
 		Vector3 ownPos = map_manager.grid_to_world(grid_pos);
 		float distance = Math.Max(1, Vector3.Distance(ownPos, targetPos));
 		

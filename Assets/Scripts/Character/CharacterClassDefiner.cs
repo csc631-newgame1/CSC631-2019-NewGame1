@@ -15,7 +15,7 @@ public class CharacterClassDefiner : MonoBehaviour
     int maxSkeletonRange = 17;
 
     // Weapon variation variables.
-    int weaponNum;
+    public int weaponNum;
 
     // Weapon objects.
     public GameObject sword;
