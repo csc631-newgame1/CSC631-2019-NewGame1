@@ -22,6 +22,7 @@ public class MapManager : MonoBehaviour
     }
 
 	public GameObject mapPrefab;
+	//public MapManager instance;
 
 	// config variables
 	private int width;
@@ -45,6 +46,7 @@ public class MapManager : MonoBehaviour
     public void Init(GameManager parent)
 	{
 		parentManager = parent;
+		//instance = this;
 		NetworkManager.mapManager = this;
 
 		// begin component init
@@ -396,9 +398,9 @@ public class MapManager : MonoBehaviour
 		return spawnPositions;
 	}
 	
-	public void setEndPos(Pos endpos)
+	public static void setEndPos(Pos endpos)
 	{
-		this.endPos = endpos;
+		MapManager.endPos = endpos;
 	}
 
 	// returns true if tile terrain at position is traversable
