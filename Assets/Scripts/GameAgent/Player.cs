@@ -41,6 +41,14 @@ public class Player : GameAgent
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
 
+    //sound effects
+    private AudioSource source;
+    public AudioClip swordSwing;
+    public AudioClip axeSwing;
+    public AudioClip bowShot;
+    public AudioClip fireSpell;
+    public AudioClip footsteps;
+
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
@@ -62,9 +70,11 @@ public class Player : GameAgent
 
         currentState = GameAgentState.Alive;
 		animating = false;
-		
-		// AI init
-		team = 0;
+
+        source = GetComponent<AudioSource>();
+
+        // AI init
+        team = 0;
 		AI = null; // players don't have AI
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
@@ -93,8 +103,22 @@ public class Player : GameAgent
 		animating = true;
 		attacking = true;
 		
-		// get target position, and distance between us and the enemy
-		Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
+        switch (weapon)
+        {
+            case 1:
+                source.PlayOneShot(swordSwing);
+                break;
+            case 2:
+                source.PlayOneShot(bowShot);
+                break;
+            case 3:
+                source.PlayOneShot(fireSpell);
+                break;
+            default:
+                break;
+        }
+        // get target position, and distance between us and the enemy
+        Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
 		Vector3 ownPos = map_manager.grid_to_world(grid_pos);
 		float distance = Vector3.Distance(ownPos, targetPos);
 		
@@ -187,8 +211,9 @@ public class Player : GameAgent
 	{
 		grid_pos = path.Last();
 		animating = true;
-        StartCoroutine(animator.StartMovementAnimation());
 
+        StartCoroutine(animator.StartMovementAnimation());
+        source.PlayOneShot(footsteps);
 			Vector3 origin, target;
 			foreach(Pos step in path) {
 
