@@ -30,6 +30,10 @@ public class MapConfiguration : MonoBehaviour
     public Vector3 GetOffset() {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
     }
+	
+	public Rect GetRect() {
+		return new Rect((-width * cell_size) / 2f, (-height * cell_size) / 2f, width * cell_size * 2f, height * cell_size * 2f);
+	}
 
     public System.Random GetRNG() {
         return new System.Random(seed);

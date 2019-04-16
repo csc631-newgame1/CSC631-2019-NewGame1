@@ -73,6 +73,9 @@ public class MapGenerator : MonoBehaviour
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
 		bridge_mesh_gen.generateBridgeMesh(map);
 		
+		Boundary boundary_gen = transform.Find("Boundaries").GetComponent<Boundary>();
+		boundary_gen.generateBoundary();
+		
 		Debug.Log("Mesh generation complete!");
 		//print_region_tree();
 

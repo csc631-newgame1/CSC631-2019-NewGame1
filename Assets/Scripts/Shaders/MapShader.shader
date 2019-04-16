@@ -47,7 +47,7 @@
 			};
 			
             struct v2f {
-                float4 pos : POSITION;
+                float4 pos : SV_POSITION;
 				half3 normal : NORMAL;
 				half3 world : TEXCOORD0;
 				//UNITY_FOG_COORDS(3)
@@ -81,7 +81,7 @@
 
             float4 frag (v2f i) : SV_Target 
 			{
-				half detail = (tex2D(_FluidTex, (_Flow * (_Time[0] * half2(1, 1))) + i.world.xz / 8).r - 0.5) * 2 * _Detail;
+				half detail = (tex2D(_FluidTex, (_Flow * (_Time[0] * half2(1, 1))) + TRANSFORM_TEX(i.world.xz, _FluidTex)).r - 0.5) * 2 * _Detail;
 				half time_osc = _SinTime[3] * _Oscillation;
 				
 				half height = abs(i.world.y / _Height);

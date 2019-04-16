@@ -11,6 +11,19 @@
     public const int Club = 9;
     public const int Unarmed = 0;
     public const int RandomClassWeapon = -1;
+	
+	public static string getWeaponDescriptor(int weapon)
+	{
+		switch (weapon) {
+			case Sword: return "Swordsman";
+			case Bow: return "Archer";
+			case Staff: return "Mage";
+			case Axe: return "Destroyer";
+			case Club: return "Barbarian";
+			case Unarmed: return "Brawler";
+			default: return "";
+		}
+	}
 };
 
 public static class CharacterRaceOptions {

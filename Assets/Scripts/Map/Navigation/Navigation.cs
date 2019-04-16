@@ -273,6 +273,7 @@ public class NavigationHandler
 	{	
 		try {
 			Vertex source = vertex_map[p_origin.x, p_origin.y];
+			if (source == null) return null;
 			List<Vertex> targetVerts = new List<Vertex>();
 
 			foreach (Pos p in targetPositions) {
