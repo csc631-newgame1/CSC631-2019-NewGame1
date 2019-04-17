@@ -160,6 +160,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2317052136631233535, guid: f8e3657f5568bf54189c010dd83ea6ee,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2317052136631233522, guid: f8e3657f5568bf54189c010dd83ea6ee,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -312,13 +317,13 @@ PrefabInstance:
     - target: {fileID: 5770905574052768778, guid: faef61f71c194ab458043ca7c57a8d2c,
         type: 3}
       propertyPath: name
-      value: Girly Dude
+      value: Bob
       objectReference: {fileID: 0}
     - target: {fileID: 5770905574052768778, guid: faef61f71c194ab458043ca7c57a8d2c,
         type: 3}
       propertyPath: charImage
       value: 
-      objectReference: {fileID: 21300000, guid: 4ed2c59bdb2a0e549b6f2a47aceb53cc,
+      objectReference: {fileID: 21300000, guid: f5b71cb2e4645b24ba791000ec13cafe,
         type: 3}
     - target: {fileID: 5770905574052768772, guid: faef61f71c194ab458043ca7c57a8d2c,
         type: 3}
