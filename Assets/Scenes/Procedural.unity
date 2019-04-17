@@ -367,6 +367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 1381725432291766444}
+  endportal: {fileID: 0}
 --- !u!114 &1591538342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2320,12 +2321,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  nickname: 
   currentAction: 0
   currentState: 0
   team: 0
   move_budget: 6
   animating: 0
   godMode: 1
+  clientID: 0
   name: Bob ||
   level: 53
   currentEXP: 0
@@ -2348,6 +2351,14 @@ MonoBehaviour:
   charImage: {fileID: 21300000, guid: 950eb0a55c2b6b84bbde361ddab994c7, type: 3}
   viewableState: 
   weapon: 1
+  swordSwing: []
+  axeSwing: []
+  bowShot: []
+  fireSpell: []
+  footsteps: []
+  deathRattle: []
+  hitNoise: []
+  armorHitNoise: []
 --- !u!95 &1381725431328680545
 Animator:
   serializedVersion: 3
@@ -18155,12 +18166,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  nickname: 
   currentAction: 0
   currentState: 0
   team: 0
   move_budget: 6
   animating: 0
   godMode: 1
+  clientID: 0
   name: Bob
   level: 1
   currentEXP: 0
@@ -18183,6 +18196,14 @@ MonoBehaviour:
   charImage: {fileID: 21300000, guid: 5f3fef4b558406449bd5c14c41b64e6a, type: 3}
   viewableState: 
   weapon: 1
+  swordSwing: []
+  axeSwing: []
+  bowShot: []
+  fireSpell: []
+  footsteps: []
+  deathRattle: []
+  hitNoise: []
+  armorHitNoise: []
 --- !u!4 &1381725432292568089
 Transform:
   m_ObjectHideFlags: 0
@@ -21658,12 +21679,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  nickname: 
   currentAction: 0
   currentState: 0
   team: 0
   move_budget: 6
   animating: 0
   godMode: 1
+  clientID: 0
   name: Bob
   level: 1
   currentEXP: 0
@@ -21686,6 +21709,14 @@ MonoBehaviour:
   charImage: {fileID: 21300000, guid: 04be4b1421ac810418207a59d6b0771b, type: 3}
   viewableState: 
   weapon: 1
+  swordSwing: []
+  axeSwing: []
+  bowShot: []
+  fireSpell: []
+  footsteps: []
+  deathRattle: []
+  hitNoise: []
+  armorHitNoise: []
 --- !u!1 &1381725432556071030
 GameObject:
   m_ObjectHideFlags: 0
@@ -23883,12 +23914,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  nickname: 
   currentAction: 0
   currentState: 0
   team: 0
   move_budget: 6
   animating: 0
   godMode: 1
+  clientID: 0
   name: Bob
   level: 1
   currentEXP: 0
@@ -23911,6 +23944,14 @@ MonoBehaviour:
   charImage: {fileID: 21300000, guid: 43b4d0dc986b602458bfc6a13e90efc0, type: 3}
   viewableState: 
   weapon: 1
+  swordSwing: []
+  axeSwing: []
+  bowShot: []
+  fireSpell: []
+  footsteps: []
+  deathRattle: []
+  hitNoise: []
+  armorHitNoise: []
 --- !u!4 &1381725432707999593
 Transform:
   m_ObjectHideFlags: 0
@@ -35926,81 +35967,86 @@ PrefabInstance:
     - target: {fileID: 564346230417825856, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346230417825856, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346230417825856, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 564346230417825856, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 564346231124100802, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346231124100802, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346231124100802, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 255
       objectReference: {fileID: 0}
     - target: {fileID: 564346231124100802, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 564346231653398852, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346231653398852, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346231653398852, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 430
       objectReference: {fileID: 0}
     - target: {fileID: 564346231653398852, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 564346230706523234, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346230706523234, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 564346230706523234, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 605
       objectReference: {fileID: 0}
     - target: {fileID: 564346230706523234, guid: da6bbee01ac351043bdf88886153c40a,
         type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: -15
+      objectReference: {fileID: 0}
+    - target: {fileID: 564346231088141209, guid: da6bbee01ac351043bdf88886153c40a,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

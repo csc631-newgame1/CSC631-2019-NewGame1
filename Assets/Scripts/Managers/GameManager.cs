@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using MapUtils;
 
 public class GameManager : MonoBehaviour
 {
-    private GameObject map;
     private MapGenerator map_gen;
     private MapManager map_manager;
 
@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
 
     private List<SpawnZone> spawnZones;
 
-    public GameObject playerPrefab;
+    public GameObject playerPrefab, endportal;
 
     public static GameManager instance; //static so we can carry oour levels and st
 
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     {
         Init();
         instance = this;
-       // DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     void Init()
@@ -39,16 +39,28 @@ public class GameManager : MonoBehaviour
         tileSelector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
 
         map_manager.Init(this);
-        enemySpawner.Init(map_manager);
         tileSelector.Init(map_manager);
         //environmentSpawner.Init(map_manager);
 
-        foreach (Client player in Network.getPeers())
+        List<Client> players = Network.getPeers();
+        List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
+
+        Pos level_end = spawn_locations[0];
+        MapManager.setEndPos(level_end);
+        map_manager.instantiate_environment(endportal, level_end);
+
+        Debug.Log("Spawned " + players.Count + " players");
+        // spawn players
+        for (int i = 0; i < players.Count; i++)
         {
-            Player instance = map_manager.instantiate_randomly(playerPrefab).GetComponent<Player>();
-            player.playerObject = instance;
-            if (player.ID == NetworkManager.clientID) localPlayer = instance;
+            Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i + 1], null, players[i].nickname).GetComponent<Player>();
+            instance.SetCharacterClass(players[i].classname);
+            players[i].playerObject = instance;
+            instance.clientID = players[i].ID;
+            if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
         }
+        // spawn enemies
+        enemySpawner.Init(map_manager);
 
         tileSelector.setPlayer(localPlayer);
         Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
@@ -64,8 +76,21 @@ public class GameManager : MonoBehaviour
         map_manager.clear_map();
     }
 
+    public static void NextLevel()
+    {
+        instance.DeInit();
+        instance.Init();
+    }
+
     void Update()
     {
+        if (Input.GetKeyDown("escape"))
+        {
+            Network.disconnectFromServer();
+            DeInit();
+            SceneManager.LoadScene("NewMenu");
+        }
+
         foreach (char key in Input.inputString)
         {
 
@@ -74,10 +99,10 @@ public class GameManager : MonoBehaviour
             switch (key)
             {
                 case 'r':
-                    DeInit();
-                    Init();
+                    NextLevel();
                     break;
             }
+
         }
 
         if (Input.GetMouseButtonDown(1))
@@ -87,18 +112,14 @@ public class GameManager : MonoBehaviour
                 case "MOVE":
                     if (tileSelector.hoveringValidMoveTile())
                     {
-                        // Network.submitCommand(new MoveCommand(localPlayer.grid_pos, tileSelector.grid_position));
-                        map_manager.move(
-                            localPlayer.grid_pos, tileSelector.grid_position);
+                        Network.submitCommand(new MoveCommand(localPlayer.grid_pos, tileSelector.grid_position));
                         tileSelector.mode = "NONE";
                     }
                     break;
                 case "ACT":
                     if (tileSelector.hoveringValidActTile())
                     {
-                        // Network.submitCommand(new AttackCommand(localPlayer.grid_pos, tileSelector.grid_position));
-                        map_manager.attack(
-                            localPlayer.grid_pos, tileSelector.grid_position);
+                        Network.submitCommand(new AttackCommand(localPlayer.grid_pos, tileSelector.grid_position));
                         tileSelector.mode = "NONE";
                     }
                     break;
@@ -141,7 +162,7 @@ public class GameManager : MonoBehaviour
     {
         if (!instance.localPlayer.can_take_action()) return;
 
-        instance.localPlayer.wait();
+        Network.submitCommand(new WaitCommand(NetworkManager.clientID));
     }
 
     public static void PotionPlayer()
@@ -155,16 +176,4 @@ public class GameManager : MonoBehaviour
     {
         map_manager.de_instantiate(character.grid_pos);
     }
-
-
-
-
-
-
-
-
-}/////CLASSSSSSSSSSssss
-    
-
-
-
+}
