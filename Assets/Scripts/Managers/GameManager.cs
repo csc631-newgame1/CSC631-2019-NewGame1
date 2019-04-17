@@ -159,12 +159,7 @@ public class GameManager : MonoBehaviour
         Network.submitCommand(new WaitCommand(NetworkManager.clientID));
     }
 
-    public static void WaitPlayer()
-    {
-        if (!instance.localPlayer.can_take_action()) return;
-
-        Network.submitCommand(new WaitCommand(NetworkManager.clientID));
-    }
+   
 
     public static void PotionPlayer()
     {

@@ -24,8 +24,6 @@ public class MapConfiguration : MonoBehaviour
     public float bridge_texture_scale;
     public float floor_texture_scale;
     public float object_size_scale;
-	
-	public int seed { get { return Settings.Seed; } }
 
     public int seed { get { return Settings.Seed; } }
 
@@ -33,12 +31,19 @@ public class MapConfiguration : MonoBehaviour
     {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
     }
-	
-	public Rect GetRect() {
-		return new Rect((-width * cell_size) / 2f, (-height * cell_size) / 2f, width * cell_size * 2f, height * cell_size * 2f);
-	}
 
-    public System.Random GetRNG() {
+    public Rect GetRect()
+    {
+        return new Rect((-width * cell_size) / 2f, (-height * cell_size) / 2f, width * cell_size * 2f, height * cell_size * 2f);
+    }
+
+    public System.Random GetRNG()
+    {
         return new System.Random(seed);
+    }
+
+    public Vector3 gridToWorld(Pos pos)
+    {
+        return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - GetOffset();
     }
 }

@@ -126,6 +126,7 @@ public class Player : GameAgent
 
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
+
     //sound effects
     private AudioSource source;
     public AudioClip[] swordSwing;
@@ -137,17 +138,6 @@ public class Player : GameAgent
     public AudioClip[] hitNoise;
     public AudioClip[] armorHitNoise;
 
-    //sound effects
-    private AudioSource source;
-    public AudioClip[] swordSwing;
-    public AudioClip[] axeSwing;
-    public AudioClip[] bowShot;
-    public AudioClip[] fireSpell;
-    public AudioClip[] footsteps;
-	public AudioClip[] deathRattle;
-	public AudioClip[] hitNoise;
-	public AudioClip[] armorHitNoise;
-
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
@@ -156,9 +146,9 @@ public class Player : GameAgent
 
         this.stats = stats;
         UpdateViewableEditorPlayerStats();
-		move_budget = 25;
-		speed = 10;
-		this.nickname = name;
+        move_budget = 25;
+        speed = 10;
+        this.nickname = name;
 
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
@@ -168,40 +158,41 @@ public class Player : GameAgent
         selectableTiles = new List<Pos>();
 
         currentState = GameAgentState.Alive;
-		animating = false;
+        animating = false;
 
         source = GetComponent<AudioSource>();
 
         // AI init
         team = 0;
-		AI = null; // players don't have AI
-		TurnManager.instance.addToRoster(this); //add player to player list
+        AI = null; // players don't have AI
+        TurnManager.instance.addToRoster(this); //add player to player list
     }
 
-	public void RespondToKeyboardInput(char key)
-	{
-		switch (key) {
-		    case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
-		    case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
-		    case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
-		    case '4': StartCoroutine(animator.PlayHitAnimation()); break;
-		    case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
-		    case '6': StartCoroutine(animator.PlayKilledAimation()); break;
-            /*case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
-            case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
-            case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
-            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;*/
+    public void RespondToKeyboardInput(char key)
+    {
+        switch (key)
+        {
+            case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
+            case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
+            case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
+            case '4': StartCoroutine(animator.PlayHitAnimation()); break;
+            case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
+            case '6': StartCoroutine(animator.PlayKilledAimation()); break;
+                /*case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
+                case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
+                case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
+                case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;*/
         }
     }
-	
-	private bool attacking = false;
-	
-	public override IEnumerator animate_attack(GameAgent target)
-	{
-		//Debug.Log("Starting attack");
-		animating = true;
-		attacking = true;
-		
+
+    private bool attacking = false;
+
+    public override IEnumerator animate_attack(GameAgent target)
+    {
+        //Debug.Log("Starting attack");
+        animating = true;
+        attacking = true;
+
         switch (weapon)
         {
             case 1:
@@ -214,36 +205,37 @@ public class Player : GameAgent
                 source.PlayOneShot(randomSFX(fireSpell));
                 break;
             default:
-				source.PlayOneShot(randomSFX(axeSwing));
+                source.PlayOneShot(randomSFX(axeSwing));
                 break;
         }
         // get target position, and distance between us and the enemy
         Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
-		Vector3 ownPos = map_manager.grid_to_world(grid_pos);
-		float distance = Vector3.Distance(ownPos, targetPos);
-		
-		// look at enemy and start attack animation
-		transform.LookAt(targetPos);
-		StartCoroutine(animator.PlayAttackAnimation());
-		
-		// wait for animation trigger
-		while (attacking) yield return null;
-		// wait a little longer based on projectile distance
-		yield return new WaitForSeconds(distance / 10f);
-		
-		target.take_damage(stats.DealDamage());
-		transform.position = ownPos; // reset position after animation, which sometimes offsets it
-		
-		animating = false;
-		//Debug.Log("Ended attack");
-	}
-	
-	public void Hit(){ attacking = false; }
-	public void Shoot(){ attacking = false; }
-	
-	public override void take_damage(int amount)
-	{
-        if (stats.currentState == GameAgentState.Alive) {
+        Vector3 ownPos = map_manager.grid_to_world(grid_pos);
+        float distance = Vector3.Distance(ownPos, targetPos);
+
+        // look at enemy and start attack animation
+        transform.LookAt(targetPos);
+        StartCoroutine(animator.PlayAttackAnimation());
+
+        // wait for animation trigger
+        while (attacking) yield return null;
+        // wait a little longer based on projectile distance
+        yield return new WaitForSeconds(distance / 10f);
+
+        target.take_damage(stats.DealDamage());
+        transform.position = ownPos; // reset position after animation, which sometimes offsets it
+
+        animating = false;
+        //Debug.Log("Ended attack");
+    }
+
+    public void Hit() { attacking = false; }
+    public void Shoot() { attacking = false; }
+
+    public override void take_damage(int amount)
+    {
+        if (stats.currentState == GameAgentState.Alive)
+        {
             if (!godMode) stats.TakeDamage(amount);
 
             if (stats.currentState == GameAgentState.Unconscious)
@@ -253,8 +245,8 @@ public class Player : GameAgent
             else
             {
                 StartCoroutine(animator.PlayHitAnimation());
-				source.PlayOneShot(randomSFX(hitNoise));
-				source.PlayOneShot(randomSFX(armorHitNoise));
+                source.PlayOneShot(randomSFX(hitNoise));
+                source.PlayOneShot(randomSFX(armorHitNoise));
             }
             //StartCoroutine(wait_to_reset_position());
         }
@@ -318,21 +310,9 @@ public class Player : GameAgent
     }
 
     public override IEnumerator smooth_movement(List<Pos> path)
-	{
-		grid_pos = path.Last();
-		animating = true;
-
-        StartCoroutine(animator.StartMovementAnimation());
-        //source.PlayOneShot(footsteps);
-			Vector3 origin, target;
-			foreach(Pos step in path) {
-
-				origin = transform.position;
-				target = map_manager.grid_to_world(step);
-				float dist = Vector3.Distance(origin, target);
-				float time = 0f;
-
-				transform.LookAt(target);
+    {
+        grid_pos = path.Last();
+        animating = true;
 
         StartCoroutine(animator.StartMovementAnimation());
         //source.PlayOneShot(footsteps);
@@ -375,34 +355,45 @@ public class Player : GameAgent
             actionNames.Add(act.GetString()); // GetString() defined in MapUtils.EnumUtils
         return actionNames.ToArray();
     }
-	
-	public bool can_take_action() { return !animating && !turn_over(); }
-	
-	public void SetCharacterClass(string classname) {
-		
+
+    public override void wait() { playerWaitingThisTurn = true; }
+    public override void potion() { playerUsedPotionThisTurn = true; }
+    public override void move() { playerMovedThisTurn = true; }
+    public override void act() { playerActedThisTurn = true; }
+    public override bool turn_over()
+    {
+        return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
+    }
+
+    public bool can_take_action() { return !animating && !turn_over(); }
+
+    public void SetCharacterClass(string classname)
+    {
+
         int weapon, classID;
-        switch (classname) {
-			case "Warrior":
-				classID = CharacterClassOptions.Knight;
-				weapon = CharacterClassOptions.Sword;
-				break;
-			case "Mage":
-				classID = CharacterClassOptions.Mage;
-				weapon = CharacterClassOptions.Staff;
-				break;
-			case "Hunter":
-				classID = CharacterClassOptions.Hunter;
-				weapon = CharacterClassOptions.Bow;
-				break;
-			case "Healer":
-				classID = CharacterClassOptions.Healer;
-				weapon = CharacterClassOptions.Staff;
-				break;
-			default:
-				classID = CharacterClassOptions.Knight;
-				weapon = CharacterClassOptions.Sword;
-				break;
-		}
+        switch (classname)
+        {
+            case "Warrior":
+                classID = CharacterClassOptions.Knight;
+                weapon = CharacterClassOptions.Sword;
+                break;
+            case "Mage":
+                classID = CharacterClassOptions.Mage;
+                weapon = CharacterClassOptions.Staff;
+                break;
+            case "Hunter":
+                classID = CharacterClassOptions.Hunter;
+                weapon = CharacterClassOptions.Bow;
+                break;
+            case "Healer":
+                classID = CharacterClassOptions.Healer;
+                weapon = CharacterClassOptions.Staff;
+                break;
+            default:
+                classID = CharacterClassOptions.Knight;
+                weapon = CharacterClassOptions.Sword;
+                break;
+        }
 
         stats = new GameAgentStats(CharacterRaceOptions.Human, classID, 1, weapon);
         attack = stats.attack;
@@ -413,19 +404,19 @@ public class Player : GameAgent
 
         classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
     }
-	
-	private static int nextSFX = 0;
-	private AudioClip randomSFX(AudioClip[] library)
-	{
-		return library[nextSFX++%library.Length];
-	}
-	
-	
-	// VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
-	// 			INTRUDERS WILL BE EXECUTED			  //
-	
-	// disabling this for now while I test changes
-	/*public string getActionMode(int action)
+
+    private static int nextSFX = 0;
+    private AudioClip randomSFX(AudioClip[] library)
+    {
+        return library[nextSFX++ % library.Length];
+    }
+
+
+    // VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
+    // 			INTRUDERS WILL BE EXECUTED			  //
+
+    // disabling this for now while I test changes
+    /*public string getActionMode(int action)
 	{
 		GameAgentAction[] actions = stats.playerCharacterClass.GetAvailableActs();
 		return actions[action].GetMode(); // mode can be ACT or AOE
