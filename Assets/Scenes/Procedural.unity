@@ -301,7 +301,12 @@ PrefabInstance:
     - target: {fileID: 5770905574052768777, guid: faef61f71c194ab458043ca7c57a8d2c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5770905574052768778, guid: faef61f71c194ab458043ca7c57a8d2c,
+        type: 3}
+      propertyPath: name
+      value: Girly Dude
       objectReference: {fileID: 0}
     - target: {fileID: 5770905574052768772, guid: faef61f71c194ab458043ca7c57a8d2c,
         type: 3}
@@ -453,7 +458,12 @@ PrefabInstance:
     - target: {fileID: 5770905574052768777, guid: faef61f71c194ab458043ca7c57a8d2c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5770905574052768778, guid: faef61f71c194ab458043ca7c57a8d2c,
+        type: 3}
+      propertyPath: name
+      value: Not A Dude
       objectReference: {fileID: 0}
     - target: {fileID: 5770905574052768772, guid: faef61f71c194ab458043ca7c57a8d2c,
         type: 3}
