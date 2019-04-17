@@ -10,14 +10,14 @@ using static MapUtils.MapConstants;
 
 public class MapGenerator : MonoBehaviour
 {
-	public bool debug;
-	
-	private int width;
-	private int height;
-	private int fill_percent;
-	private int smoothness;
-	private int region_cull_threshold;
-	private float cell_size;
+    public bool debug;
+
+    private int width;
+    private int height;
+    private int fill_percent;
+    private int smoothness;
+    private int region_cull_threshold;
+    private float cell_size;
     private float object_size_scale;
 	private int seed;
 	private Vector3 offset;

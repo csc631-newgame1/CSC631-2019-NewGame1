@@ -7,7 +7,7 @@ using static MapUtils.Dir;
 using static MapUtils.Type;
 using static GameAgentAction;
 
-namespace MapUtils 
+namespace MapUtils
 {
 	public enum Dir  { LEFT = 0, UP, RIGHT, DOWN, NONE };
 	

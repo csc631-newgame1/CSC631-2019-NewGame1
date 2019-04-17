@@ -13,7 +13,7 @@ public class NetworkManager : MonoBehaviour
 	
     void Awake()
     {
-		DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(this.gameObject);
     }
 
     // Update is called once per frame
@@ -135,9 +135,4 @@ public class NetworkManager : MonoBehaviour
 		}
 		if (!Network.connected()) clientID = 0;
     }
-	
-	void OnApplicationQuit()
-	{
-		Network.disconnectFromServer();
-	}
 }

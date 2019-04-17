@@ -23,14 +23,31 @@ public class Player : GameAgent
     private bool playerUsedPotionThisTurn = false;
     private bool playerWaitingThisTurn = false;
 
+
     [Header("Player Stats")]
     public string name;
-    public float attack;
-    public float maxHealth;
+    public int level;
+    public int currentEXP;
+    public int[] expToNextLevel;
+    public int maxLevel = 100;
+    public int baseEXP = 100;
+
     public float currentHealth;
+    public float maxHealth= 100;
+    public int currentMP;
+    public int maxMP = 30;
+    public int[] mpLvlBonus;
+    public float attack;
+    public int defence;
+    public int wpnPwr;
+    public int armrPwr;
+    public string equippedWpn;
+    public string equippedArmr;
     public float range;
     public float _speed;
-    public int level;
+    public Sprite charImage;
+
+
     public string viewableState;
 
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
@@ -38,9 +55,87 @@ public class Player : GameAgent
 
 	CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
+    //////////////////////////////////////////////////////////////////////////////////////////// LEVELING SYSTEM
+   ///// http://wiki.unity3d.com/index.php/LevelUp
+
+    // Use this for initialization
+    void Start()
+    {   
+        expToNextLevel = new int[maxLevel];                                            /// <summary>
+                                                                                        /// LEVELING SYSTEM
+                                                                                       /// </summary>
+        expToNextLevel[1] = baseEXP;
+
+        for (int i = 2; i < expToNextLevel.Length; i++)
+        {
+            expToNextLevel[i] = Mathf.FloorToInt(expToNextLevel[i - 1] * 1.05f);
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            AddExp(1000);
+        }
+    }
+
+
+
+
+    public void AddExp(int expToAdd)
+    {
+        currentEXP += expToAdd;
+
+        if (level < maxLevel)
+        {
+            if (currentEXP > expToNextLevel[level])
+            {
+                currentEXP -= expToNextLevel[level];
+
+                level++;
+
+                //determine whether to add to str or def based on odd or even
+                if (level % 2 == 0)
+                {
+                    attack++;
+                }
+                else
+                {
+                    defence++;
+                }
+
+                maxHealth = Mathf.FloorToInt(maxHealth * 1.05f);
+                currentHealth = maxHealth;
+
+                maxMP += mpLvlBonus[level];
+                currentMP = maxMP;
+            }
+        }
+        if (level >= maxLevel)
+        {
+            currentEXP = 0;
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////LEVELING SYSTEM
+
 
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
+    //sound effects
+    private AudioSource source;
+    public AudioClip[] swordSwing;
+    public AudioClip[] axeSwing;
+    public AudioClip[] bowShot;
+    public AudioClip[] fireSpell;
+    public AudioClip[] footsteps;
+    public AudioClip[] deathRattle;
+    public AudioClip[] hitNoise;
+    public AudioClip[] armorHitNoise;
 
     //sound effects
     private AudioSource source;
@@ -56,7 +151,7 @@ public class Player : GameAgent
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
-		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
+        map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 
         this.stats = stats;
@@ -151,28 +246,33 @@ public class Player : GameAgent
         if (stats.currentState == GameAgentState.Alive) {
             if (!godMode) stats.TakeDamage(amount);
 
-            if (stats.currentState == GameAgentState.Unconscious) {
+            if (stats.currentState == GameAgentState.Unconscious)
+            {
                 StartCoroutine(animator.PlayKilledAimation());
-            } else {
+            }
+            else
+            {
                 StartCoroutine(animator.PlayHitAnimation());
 				source.PlayOneShot(randomSFX(hitNoise));
 				source.PlayOneShot(randomSFX(armorHitNoise));
             }
-			//StartCoroutine(wait_to_reset_position());
+            //StartCoroutine(wait_to_reset_position());
         }
 
         UpdateViewableEditorPlayerStats();
     }
-	
-	/*private IEnumerator slide_to_position()
+
+    /*private IEnumerator slide_to_position()
 	{
 		Vector3 originalPos = transform.position;
 		yield return new WaitForSeconds(1f);
 		transform.position = pos;
 	}*/
 
-    public override void GetHealed(int amount) {
-        if (stats.currentState == GameAgentState.Alive) {
+    public override void GetHealed(int amount)
+    {
+        if (stats.currentState == GameAgentState.Alive)
+        {
             if (!godMode) stats.GetHealed(amount);
 
             StartCoroutine(animator.PlayUseItemAnimation());
@@ -182,8 +282,9 @@ public class Player : GameAgent
     }
 
     public override void take_turn()
-	{
-        if (stats.currentState == GameAgentState.Alive) {
+    {
+        if (stats.currentState == GameAgentState.Alive)
+        {
             playerMovedThisTurn = false;
             playerActedThisTurn = false;
             playerUsedPotionThisTurn = false;
@@ -193,7 +294,8 @@ public class Player : GameAgent
         UpdateViewableEditorPlayerStats();
     }
 
-    private void UpdateViewableEditorPlayerStats() {
+    private void UpdateViewableEditorPlayerStats()
+    {
         attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = stats.currentHealth;
@@ -201,7 +303,8 @@ public class Player : GameAgent
         _speed = stats.speed;
         level = stats.level;
 
-        switch (stats.currentState) {
+        switch (stats.currentState)
+        {
             case GameAgentState.Alive:
                 viewableState = "Alive";
                 break;
@@ -231,40 +334,46 @@ public class Player : GameAgent
 
 				transform.LookAt(target);
 
-					while(time < 1f && dist > 0f) {
-						time += (Time.deltaTime * speed) / dist;
-						transform.position = Vector3.Lerp(origin, target, time);
-						yield return null;
-					}
-			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+        StartCoroutine(animator.StartMovementAnimation());
+        //source.PlayOneShot(footsteps);
+        Vector3 origin, target;
+        foreach (Pos step in path)
+        {
+
+            origin = transform.position;
+            target = map_manager.grid_to_world(step);
+            float dist = Vector3.Distance(origin, target);
+            float time = 0f;
+
+            transform.LookAt(target);
+
+            while (time < 1f && dist > 0f)
+            {
+                time += (Time.deltaTime * speed) / dist;
+                transform.position = Vector3.Lerp(origin, target, time);
+                yield return null;
+            }
+        }
+        transform.position = map_manager.grid_to_world(path[path.Count - 1]);
 
         StartCoroutine(animator.StopMovementAnimation());
         animating = false;
-		
-        playerMovedThisTurn = true;
-	}
 
-	/*** UNUSED ANIMATION RECEIVERS ***/
-	public void FootR(){}
-	public void FootL(){}
-	public void WeaponSwitch(){}
-	/*** END ANIMATION RECEIVERS ***/
-	
-	public string[] getActions()
-	{
-		List<string> actionNames = new List<string>();
-		foreach (GameAgentAction act in stats.playerCharacterClass.GetAvailableActs())
-			actionNames.Add(act.GetString()); // GetString() defined in MapUtils.EnumUtils
-		return actionNames.ToArray();
-	}
-	
-	public override void wait() { playerWaitingThisTurn = true; }
-	public override void potion() { playerUsedPotionThisTurn = true; }
-	public override void move() { playerMovedThisTurn = true; }
-	public override void act() { playerActedThisTurn = true; }
-	public override bool turn_over() {
-		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
+        playerMovedThisTurn = true;
+    }
+
+    /*** UNUSED ANIMATION RECEIVERS ***/
+    public void FootR() { }
+    public void FootL() { }
+    public void WeaponSwitch() { }
+    /*** END ANIMATION RECEIVERS ***/
+
+    public string[] getActions()
+    {
+        List<string> actionNames = new List<string>();
+        foreach (GameAgentAction act in stats.playerCharacterClass.GetAvailableActs())
+            actionNames.Add(act.GetString()); // GetString() defined in MapUtils.EnumUtils
+        return actionNames.ToArray();
     }
 	
 	public bool can_take_action() { return !animating && !turn_over(); }
@@ -321,9 +430,9 @@ public class Player : GameAgent
 		GameAgentAction[] actions = stats.playerCharacterClass.GetAvailableActs();
 		return actions[action].GetMode(); // mode can be ACT or AOE
 	}*/
-	
-	// a lot of the WaitForXXX functions seemed redundant... we can add this functionality back later if necessary
-	/*IEnumerator WaitForAttackEnd(Pos attackPos)
+
+    // a lot of the WaitForXXX functions seemed redundant... we can add this functionality back later if necessary
+    /*IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
 		isAttacking = true;
         // Have player look at the target it's attacking
@@ -401,7 +510,7 @@ public class Player : GameAgent
         playerActedThisTurn = true;
     }*/
 
-	// if right mouse button is pressed, move player model to hover position
+    // if right mouse button is pressed, move player model to hover position
     /*public void RespondToMouseClick()
     {
 		if (!moving && !isAttacking && hoveringActionTileSelector) {
@@ -448,7 +557,7 @@ public class Player : GameAgent
             }
 		}
 	}*/
-	
+
     /*public override void move() {
 		if (playerMovedThisTurn || turn_over())
             return;
@@ -635,5 +744,5 @@ public class Player : GameAgent
         return sortedPlayersIndex;
     }*/
 
-   
+
 }

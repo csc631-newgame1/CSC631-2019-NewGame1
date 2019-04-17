@@ -12,9 +12,9 @@ public class GameManager : MonoBehaviour
 	private MapManager map_manager;
 
     private EnemySpawner enemySpawner;
-	private EnvironmentSpawner environmentSpawner;
+    private EnvironmentSpawner environmentSpawner;
     private Player localPlayer;
-	private TileSelector tileSelector;
+    private TileSelector tileSelector;
 
     private TurnManager turn_manager;
 
@@ -23,20 +23,20 @@ public class GameManager : MonoBehaviour
     public GameObject playerPrefab, endportal;
 
     public static GameManager instance; //static so we can carry oour levels and st
-    
-	void Start()
-	{
-		Init();
+
+    void Start()
+    {
+        Init();
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
-	
+
     void Init()
     {
-		map_manager = GetComponent<MapManager>();
-		enemySpawner = GetComponent<EnemySpawner>();
-		environmentSpawner = GetComponent<EnvironmentSpawner>();
-		tileSelector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
+        map_manager = GetComponent<MapManager>();
+        enemySpawner = GetComponent<EnemySpawner>();
+        environmentSpawner = GetComponent<EnvironmentSpawner>();
+        tileSelector = GameObject.FindGameObjectWithTag("Selector").GetComponent<TileSelector>();
 
 		map_manager.Init(this);
 		tileSelector.Init(map_manager);
@@ -91,7 +91,12 @@ public class GameManager : MonoBehaviour
 		
 		foreach (char key in Input.inputString) {
 
-			localPlayer.RespondToKeyboardInput(key);
+            switch (key)
+            {
+                case 'r':
+                    NextLevel();
+                    break;
+            }
 
 			switch (key) {
 			case 'r':
@@ -130,17 +135,18 @@ public class GameManager : MonoBehaviour
 			instance.tileSelector.mode = "MOVE";
     }
 
-	private static int last_action = -1;
-	public static void ActionPlayer(int action) {
-		if (!instance.localPlayer.can_take_action()) return;
-		
+    private static int last_action = -1;
+    public static void ActionPlayer(int action)
+    {
+        if (!instance.localPlayer.can_take_action()) return;
+
         //instance.tileSelector.setMode(instance.localPlayer.getActionMode(action));
-		if (instance.tileSelector.mode == "ACT" && action == last_action)
-			instance.tileSelector.mode = "NONE";
-		else
-			instance.tileSelector.mode = "ACT";
-		
-		last_action = action;
+        if (instance.tileSelector.mode == "ACT" && action == last_action)
+            instance.tileSelector.mode = "NONE";
+        else
+            instance.tileSelector.mode = "ACT";
+
+        last_action = action;
     }
 	
 	public static void ClearPlayerAction() {
@@ -153,14 +159,22 @@ public class GameManager : MonoBehaviour
         Network.submitCommand(new WaitCommand(NetworkManager.clientID));
     }
 
-    public static void PotionPlayer() {
-		if (!instance.localPlayer.can_take_action()) return;
-		
+    public static void WaitPlayer()
+    {
+        if (!instance.localPlayer.can_take_action()) return;
+
+        Network.submitCommand(new WaitCommand(NetworkManager.clientID));
+    }
+
+    public static void PotionPlayer()
+    {
+        if (!instance.localPlayer.can_take_action()) return;
+
         instance.localPlayer.potion();
     }
-	
-	public void kill(GameAgent character)
-	{
-		map_manager.de_instantiate(character.grid_pos);
-	}
+
+    public void kill(GameAgent character)
+    {
+        map_manager.de_instantiate(character.grid_pos);
+    }
 }

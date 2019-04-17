@@ -7,12 +7,12 @@ using UnityEngine;
 // class containing client properties
 public class Client
 {
-	public int ID;
-	public Player playerObject = null;
-	public string nickname;
-	public string classname;
-	public bool ready = false;
-	public Client(int ID) { this.ID = ID; nickname = "Client" + ID; classname = "Warrior"; }
+    public int ID;
+    public Player playerObject = null;
+    public string nickname;
+    public string classname;
+    public bool ready = false;
+    public Client(int ID) { this.ID = ID; nickname = "Client" + ID; classname = "Warrior"; }
 }
 
 /* The Network class serves as an abstraction layer on top of NetworkBase 

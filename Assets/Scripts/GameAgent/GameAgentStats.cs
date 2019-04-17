@@ -46,7 +46,8 @@ public class GameAgentStats
     // the player will receive 1000xp * scaleFactor worth of xp
     private float scaleFactor = 0.25f;
 
-    public GameAgentStats(int characterRace, int characterClass, float attack, float health, float range, float speed, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+    public GameAgentStats(int characterRace, int characterClass, float attack, float health, float range, float speed, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon)
+    {
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
 
         this.characterRace = characterRace;
@@ -64,8 +65,10 @@ public class GameAgentStats
     }
 
     // Only used for creating base stats
-    public GameAgentStats(float attack, float health, float range, float speed, bool baseStats) {
-        if (baseStats) {
+    public GameAgentStats(float attack, float health, float range, float speed, bool baseStats)
+    {
+        if (baseStats)
+        {
             this.attack = attack;
             maxHealth = health;
             currentHealth = health;
@@ -74,7 +77,8 @@ public class GameAgentStats
         }
     }
 
-    public GameAgentStats(int characterRace, int characterClass, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+    public GameAgentStats(int characterRace, int characterClass, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon)
+    {
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
 
         this.characterRace = characterRace;
@@ -86,7 +90,8 @@ public class GameAgentStats
         currentStatus = GameAgentStatusEffect.None;
     }
 
-    private void GetBaseCharacterClassStats() {
+    private void GetBaseCharacterClassStats()
+    {
         attack = playerCharacterClass.baseStats.attack;
         maxHealth = playerCharacterClass.baseStats.maxHealth;
         currentHealth = maxHealth;
@@ -94,7 +99,8 @@ public class GameAgentStats
         speed = playerCharacterClass.baseStats.speed;
     }
 
-    public void LevelUp() {
+    public void LevelUp()
+    {
         level++;
         attack += playerCharacterClass.GetAttackStatIncreaseFromLevelUp();
         range += playerCharacterClass.GetRangeStatIncreaseFromLevelUp();
@@ -102,79 +108,101 @@ public class GameAgentStats
         int healthIncrease = playerCharacterClass.GetHealthStatIncreaseFromLevelUp();
 
         maxHealth += healthIncrease;
-        if (currentHealth > 0) {
+        if (currentHealth > 0)
+        {
             currentHealth += healthIncrease;
         }
     }
 
-    public void LevelUpToDesiredLevel(int desiredLevel) {
-        while (level < desiredLevel) {
+    public void LevelUpToDesiredLevel(int desiredLevel)
+    {
+        while (level < desiredLevel)
+        {
             LevelUp();
         }
     }
 
-    public void GainXP(int xpGained) {
+    public void GainXP(int xpGained)
+    {
         xp += xpGained;
         CheckLevelProgression();
     }
 
-    public void TakeDamage(int damage) {
+    public void TakeDamage(int damage)
+    {
         int damageDealt = damage - defense;
-        if (damageDealt < 1) {
+        if (damageDealt < 1)
+        {
             damageDealt = 1;
         }
         currentHealth -= damageDealt;
 
-        if (currentHealth <= 0) {
+        if (currentHealth <= 0)
+        {
             currentHealth = 0;
             currentState = GameAgentState.Unconscious;
         }
     }
 
-    public void SetTauntingStatus(bool active) {
-        if (active) {
-            if (currentStatus != GameAgentStatusEffect.Taunting) {
+    public void SetTauntingStatus(bool active)
+    {
+        if (active)
+        {
+            if (currentStatus != GameAgentStatusEffect.Taunting)
+            {
                 defenseFromTaunting = Mathf.RoundToInt(attack * 0.33f);
             }
-        } else {
+        }
+        else
+        {
             // remove defenseFromTaunting
         }
     }
 
-    public void GetHealed(int amount) {
+    public void GetHealed(int amount)
+    {
         currentHealth += amount;
 
-        if (currentHealth >= maxHealth) {
+        if (currentHealth >= maxHealth)
+        {
             currentHealth = maxHealth;
         }
     }
 
-    public void GetMP(int amount) {
+    public void GetMP(int amount)
+    {
         currentMagicPoints += amount;
 
-        if (currentMagicPoints >= maxMagicPoints) {
+        if (currentMagicPoints >= maxMagicPoints)
+        {
             currentMagicPoints = maxMagicPoints;
         }
     }
 
-    public void UsePotion() {
+    public void UsePotion()
+    {
         GetHealed(Mathf.RoundToInt(maxHealth * 0.33f));
         GetMP(Mathf.RoundToInt(maxMagicPoints * 0.33f));
     }
 
-    public int DealDamage() {
+    public int DealDamage()
+    {
         return Mathf.RoundToInt(attack + attackStatBoost);
     }
 
-    public int GetHealAmount() {
-        if (characterClassOption == CharacterClassOptions.Healer) {
+    public int GetHealAmount()
+    {
+        if (characterClassOption == CharacterClassOptions.Healer)
+        {
             return Mathf.RoundToInt(UnityEngine.Random.Range(0.5f, 0.75f) * (attack + attackStatBoost));
         }
         return 0;
     }
 
-    public int GetMultiShotCount() {
-        if (characterClassOption == CharacterClassOptions.Hunter) {
+    public int GetMultiShotCount()
+    {
+        if (characterClassOption == CharacterClassOptions.Hunter)
+        {
             int min = 1;
             int max = 4;
             int mean = (min + max) / 2;
@@ -183,29 +211,36 @@ public class GameAgentStats
         return 0;
     }
 
-    public int GetMultiShotDamage() {
+    public int GetMultiShotDamage()
+    {
         return Mathf.RoundToInt(UnityEngine.Random.Range(0.55f, 0.7f) * (attack + attackStatBoost));
     }
 
-    private void CheckLevelProgression() {
+    private void CheckLevelProgression()
+    {
         // This formula is used for a linearly rising level gap
-        float progressionTowardsLevel = (Mathf.Sqrt(100f * (2 * xp + 25f))+50f)/ 100f;
+        float progressionTowardsLevel = (Mathf.Sqrt(100f * (2 * xp + 25f)) + 50f) / 100f;
 
         // Level Up multiple times if needed
-        if (progressionTowardsLevel >= level + 1) {
-            while(progressionTowardsLevel > 1) {
+        if (progressionTowardsLevel >= level + 1)
+        {
+            while (progressionTowardsLevel > 1)
+            {
                 LevelUp();
                 progressionTowardsLevel--;
             }
         }
     }
-    
-    public int RewardXPFromDeath() {
+
+    public int RewardXPFromDeath()
+    {
         return Mathf.RoundToInt((level * level + level) / 2 * 100 - (level * 100) * scaleFactor);
     }
 
-    private void SetGameAgentCharacterClass(int characterWeapon) {
-        switch (characterClassOption) {
+    private void SetGameAgentCharacterClass(int characterWeapon)
+    {
+        switch (characterClassOption)
+        {
             case CharacterClassOptions.Knight:
                 playerCharacterClass = new Knight();
                 break;

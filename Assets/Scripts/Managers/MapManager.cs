@@ -10,11 +10,13 @@ using System;
 
 public class MapManager : MonoBehaviour
 {
-	private class MapCell {
+    private class MapCell
+    {
         public bool traversable;
         public bool occupied;
         public GameAgent resident;
-        public MapCell(bool traversable) {
+        public MapCell(bool traversable)
+        {
             this.traversable = traversable;
             occupied = false;
             resident = null;
@@ -24,11 +26,11 @@ public class MapManager : MonoBehaviour
 	public GameObject mapPrefab;
 	//public MapManager instance;
 
-	// config variables
-	private int width;
-	private int height;
-	private float cell_size;
-	private Vector3 offset;
+    // config variables
+    private int width;
+    private int height;
+    private float cell_size;
+    private Vector3 offset;
 
 	// map data
 	private int[,] map_raw;
@@ -405,68 +407,79 @@ public class MapManager : MonoBehaviour
 
 	// returns true if tile terrain at position is traversable
     public bool IsTraversable(Pos pos)
-	{
-		if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
-			return false;
-		return map[pos.x, pos.y].traversable;
+    {
+        if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+            return false;
+        return map[pos.x, pos.y].traversable;
     }
 
-    public bool IsTileInRegion(Pos tile, int ID) {
+    public bool IsTileInRegion(Pos tile, int ID)
+    {
         return (map_raw[tile.x, tile.y] == ID);
     }
 
-    public int GetTileRegion(Pos tile) {
+    public int GetTileRegion(Pos tile)
+    {
         return map_raw[tile.x, tile.y];
     }
 
-    public int[,] GetRegionMap() {
+    public int[,] GetRegionMap()
+    {
         return map_raw;
     }
 
     // returns true if tile at position contains an agent
-    public bool IsOccupied(Pos pos) {
+    public bool IsOccupied(Pos pos)
+    {
         if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
-			return false;
-		return map[pos.x, pos.y].occupied;
+            return false;
+        return map[pos.x, pos.y].occupied;
     }
-	
-	// wrapper function, return true if tile at position is traversable AND not occupied
-	public bool IsWalkable(Pos pos)
-	{
-		return IsTraversable(pos) && !IsOccupied(pos);
-	}
 
-    public GameAgentState GetGameAgentState(Pos dest) {
+    // wrapper function, return true if tile at position is traversable AND not occupied
+    public bool IsWalkable(Pos pos)
+    {
+        return IsTraversable(pos) && !IsOccupied(pos);
+    }
+
+    public GameAgentState GetGameAgentState(Pos dest)
+    {
         if (!IsOccupied(dest))
             return GameAgentState.Null;
 
         return map[dest.x, dest.y].resident.stats.currentState;
     }
 
-    public bool GetHealed(Pos dest, int healAmount) {
+    public bool GetHealed(Pos dest, int healAmount)
+    {
         if (!IsOccupied(dest))
             return false;
 
         map[dest.x, dest.y].resident.GetHealed(healAmount);
         return true;
     }
-	
-	// gets the transform of agent at position on map, if there is any
-    public Transform GetUnitTransform(Pos pos) {
+
+    // gets the transform of agent at position on map, if there is any
+    public Transform GetUnitTransform(Pos pos)
+    {
         if (!map[pos.x, pos.y].occupied)
             return null;
         return map[pos.x, pos.y].resident.transform;
     }
 
-    public Transform GetNearestUnitTransform(Pos pos, List<Pos> agents) {
+    public Transform GetNearestUnitTransform(Pos pos, List<Pos> agents)
+    {
 
-        if (agents.Count > 0) {
+        if (agents.Count > 0)
+        {
             int minDistance = Int32.MaxValue;
             Pos closestAgent = agents[0];
 
-            foreach (Pos agent in agents) {
+            foreach (Pos agent in agents)
+            {
                 int distance = Pos.abs_dist(pos, agent);
-                if (distance < minDistance) {
+                if (distance < minDistance)
+                {
                     closestAgent = agent;
                     minDistance = distance;
                 }
@@ -478,28 +491,28 @@ public class MapManager : MonoBehaviour
     }
 
     // converts grid position (int)(x, y) to world coordinates (float)(x, y, z)
-	public Vector3 grid_to_world(Pos pos)
-	{
-		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
-	}
+    public Vector3 grid_to_world(Pos pos)
+    {
+        return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
+    }
 
-	// converts world position (float)(x, y, z) to grid position (int)(x, y)
-	public Pos world_to_grid(Vector3 pos)
-	{
-		pos = pos + offset;
-		return new Pos((int) pos.x, (int) pos.z);
-	}
-	
-	/*******************/
-	/* DEBUG FUNCTIONS */
-	/*******************/
-	
-	// draws line from point a to point b on the map
-	public void DrawLine(Pos a, Pos b, Color color, float time=5.0f)
-	{
-		Vector3 origin = grid_to_world(a);
-		Vector3 destination = grid_to_world(b);
-		
-		Debug.DrawLine(origin, destination, color, time);
-	}
+    // converts world position (float)(x, y, z) to grid position (int)(x, y)
+    public Pos world_to_grid(Vector3 pos)
+    {
+        pos = pos + offset;
+        return new Pos((int)pos.x, (int)pos.z);
+    }
+
+    /*******************/
+    /* DEBUG FUNCTIONS */
+    /*******************/
+
+    // draws line from point a to point b on the map
+    public void DrawLine(Pos a, Pos b, Color color, float time = 5.0f)
+    {
+        Vector3 origin = grid_to_world(a);
+        Vector3 destination = grid_to_world(b);
+
+        Debug.DrawLine(origin, destination, color, time);
+    }
 }

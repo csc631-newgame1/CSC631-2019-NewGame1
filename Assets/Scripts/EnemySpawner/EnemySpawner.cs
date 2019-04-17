@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class EnemySpawner : MonoBehaviour {
-	
+public class EnemySpawner : MonoBehaviour
+{
+
     private int width;
     private int height;
     private float cell_size;
@@ -20,8 +21,8 @@ public class EnemySpawner : MonoBehaviour {
     List<Region> regions;
     public bool showEnemySpawnZones;
     private MapConfiguration mapConfiguration;
-	
-	public GameObject enemyPrefab;
+
+    public GameObject enemyPrefab;
 
     [Header("Enemy Spawn Zone Settings")]
     [Tooltip("Increase slightly to increase distance between zones.")]
@@ -53,24 +54,27 @@ public class EnemySpawner : MonoBehaviour {
         rng = config.GetRNG();
 
         spawnZones = new List<SpawnZone>();
-		SpawnEnemies();
+        SpawnEnemies();
     }
 
     // Call this to spawn enemies on the Map Manager
-    public void SpawnEnemies() {
+    public void SpawnEnemies()
+    {
         GenerateSpawnZones();
         TrimSpawnZones();
 
         EnemyGroupManager enemyGroupManager = new EnemyGroupManager(spawnZones);
         List<EnemyToSpawn> enemies = enemyGroupManager.GetEnemiesToSpawn();
 
-		foreach (EnemyToSpawn enemy in enemies) {
-			mapManager.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
-		}
+        foreach (EnemyToSpawn enemy in enemies)
+        {
+            mapManager.instantiate(enemyPrefab, enemy.gridPosition, enemy.stats);
+        }
     }
 
     // Creates a list of Spawn Zones of varrying sizes in the map
-    private void GenerateSpawnZones() {
+    private void GenerateSpawnZones()
+    {
 
         regions = mapGenerator.getRegions();
         List<Pos> regionTiles = new List<Pos>();
@@ -81,33 +85,41 @@ public class EnemySpawner : MonoBehaviour {
         int numOfSpawnZonesInRegion = 0;
 
         // Iterates through each region
-        foreach (Region region in regions) {
+        foreach (Region region in regions)
+        {
             numOfSpawnZonesInRegion = 0;
             regionTiles = region.GetRegionTiles();
 
             // Checks through each tile in the region
-            foreach (Pos tile in regionTiles) {
+            foreach (Pos tile in regionTiles)
+            {
                 distanceBetweenZones = rng.Next(Mathf.Max(1, Mathf.RoundToInt(this.distanceBetweenZones / 2f)), Mathf.RoundToInt(this.distanceBetweenZones));
                 spawnZoneRadius = rng.Next(Mathf.RoundToInt(lowerRadius), Mathf.RoundToInt(upperRadius + 1));
                 radiusAndDistance = distanceBetweenZones + spawnZoneRadius;
                 bool valid = true;
 
-                while (!IsValid(tile, spawnZones, grid, spawnZoneRadius)) {
+                while (!IsValid(tile, spawnZones, grid, spawnZoneRadius))
+                {
                     // If smallest radius doesn't work, then it isn't a valid spawn point
-                    if (spawnZoneRadius == lowerRadius) {
+                    if (spawnZoneRadius == lowerRadius)
+                    {
                         valid = false;
                         break;
-                    } else {
+                    }
+                    else
+                    {
                         // Try a smaller radius
                         spawnZoneRadius--;
                     }
                 }
 
-                if (valid) {
+                if (valid)
+                {
                     SpawnZone spawnZone = CreateSpawnZone(tile, spawnZoneRadius);
                     // Checks if the number of zone tiles is acceptable
                     if (spawnZone.GetNumberOfUnpopulatedTilesInZone() >= minimumNumberOfTilesInSpawnZone
-                        && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone) {
+                        && spawnZone.GetNumberOfUnpopulatedTilesInZone() <= maximumNumberOfTilesInSpawnZone)
+                    {
 
                         // Spawn Zone is accepted and added to the list
                         spawnZones.Add(spawnZone);
@@ -123,8 +135,10 @@ public class EnemySpawner : MonoBehaviour {
 
     // Randomly removes spawn zones
     // Makes sure there is at least one spawn zone per region
-    private void TrimSpawnZones() {
-        if (spawnZones.Count > maxNumberOfSpawnZones && regions.Count > 0) {
+    private void TrimSpawnZones()
+    {
+        if (spawnZones.Count > maxNumberOfSpawnZones && regions.Count > 0)
+        {
             int numOfZonesToRemove = spawnZones.Count - maxNumberOfSpawnZones;
             int randomIndex = 0;
             bool oneSpawnZoneLeftInEveryRegion = false;
@@ -141,52 +155,67 @@ public class EnemySpawner : MonoBehaviour {
                     zoneRemoved = false;
 
                     // Checks through all the regions
-                    for (int i = 0; i < regions.Count; i++) {
+                    for (int i = 0; i < regions.Count; i++)
+                    {
                         // All the spawn zones needed have been removed
-                        if (numOfZonesToRemove <= 0) {
+                        if (numOfZonesToRemove <= 0)
+                        {
                             break;
                         }
 
                         exclude.Clear();
-                        for (int j = 0; j < spawnZones.Count; j++) {
+                        for (int j = 0; j < spawnZones.Count; j++)
+                        {
                             // Get a random spawn zone
                             randomIndex = Utility.GetRandomIntWithExclusion(0, spawnZones.Count - 1, rng, exclude);
                             // Remove the spawn zone as long as the region has more than 1 spawn zone
-                            if (regions[i].numOfSpawnZones > 1 && spawnZones[randomIndex].region == regions[i].ID) {
+                            if (regions[i].numOfSpawnZones > 1 && spawnZones[randomIndex].region == regions[i].ID)
+                            {
                                 spawnZones.Remove(spawnZones[randomIndex]);
                                 regions[i].numOfSpawnZones--;
                                 numOfZonesToRemove--;
                                 zoneRemoved = true;
                                 break;
-                            } else {
+                            }
+                            else
+                            {
                                 exclude.Add(randomIndex);
                             }
                         }
                     }
 
                     // Every region has 1 or less spawn zones
-                    if (!zoneRemoved) {
+                    if (!zoneRemoved)
+                    {
                         oneSpawnZoneLeftInEveryRegion = true;
                     }
-                } else {
+                }
+                else
+                {
                     // Begins removing spawn zones once every region only has 1 spawn zone
-                    for (int i = 0; i < regions.Count; i++) {
+                    for (int i = 0; i < regions.Count; i++)
+                    {
                         // All the spawn zones needed have been removed
-                        if (numOfZonesToRemove <= 0) {
+                        if (numOfZonesToRemove <= 0)
+                        {
                             break;
                         }
 
                         exclude.Clear();
-                        for (int j = 0; j < spawnZones.Count; j++) {
+                        for (int j = 0; j < spawnZones.Count; j++)
+                        {
                             // Get a random spawn zone
                             randomIndex = Utility.GetRandomIntWithExclusion(0, spawnZones.Count - 1, rng, exclude);
                             // Remove the spawn zone if able
-                            if (regions[i].numOfSpawnZones > 0 && spawnZones[randomIndex].region == regions[i].ID) {
+                            if (regions[i].numOfSpawnZones > 0 && spawnZones[randomIndex].region == regions[i].ID)
+                            {
                                 spawnZones.Remove(spawnZones[randomIndex]);
                                 regions[i].numOfSpawnZones--;
                                 numOfZonesToRemove--;
                                 break;
-                            } else {
+                            }
+                            else
+                            {
                                 exclude.Add(randomIndex);
                             }
                         }
@@ -198,14 +227,17 @@ public class EnemySpawner : MonoBehaviour {
 
     // Checks if the center of the Spawn Zone (candidate) will create a valid Spawn Zone
     // Checks if the center is traversable, and if other Spawn Zones fall within this Spawn Zone
-    bool IsValid(Pos candidate, List<SpawnZone> points, int[,] grid, float spawnZoneRadius) {
+    bool IsValid(Pos candidate, List<SpawnZone> points, int[,] grid, float spawnZoneRadius)
+    {
         // Check if center is traversable
-        if (!mapManager.IsTraversable(new Pos((int)candidate.x, (int)candidate.y))) {
+        if (!mapManager.IsTraversable(new Pos((int)candidate.x, (int)candidate.y)))
+        {
             return false;
         }
 
         // Check if the surrounding cells are within the radius of another Spawn Zone already created
-        if (candidate.x >=0 && candidate.x < regionSize.x && candidate.y >= 0 && candidate.y < regionSize.y) {
+        if (candidate.x >= 0 && candidate.x < regionSize.x && candidate.y >= 0 && candidate.y < regionSize.y)
+        {
             int cellX = candidate.x;
             int cellY = candidate.y;
             int numOfCellsToScan = Mathf.CeilToInt(upperRadius);
@@ -216,13 +248,17 @@ public class EnemySpawner : MonoBehaviour {
             int searchStartY = Mathf.Max(0, cellY - numOfCellsToScan);
             int searchEndY = Mathf.Min(cellY + numOfCellsToScan, height - 1);
 
-            for (int x = searchStartX; x <= searchEndX; x++) {
-                for (int y = searchStartY; y <= searchEndY; y++) {
+            for (int x = searchStartX; x <= searchEndX; x++)
+            {
+                for (int y = searchStartY; y <= searchEndY; y++)
+                {
                     int pointIndex = grid[x, y] - 1;
                     // non -1 means there is a Spawn Zone
-                    if (pointIndex != -1) {
+                    if (pointIndex != -1)
+                    {
                         float dst = (new Vector3(candidate.x, candidate.y) - new Vector3(points[pointIndex].GetPosition().x, points[pointIndex].GetPosition().y)).magnitude;
-                        if (dst <= (spawnZoneRadius + points[pointIndex].GetRadius())) {
+                        if (dst <= (spawnZoneRadius + points[pointIndex].GetRadius()))
+                        {
                             // Candidate too close to another Spawn Zone
                             return false;
                         }
@@ -236,7 +272,8 @@ public class EnemySpawner : MonoBehaviour {
 
     // Creates the Spawn Zone and populates its traversable zone tile list
     // by checking all the tiles within its radius
-    SpawnZone CreateSpawnZone(Pos candidate, float spawnZoneRadius) {
+    SpawnZone CreateSpawnZone(Pos candidate, float spawnZoneRadius)
+    {
         SpawnZone spawnZone = new SpawnZone(candidate, spawnZoneRadius, mapManager.GetTileRegion(candidate));
         List<Pos> zoneTiles = new List<Pos>();
 
@@ -249,13 +286,17 @@ public class EnemySpawner : MonoBehaviour {
         int searchStartY = Mathf.Max(0, cellY - numOfCellsToScan);
         int searchEndY = Mathf.Min(cellY + numOfCellsToScan, height - 1);
 
-        for (int x = searchStartX; x <= searchEndX; x++) {
-            for (int y = searchStartY; y <= searchEndY; y++) {
+        for (int x = searchStartX; x <= searchEndX; x++)
+        {
+            for (int y = searchStartY; y <= searchEndY; y++)
+            {
                 Pos tile = new Pos(x, y);
-                if (mapManager.IsTraversable(tile) && !mapManager.IsOccupied(tile)) {
+                if (mapManager.IsTraversable(tile) && !mapManager.IsOccupied(tile))
+                {
                     int a = cellX - x;
                     int b = cellY - y;
-                    if (Mathf.Sqrt(a*a + b*b) <= spawnZoneRadius) {
+                    if (Mathf.Sqrt(a * a + b * b) <= spawnZoneRadius)
+                    {
                         zoneTiles.Add(tile);
                     }
                 }
@@ -266,22 +307,29 @@ public class EnemySpawner : MonoBehaviour {
         return spawnZone;
     }
 
-    public List<SpawnZone> GetSpawnZones() {
+    public List<SpawnZone> GetSpawnZones()
+    {
         return spawnZones;
     }
 
-    void OnDrawGizmos() {
-        if (showEnemySpawnZones) {
+    void OnDrawGizmos()
+    {
+        if (showEnemySpawnZones)
+        {
             List<Color> gizColors = new List<Color> { Color.red, Color.yellow, Color.blue, Color.cyan, Color.green, Color.white, Color.grey };
 
-            if (spawnZones.Count > 0) {
-                for (int i = 0; i < spawnZones.Count; i++) {
+            if (spawnZones.Count > 0)
+            {
+                for (int i = 0; i < spawnZones.Count; i++)
+                {
 
-                    if (spawnZones[i].IsPopulated()) {
+                    if (spawnZones[i].IsPopulated())
+                    {
                         Gizmos.color = Color.white;
                         Gizmos.DrawWireSphere(mapManager.grid_to_world(new Pos((int)spawnZones[i].GetPosition().x, (int)spawnZones[i].GetPosition().y)), spawnZones[i].GetRadius());
                         List<Pos> zoneTiles = spawnZones[i].GetUnpopulatedZoneTiles();
-                        foreach (Pos tile in zoneTiles) {
+                        foreach (Pos tile in zoneTiles)
+                        {
                             Gizmos.color = gizColors[i % gizColors.Count];
                             Gizmos.DrawWireCube(mapManager.grid_to_world(new Pos((int)tile.x, (int)tile.y)), new Vector3(mapConfiguration.cell_size, 0, mapConfiguration.cell_size));
                         }
