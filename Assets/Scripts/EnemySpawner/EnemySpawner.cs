@@ -9,7 +9,6 @@ public class EnemySpawner : MonoBehaviour {
     private int width;
     private int height;
     private float cell_size;
-    private Vector3 offset;
     private Vector3 regionSize;
     private float radius;
     private MapManager mapManager;
@@ -47,7 +46,6 @@ public class EnemySpawner : MonoBehaviour {
         regionSize = new Vector2(width, height);
         cell_size = config.cell_size;
         radius = cell_size * Mathf.Sqrt(2);
-        offset = config.GetOffset();
         this.mapManager = mapManager;
         mapConfiguration = config;
         rng = config.GetRNG();

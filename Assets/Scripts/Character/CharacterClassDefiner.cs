@@ -15,7 +15,8 @@ public class CharacterClassDefiner : MonoBehaviour
     int maxSkeletonRange = 17;
 
     // Weapon variation variables.
-    public int weaponNum;
+    public GameObject activeWeapon;
+	public int weaponNum;
 
     // Weapon objects.
     public GameObject sword;
@@ -42,11 +43,20 @@ public class CharacterClassDefiner : MonoBehaviour
             SetCharacterClass(characterRace, characterClass, characterWeapon);
         }
     }
-
-    void Update()
-    {
-        
-    }
+	
+	public void DisableRendering()
+	{
+		if (activeWeapon != null)
+			activeWeapon.SetActive(false);
+		characterAvatar.gameObject.SetActive(false);
+	}
+	
+	public void EnableRendering()
+	{
+		if (activeWeapon != null)
+			activeWeapon.SetActive(true);
+		characterAvatar.gameObject.SetActive(true);
+	}
 
     // SetCharacterClass(int characterID), SetCharacterModel(int modelID), SetCharacterWeapon(int weaponID)
     #region Main Methods
@@ -108,6 +118,8 @@ public class CharacterClassDefiner : MonoBehaviour
                 }
                 break;
         }
+		
+		weaponNum = characterWeapon;
 
         SetCharacterModel(characterModel);
         SetCharacterWeapon(characterWeapon);
@@ -136,30 +148,36 @@ public class CharacterClassDefiner : MonoBehaviour
         {
             animator.SetInteger("Weapon", CharacterClassOptions.Sword);
             sword.SetActive(true);
+			activeWeapon = sword;
         }
         else if (weaponID == CharacterClassOptions.Bow) // Bow
         {
             animator.SetInteger("Weapon", CharacterClassOptions.Bow);
             bow.SetActive(true);
+			activeWeapon = bow;
         }
         else if (weaponID == CharacterClassOptions.Staff) // Staff
         {
             animator.SetInteger("Weapon", CharacterClassOptions.Staff);
             staff.SetActive(true);
+			activeWeapon = staff;
         }
         else if (weaponID == CharacterClassOptions.Axe) // Axe
         {
             animator.SetInteger("Weapon", CharacterClassOptions.Axe);
             axe.SetActive(true);
+			activeWeapon = axe;
         }
         else if (weaponID == CharacterClassOptions.Club) // Club
         {
             animator.SetInteger("Weapon", CharacterClassOptions.Club);
             club.SetActive(true);
+			activeWeapon = club;
         } 
         else if (weaponID == CharacterClassOptions.Unarmed) // Staff
         {
             animator.SetInteger("Weapon", CharacterClassOptions.Unarmed);
+			activeWeapon = null;
         }
 
         animator.SetTrigger("InstantSwitchTrigger");

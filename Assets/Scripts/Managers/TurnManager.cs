@@ -41,19 +41,16 @@ public class TurnManager : MonoBehaviour
 				while (!AIManager.turnOver(team)) {
 					yield return null;
 				}
-				ClearDead();
 			}
 		}
     }
 	
-	void ClearDead()
+	public void removeFromRoster(GameAgent agent)
 	{
 		foreach (List<GameAgent> faction in teamRoster) {
-			foreach (GameAgent agent in faction.ToArray()) {
-				if (agent.stats.currentState == GameAgentState.Dead) {
-					faction.Remove(agent);
-					parentManager.kill(agent);
-				}
+			if (faction.Contains(agent)) {
+				faction.Remove(agent);
+				return;
 			}
 		}
 	}

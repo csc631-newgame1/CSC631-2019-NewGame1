@@ -55,7 +55,6 @@ public class GameManager : MonoBehaviour
 			Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
 			instance.SetCharacterClass(players[i].classname);
 			players[i].playerObject = instance;
-			instance.clientID = players[i].ID;
 			if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
 		}
 		// spawn enemies
@@ -159,8 +158,10 @@ public class GameManager : MonoBehaviour
         instance.localPlayer.potion();
     }
 	
-	public void kill(GameAgent character)
+	public static void kill(DungeonObject obj)
 	{
-		map_manager.de_instantiate(character.grid_pos);
+		instance.map_manager.de_instantiate(obj.grid_pos);
+		if (obj is GameAgent)
+			instance.turn_manager.removeFromRoster(obj as GameAgent);
 	}
 }

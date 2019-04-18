@@ -13,7 +13,7 @@ public class MapManager : MonoBehaviour
 	private class MapCell {
         public bool traversable;
         public bool occupied;
-        public GameAgent resident;
+        public DungeonObject resident;
         public MapCell(bool traversable) {
             this.traversable = traversable;
             occupied = false;
@@ -28,7 +28,6 @@ public class MapManager : MonoBehaviour
 	private int width;
 	private int height;
 	private float cell_size;
-	private Vector3 offset;
 
 	// map data
 	private int[,] map_raw;
@@ -41,13 +40,14 @@ public class MapManager : MonoBehaviour
 	private TileSelector tileSelector = null;
 	private System.Random rng;
 	private List<GameObject> environmentObjects;
+	private MapManager instance;
 
     // called by gamemanager, initializes map components
     public void Init(GameManager parent)
 	{
 		parentManager = parent;
-		//instance = this;
-		NetworkManager.mapManager = this;
+		instance = this;
+		NetworkManager.mapManager = instance;
 
 		// begin component init
 		GameObject mapObject = GameObject.FindGameObjectWithTag("Map");
@@ -79,7 +79,6 @@ public class MapManager : MonoBehaviour
 		this.width = config.width;
 		this.height = config.height;
 		this.cell_size = config.cell_size;
-		this.offset = config.GetOffset();
 	}
 	
 	/*****************/
@@ -125,20 +124,25 @@ public class MapManager : MonoBehaviour
 	public GameObject instantiate_environment(GameObject prefab, Pos pos, bool traversable = true)
 	{
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
-		environmentObjects.Add(clone);
 		
 		if (!traversable) {
 			nav_map.removeTraversableTile(pos);
 			map[pos.x, pos.y].traversable = false;
 		}
 		
+		EnvironmentObject env = clone.GetComponent<EnvironmentObject>();
+		env.init_environment(pos);
+		
+		map[pos.x, pos.y].occupied = true;
+		map[pos.x, pos.y].resident = env;
+		
 		return clone;
 	}
 
-	// removes an agent from the map, destroying it's game object
-	public void de_instantiate(Pos pos)
+	// removes an object from the map, destroying its game object
+	public void de_instantiate(Pos pos, float waitTime = 5f)
 	{
-		Destroy(map[pos.x, pos.y].resident.gameObject, 5.0f);
+		Destroy(map[pos.x, pos.y].resident.gameObject, waitTime);
 
 		nav_map.insertTraversableTile(pos);
 		map[pos.x, pos.y].resident = null;
@@ -148,12 +152,9 @@ public class MapManager : MonoBehaviour
 	// destroys all game objects currently on the map
 	public void clear_map()
 	{
-		foreach (GameObject environment in environmentObjects) {
-			Destroy(environment);
-		}
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++) 
-				if (map[x, y].occupied) {
+				if (map[x, y].resident != null) {
 					Destroy(map[x, y].resident.gameObject);
 					map[x, y].occupied = false;
 					map[x, y].resident = null;
@@ -163,8 +164,13 @@ public class MapManager : MonoBehaviour
 	// move a character from source to dest
 	public void move(Pos source, Pos dest)
 	{
-		GameAgent agent = map[source.x, source.y].resident;
-		if (agent == null) { Debug.Log("Move command was invalid!"); return; }
+		DungeonObject obj = map[source.x, source.y].resident;
+		if (obj == null || !(obj is GameAgent)) { 
+			Debug.Log("Move command was invalid!"); 
+			return; 
+		}
+		
+		GameAgent agent = obj as GameAgent;
 		
 		Path path = get_path(source, dest);
 		
@@ -182,9 +188,16 @@ public class MapManager : MonoBehaviour
 	// applies damage to agent at position, if one is there
 	public void attack(Pos source, Pos dest)
 	{
-		GameAgent attacker = map[source.x, source.y].resident;
-		GameAgent target = map[dest.x, dest.y].resident;
-		if (target == null || attacker == null) { Debug.Log("Attack command was invalid!"); return; }
+		DungeonObject obj_attacker = map[source.x, source.y].resident;
+		DungeonObject obj_target = map[dest.x, dest.y].resident;
+		if (obj_attacker == null || obj_target == null || !(obj_attacker is GameAgent) || !(obj_target is GameAgent)) {
+			Debug.Log("Attack command was invalid!");
+			return;
+		}
+		
+		GameAgent attacker = obj_attacker as GameAgent;
+		GameAgent target = obj_target as GameAgent;
+		
 		StartCoroutine(attacker.animate_attack(target));
 	}
 	
@@ -437,17 +450,23 @@ public class MapManager : MonoBehaviour
 	}
 
     public GameAgentState GetGameAgentState(Pos dest) {
-        if (!IsOccupied(dest))
-            return GameAgentState.Null;
+        DungeonObject obj = map[dest.x, dest.y].resident;
+		if (obj == null || !(obj is GameAgent))
+			return GameAgentState.Null;
+		
+		GameAgent agent = obj as GameAgent;
 
-        return map[dest.x, dest.y].resident.stats.currentState;
+        return agent.stats.currentState;
     }
 
     public bool GetHealed(Pos dest, int healAmount) {
-        if (!IsOccupied(dest))
-            return false;
+        DungeonObject obj = map[dest.x, dest.y].resident;
+		if (obj == null || !(obj is GameAgent))
+			return false;
+		
+		GameAgent agent = obj as GameAgent;
 
-        map[dest.x, dest.y].resident.GetHealed(healAmount);
+        agent.GetHealed(healAmount);
         return true;
     }
 	
@@ -480,13 +499,13 @@ public class MapManager : MonoBehaviour
     // converts grid position (int)(x, y) to world coordinates (float)(x, y, z)
 	public Vector3 grid_to_world(Pos pos)
 	{
-		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
+		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f);
 	}
 
 	// converts world position (float)(x, y, z) to grid position (int)(x, y)
 	public Pos world_to_grid(Vector3 pos)
 	{
-		pos = pos + offset;
+		pos = pos;
 		return new Pos((int) pos.x, (int) pos.z);
 	}
 	

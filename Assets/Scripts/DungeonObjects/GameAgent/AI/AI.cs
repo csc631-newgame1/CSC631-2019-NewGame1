@@ -200,6 +200,8 @@ public class AIComponent
 	
 	public bool calcAttack()
 	{
+		if (alliedDistances == null) return false;
+		
 		GameAgent mostDesireable = null;
 		float bestRating = -1;
 		for (int i = 0; i < enemyPool.Count; i++) {

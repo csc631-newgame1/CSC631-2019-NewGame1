@@ -14,13 +14,13 @@ public class MapGenerator : MonoBehaviour
 	
 	private int width;
 	private int height;
+	private int padding;
 	private int fill_percent;
 	private int smoothness;
 	private int region_cull_threshold;
 	private float cell_size;
     private float object_size_scale;
 	private int seed;
-	private Vector3 offset;
 	
 	[HideInInspector]
 	public int[,] map;
@@ -34,16 +34,16 @@ public class MapGenerator : MonoBehaviour
 	
 	void set_variables()
 	{
-		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
-		this.width = config.width;
-		this.height = config.height;
+		MapConfiguration config = GetComponent<MapConfiguration>();
+		this.width = config._width;
+		this.height = config._height;
+		this.padding = config._padding;
 		this.fill_percent = config.fill_percent;
 		this.smoothness = config.smoothness;
 		this.region_cull_threshold = config.region_cull_threshold;
 		this.cell_size = config.cell_size;
         this.object_size_scale = config.object_size_scale;
 		this.seed = config.seed;
-		this.offset = config.GetOffset();
 		
 		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 	}
@@ -58,7 +58,7 @@ public class MapGenerator : MonoBehaviour
 		// binary map generation, using cellular automata method
 		random_fill();
 		smooth(smoothness);
-		pad_edges();
+		pad_edges(); // pads out map to point where edge is not normally visible to player
 		
 		// map post-processing
 		extract_regions();
@@ -66,6 +66,8 @@ public class MapGenerator : MonoBehaviour
 		bridge_all_regions();
 
 		Debug.Log("Done generating map! Creating meshes...");
+		
+		GetComponent<FogOfWar>().Init();
 
 		MapMeshGenerator surface_gen = transform.Find("Surface").GetComponent<MapMeshGenerator>();
 		surface_gen.generate_map_mesh(map);
@@ -75,6 +77,10 @@ public class MapGenerator : MonoBehaviour
 		
 		Boundary boundary_gen = transform.Find("Boundaries").GetComponent<Boundary>();
 		boundary_gen.generateBoundary();
+		
+		BoxCollider box = GetComponent<BoxCollider>();
+		box.center = GetComponent<MapConfiguration>().GetCenter();
+		box.size = new Vector3(width, 0.5f, height);
 		
 		Debug.Log("Mesh generation complete!");
 		//print_region_tree();
@@ -128,16 +134,19 @@ public class MapGenerator : MonoBehaviour
 	}
 	
 	void pad_edges()
-	{
-		for (int x = 0; x < width; x++) {
-			map[x,0] = EMPTY;
-			map[x,height-1] = EMPTY;
+	{	
+		this.width = GetComponent<MapConfiguration>().width;
+		this.height = GetComponent<MapConfiguration>().height;
+		
+		int[,] new_map = new int[width, height];
+		
+		for (int x = padding; x < width - padding; x++) {
+			for (int y = padding; y < height - padding; y++) {
+				new_map[x, y] = map[x - padding, y - padding];
+			}
 		}
 		
-		for (int y = 0; y < height; y++) {
-			map[0,y] = EMPTY;
-			map[width-1,y] = EMPTY;
-		}
+		map = new_map;
 	}
 	
 	/************************/
@@ -328,7 +337,7 @@ public class MapGenerator : MonoBehaviour
 	
 	public Vector3 grid_to_world(Pos pos)
 	{
-		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
+		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f);
 	}
 	
 	public List<Region> getRegions()
@@ -410,7 +419,7 @@ public class MapGenerator : MonoBehaviour
 	
 	private Vector3 to_vector3(Pos p)
 	{
-		return new Vector3(p.x, 0f, p.y) - offset;
+		return new Vector3(p.x, 0f, p.y);
 	}
 	
 	Pos getRegionPoint(int ID)

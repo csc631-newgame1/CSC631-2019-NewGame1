@@ -6,9 +6,8 @@ using MapUtils;
 
 public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
 
-public abstract class GameAgent : MonoBehaviour
+public abstract class GameAgent : DungeonObject
 {
-	public Pos grid_pos;
     public float speed;
 	public string nickname;
     public GameAgentStats stats;
@@ -25,8 +24,6 @@ public abstract class GameAgent : MonoBehaviour
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
 	public abstract IEnumerator animate_attack(GameAgent target);
-	
-	public abstract void take_damage(int amount);
 
     public abstract void GetHealed(int amount);
 	
