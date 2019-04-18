@@ -13,12 +13,14 @@ public class Boundary : MonoBehaviour
 		
 		mat.SetTexture("_FluidTex", surfacemat.GetTexture("_FluidTex"));
 		mat.SetTexture("_FluidGradient", surfacemat.GetTexture("_FluidGradient"));
+		mat.SetTexture("_FOWTex", FogOfWar.fogTex);
 		mat.SetFloat("_Oscillation", surfacemat.GetFloat("_Oscillation"));
 		mat.SetFloat("_Detail", surfacemat.GetFloat("_Detail"));
 		mat.SetFloat("_Bias", surfacemat.GetFloat("_Bias"));
 		mat.SetFloat("_Flow", surfacemat.GetFloat("_Flow"));
 		mat.SetVector("_FluidTex_ST", surfacemat.GetVector("_FluidTex_ST"));
 		mat.SetVector("_FluidGradient_ST", surfacemat.GetVector("_FluidGradient_ST"));
+		mat.SetVector("_MapWidthHeight", surfacemat.GetVector("_MapWidthHeight"));
 		
 		MapConfiguration config = transform.parent.GetComponent<MapConfiguration>();
 		transform.position = new Vector3(0, -config.wall_height, 0);

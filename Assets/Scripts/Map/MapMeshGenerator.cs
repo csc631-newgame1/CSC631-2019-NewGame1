@@ -15,7 +15,6 @@ public class MapMeshGenerator : MonoBehaviour
 	private int height;
 	private float cell_size;
 	private float wall_height;
-	private Vector3 offset;
 	
 	public float steepness;
 	
@@ -29,7 +28,6 @@ public class MapMeshGenerator : MonoBehaviour
 		this.height = config.height;
 		this.cell_size = config.cell_size;
 		this.wall_height = config.wall_height;
-		this.offset = config.GetOffset();
 	}
 	
 	public void generate_map_mesh(int[,] map)
@@ -115,7 +113,7 @@ public class MapMeshGenerator : MonoBehaviour
 			// initialize vertex_map with vector x and z values
 			for(int x = 0; x < width * 2 + 1; x++)
 				for(int y = 0; y < height * 2 + 1; y++)
-					vertex_map[x, y] = new Vector3((float) x / 2f, 0f, (float) y / 2f) - offset;
+					vertex_map[x, y] = new Vector3((float) x / 2f, 0f, (float) y / 2f);
 			
 			// Generate vertex_map height values based on height map
 			// vertex heights are the average heights of all the tiles they touch
@@ -303,6 +301,9 @@ public class MapMeshGenerator : MonoBehaviour
 		
 		texture.SetPixels(colors);
 		texture.Apply(true);
+		
+		rend.material.SetTexture("_FOWTex", FogOfWar.fogTex);
+		rend.material.SetVector("_MapWidthHeight", new Vector4(width, height, 0, 0));
 		
 		/* STEP 7: FINALISATION
 		 * Assigns vertices, triangles, and uvs to mesh

@@ -10,7 +10,6 @@ public class TileSelector : MonoBehaviour
 	private int width;
 	private int height;
 	private float cell_size;
-	private Vector3 offset;
 
     private Transform select_square;
 	private MapManager map_manager;
@@ -53,14 +52,9 @@ public class TileSelector : MonoBehaviour
 		cell_size = config.cell_size;
 		width = config.width;
 		height = config.height;
-		offset = config.GetOffset();
 		
 		this.map_manager = map_manager;
 		this.path_render = GetComponent<LineRenderer>();
-		
-		Vector3 collider_size = new Vector3(width * cell_size, 0.1f, height * cell_size);
-		BoxCollider selection_collider = GetComponent<BoxCollider>();
-		selection_collider.size = collider_size;
 		
 		select_square = transform.Find("Selector");
 	}

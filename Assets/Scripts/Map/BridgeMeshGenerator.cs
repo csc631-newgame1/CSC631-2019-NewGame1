@@ -199,6 +199,9 @@ public class BridgeMeshGenerator : MonoBehaviour
 		texture.SetPixels(colors);
 		texture.Apply(true);
 		
+		rend.material.SetTexture("_FOWTex", FogOfWar.fogTex);
+		rend.material.SetVector("_MapWidthHeight", new Vector4(width, height, 0, 0));
+		
 		/* STEP 5 - FINALIZATION
 		 * Finally, we write our new vertices & triangles to the mesh filter */
 		

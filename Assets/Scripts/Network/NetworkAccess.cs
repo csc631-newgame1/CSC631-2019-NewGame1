@@ -80,6 +80,13 @@ public class Network : NetworkBase
 		return networkEnabled;
 	}
 	
+	public static List<Player> getPlayers()
+	{
+		List<Player> players = new List<Player>();
+		foreach (Client peer in getPeers()) players.Add(peer.playerObject);
+		return players;
+	}
+	
 	public static List<Client> getPeers()
 	{
 		// sorts list by ID before returning so that list order is the same on all clients

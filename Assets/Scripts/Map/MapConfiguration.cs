@@ -6,8 +6,11 @@ using MapUtils;
 
 public class MapConfiguration : MonoBehaviour
 {
-    public int width;
-	public int height;
+	public int _width;
+	public int _height;
+	public int _padding;
+    public int width { get { return _width + _padding*2; } }
+	public int height { get { return _height + _padding*2; } }
 	[Range(0, 100)]
 	public int fill_percent;
 	[Range(0, 30)]
@@ -27,7 +30,7 @@ public class MapConfiguration : MonoBehaviour
 	
 	public int seed { get { return Settings.Seed; } }
 
-    public Vector3 GetOffset() {
+    public Vector3 GetCenter() {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));
     }
 	
@@ -40,6 +43,6 @@ public class MapConfiguration : MonoBehaviour
     }
 	
 	public Vector3 gridToWorld(Pos pos) {
-		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - GetOffset();
+		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f);
 	}
 }
