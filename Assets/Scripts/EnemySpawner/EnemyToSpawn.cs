@@ -4,10 +4,10 @@ using UnityEngine;
 public class EnemyToSpawn
 {
     public Pos gridPosition;
-    public GameAgentStats stats;
+    public GameAgentController stats;
     GameObject enemy;
 
-    public EnemyToSpawn(Pos gridPosition, GameAgentStats stats) {
+    public EnemyToSpawn(Pos gridPosition, GameAgentController stats) {
         this.gridPosition = gridPosition;
         this.stats = stats;
     }

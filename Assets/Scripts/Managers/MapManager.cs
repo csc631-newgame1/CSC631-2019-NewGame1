@@ -7,6 +7,7 @@ using MapUtils;
 using RegionUtils;
 using static MapUtils.MapConstants;
 using System;
+using static Constants;
 
 public class MapManager : MonoBehaviour
 {
@@ -101,7 +102,7 @@ public class MapManager : MonoBehaviour
 
 
 	// instantiates an agent into the map
-    public GameObject instantiate(GameObject prefab, Pos pos, GameAgentStats stats = null, string name = null)
+    public GameObject instantiate(GameObject prefab, Pos pos, GameAgentController stats = null, string name = null)
 	{
 		if (!IsWalkable(pos)) return null;
 		
@@ -110,7 +111,7 @@ public class MapManager : MonoBehaviour
         //string[] names = new string[] { "Keawa", "Benjamin", "Diana", "Jerry", "Joe" };
 
         if (stats == null) {
-            agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), name);
+            agent.init_agent(pos, new GameAgentController(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), name);
         } else {
             agent.init_agent(pos, stats);
         }

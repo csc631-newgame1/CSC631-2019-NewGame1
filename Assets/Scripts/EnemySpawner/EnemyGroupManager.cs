@@ -3,6 +3,7 @@ using RegionUtils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static Constants;
 
 // Responsible for taking a List of enemy groups and spawn zones
 // and figuring out where to spawn the enemies within the spawn zones
@@ -32,14 +33,14 @@ public class EnemyGroupManager
     // Takes the group of enemies and creates EnemyToSpawn objects with the location
     // within the spawn zone of where to spawn them
     private void PopulateSpawnZone(EnemyGroup group, SpawnZone spawnZone) {
-        List<GameAgentStats> enemyStats = group.GetEnemiesStatsForSpawn();
+        List<GameAgentController> enemyStats = group.GetEnemiesStatsForSpawn();
         List<Pos> zoneTiles = spawnZone.GetUnpopulatedZoneTiles();
         List<Pos> populatedZoneTiles = new List<Pos>();
 
         // Random distribution in zone
         List<int> exclusion = new List<int>();
 
-        foreach(GameAgentStats stats in enemyStats) {
+        foreach(GameAgentController stats in enemyStats) {
             int randomIndex = Utility.GetRandomIntWithExclusion(0, zoneTiles.Count - 1, rng, exclusion);
             Pos enemyPos = new Pos((int)zoneTiles[randomIndex].x, (int)zoneTiles[randomIndex].y);
             populatedZoneTiles.Add(zoneTiles[randomIndex]);

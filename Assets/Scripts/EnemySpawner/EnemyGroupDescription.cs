@@ -2,7 +2,7 @@
 
 public class EnemyGroupDescription
 {
-    public GameAgentStats stats;
+    public GameAgentController stats;
     public float attackVariance;
     public float healthVariance;
     public float rangeVariance;
@@ -21,7 +21,7 @@ public class EnemyGroupDescription
 
     // Variance is based on a percentage from 0 to 1 (1 = 100%)
     // The stat can be potentially rasied to any percetage, but cannot fall below 50% the original stat
-    public EnemyGroupDescription(GameAgentStats stats, int quantityOfEnemyInGroup, 
+    public EnemyGroupDescription(GameAgentController stats, int quantityOfEnemyInGroup, 
                                 float attackVariance = 0f,  float healthVariance = 0f,
                                 float rangeVariance = 0f, float speedVariance = 0f,
                                 bool randomNumberOfEnemies = false, 

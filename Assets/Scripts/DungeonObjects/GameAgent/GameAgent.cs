@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using MapUtils;
-
-public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
+using static Constants;
 
 public abstract class GameAgent : DungeonObject
 {
     public float speed;
 	public string nickname;
-    public GameAgentStats stats;
+    public GameAgentController stats;
     public GameAgentAction currentAction;
 	
     public GameAgentState currentState;
@@ -27,7 +26,7 @@ public abstract class GameAgent : DungeonObject
 
     public abstract void GetHealed(int amount);
 	
-	public abstract void init_agent(Pos position, GameAgentStats stats, string name = null);
+	public abstract void init_agent(Pos position, GameAgentController stats, string name = null);
 	
 	// for enemies, this will make them go through their AI motions
 	// for players, this will trigger the boolean value that allows them to take their turn

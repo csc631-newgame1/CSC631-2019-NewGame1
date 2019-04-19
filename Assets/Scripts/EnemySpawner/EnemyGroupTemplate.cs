@@ -1,55 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-// Melee - group of knights
-// BalancedAllUnits - group of knights, hunters, mages, and healers
-// BalancedSingleRange - group of knights, (hunters or mages), and healers
-// MeleeAndSingleRange - group of knights and (hunters or mages)
-// MeleeAndRange - group of knights, hunters, and mages
-// MeleeAndHealers - group of knights and healers
-// RangeAndHealers - group of (hunters or mages) and healers
-// LessKnightsAndMoreMages - group of few knights and more mages
-// MoreKnightsAndLessMages - group of more knights and few mages
-// LessKnightsAndMoreHunters - group of few knights and more hunters
-// MoreKnightsAndLessHunters - group of more knights and few hunters
-// MixedRange - group of hunters and mages
-// MixedRangeAndHealers - group of hunters, mages, and healers
-public static class EnemyGroupType {
-    public const int Melee = 1;
-    public const int BalancedAllUnits = 2;
-    public const int BalancedSingleRange = 3;
-    public const int MeleeAndSingleRange = 4;
-    public const int MeleeAndRange = 5;
-    public const int MeleeAndHealers = 6;
-    public const int RangeAndHealers = 7;
-    public const int LessKnightsAndMoreMages = 8;
-    public const int MoreKnightsAndLessMages = 9;
-    public const int LessKnightsAndMoreHunters = 10;
-    public const int MoreKnightsAndLessHunters = 11;
-    public const int MixedRange = 12;
-    public const int MixedRangeAndHealers = 13;
-};
-
-// Determines the level of the enemies
-public static class EnemyGroupDifficulty {
-    public const int Trivial = 0;
-    public const int Average = 1;
-    public const int Difficult = 2;
-    public const int Impossible = 3;
-
-    public const int count = 4;
-};
-
-public static class EnemyGroupSize {
-    public const int Small = 3;
-    public const int MediumLowerBound = 4;
-    public const int Medium = 5;
-    public const int MediumUpperBound = 6;
-    public const int Large = 7;
-    public const int LargeUpperBound = 8;
-    public const int XLarge = 9;
-};
+using static Constants;
 
 public static class EnemyGroupTemplate {
     public static EnemyGroup GetEnemyGroupGivenDifficulty(int difficulty, int level, System.Random rng, int race = -1, int enemyGroupSize = -1) {
@@ -94,141 +46,141 @@ public static class EnemyGroupTemplate {
             // Melee - group of knights
             case EnemyGroupType.Melee:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.Melee, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)), 
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)), 
                                                                      enemyQuantities[0]));
                 break;
             // BalancedAllUnits - group of knights, hunters, mages, and healers
             case EnemyGroupType.BalancedAllUnits:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.BalancedAllUnits, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
                 
                 if (enemyGroupSize > EnemyGroupSize.Small) {
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[2]));
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[3]));
                 } else if (enemyGroupSize == EnemyGroupSize.Small) {
                     if (rng.Next(0, 1 + 1) == 1) {
-                        enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                        enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
                     } else {
-                        enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                        enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                              enemyQuantities[1]));
                     }
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[2]));
                 }
                 break;
             // BalancedSingleRange - group of knights, (hunters or mages), and healers
             case EnemyGroupType.BalancedSingleRange:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.BalancedSingleRange, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
                 if (rng.Next(0, 1 + 1) == 1) {
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                  enemyQuantities[1]));
                 } else {
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[1]));
                 }
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[2]));
                 break;
             // MeleeAndSingleRange - group of knights and (hunters or mages)
             case EnemyGroupType.MeleeAndSingleRange:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.MeleeAndSingleRange, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
                 if (rng.Next(0, 1 + 1) == 1) {
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                  enemyQuantities[1]));
                 } else {
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[1]));
                 }
                 break;
             // MeleeAndRange - group of knights, hunters, and mages
             case EnemyGroupType.MeleeAndRange:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.MeleeAndRange, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[2]));
                 break;
             // MeleeAndHealers - group of knights and healers
             case EnemyGroupType.MeleeAndHealers:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.MeleeAndHealers, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[1]));
                 break;
             // RangeAndHealers - group of (hunters or mages) and healers
             case EnemyGroupType.RangeAndHealers:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.RangeAndHealers, rng, enemyGroupSize);
                 if (rng.Next(0, 1 + 1) == 1) {
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                         enemyQuantities[0]));
                 } else {
-                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                    enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                          enemyQuantities[0]));
                 }
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
                 break;
             // LessKnightsAndMoreMages - group of few knights and more mages
             case EnemyGroupType.LessKnightsAndMoreMages:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.LessKnightsAndMoreMages, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
                 break;
             // MoreKnightsAndLessMages - group of more knights and few mages
             case EnemyGroupType.MoreKnightsAndLessMages:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.MoreKnightsAndLessMages, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
                 break;
             // LessKnightsAndMoreHunters - group of few knights and more hunters
             case EnemyGroupType.LessKnightsAndMoreHunters:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.LessKnightsAndMoreHunters, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
                 break;
             // MoreKnightsAndLessHunters - group of more knights and few hunters
             case EnemyGroupType.MoreKnightsAndLessHunters:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.MoreKnightsAndLessHunters, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Knight, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
                 break;
             // MixedRange - group of hunters and mages
             case EnemyGroupType.MixedRange:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.MixedRange, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
                 break;
             // MixedRangeAndHealers - group of hunters, mages, and healers
             case EnemyGroupType.MixedRangeAndHealers:
                 enemyQuantities = GetEnemyQuantities(EnemyGroupType.MixedRangeAndHealers, rng, enemyGroupSize);
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Hunter, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[0]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Mage, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[1]));
-                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentStats(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
+                enemyGroupDescriptions.Add(new EnemyGroupDescription(new GameAgentController(race, CharacterClassOptions.Healer, GetLevel(difficulty, rng, level)),
                                                                      enemyQuantities[2]));
                 break;
         }

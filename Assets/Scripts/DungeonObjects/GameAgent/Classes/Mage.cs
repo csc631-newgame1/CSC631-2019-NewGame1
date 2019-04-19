@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using static Constants;
 
 public class Mage : CharacterClass
 {
     public Mage() {
-        baseStats = new GameAgentStats(23, 40, 7, 6, true);
+        baseStats = new GameAgentController(23, 40, 7, 6, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 

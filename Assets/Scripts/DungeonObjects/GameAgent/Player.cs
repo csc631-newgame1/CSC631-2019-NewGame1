@@ -6,6 +6,7 @@ using UnityEngine;
 
 using MapUtils;
 using static MapUtils.EnumUtils;
+using static Constants;
 
 public class Player : GameAgent
 {	
@@ -53,7 +54,7 @@ public class Player : GameAgent
 	public AudioClip[] armorHitNoise;
 
     // Gets references to necessary game components
-    public override void init_agent(Pos position, GameAgentStats stats, string name = null)
+    public override void init_agent(Pos position, GameAgentController stats, string name = null)
     {
 		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
@@ -296,7 +297,7 @@ public class Player : GameAgent
 				break;
 		}
 
-        stats = new GameAgentStats(CharacterRaceOptions.Human, classID, 1, weapon);
+        stats = new GameAgentController(CharacterRaceOptions.Human, classID, 1, weapon);
         attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = maxHealth;

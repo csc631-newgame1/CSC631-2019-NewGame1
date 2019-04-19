@@ -5,7 +5,8 @@ using UnityEngine;
 
 using static MapUtils.Dir;
 using static MapUtils.Type;
-using static GameAgentAction;
+using static Constants.GameAgentAction;
+using static Constants;
 
 namespace MapUtils 
 {

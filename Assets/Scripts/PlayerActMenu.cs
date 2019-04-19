@@ -1,22 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-
-public class ActMenuButtons { 
-	// Button indexes
-	public const int MOVE = 0;
-	public const int ACT = 1;
-	public const int POTION = 2;
-	public const int WAIT = 3;
-	public const int ACTION1 = 4;
-	public const int ACTION2 = 5;
-	public const int BLANK = 6;
-	public const int BACK = 7;
-}
+using static Constants;
 
 public class PlayerActMenu
 {
-	
-	
     private static GameObject actMenu;
     private static GameObject[] playerStats;
     private static Button[] buttons;
@@ -58,7 +45,7 @@ public class PlayerActMenu
         SetPlayerActMenuActive(false);
     }
 
-    public static void UpdatePlayerStatsMenu(int position, string name, GameAgentStats stats, bool deactivatePlayerSpot = false) {
+    public static void UpdatePlayerStatsMenu(int position, string name, GameAgentController stats, bool deactivatePlayerSpot = false) {
         if (!deactivatePlayerSpot) {
             if (position < playerStats.Length) {
                 if (!playerStats[position].activeSelf) {

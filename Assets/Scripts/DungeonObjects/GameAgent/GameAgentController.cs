@@ -1,12 +1,9 @@
 ﻿// Holds information regarding the GameAgents ingame stats
 using System;
 using UnityEngine;
+using static Constants;
 
-public enum GameAgentState { Alive, Unconscious, Dead, Null };
-
-public enum GameAgentStatusEffect { None, Taunted, Taunting };
-
-public class GameAgentStats
+public class GameAgentController
 {
     public int characterClassOption;
     public int characterRace;
@@ -46,7 +43,7 @@ public class GameAgentStats
     // the player will receive 1000xp * scaleFactor worth of xp
     private float scaleFactor = 0.25f;
 
-    public GameAgentStats(int characterRace, int characterClass, float attack, float health, float range, float speed, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+    public GameAgentController(int characterRace, int characterClass, float attack, float health, float range, float speed, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
 
         this.characterRace = characterRace;
@@ -64,7 +61,7 @@ public class GameAgentStats
     }
 
     // Only used for creating base stats
-    public GameAgentStats(float attack, float health, float range, float speed, bool baseStats) {
+    public GameAgentController(float attack, float health, float range, float speed, bool baseStats) {
         if (baseStats) {
             this.attack = attack;
             maxHealth = health;
@@ -74,7 +71,7 @@ public class GameAgentStats
         }
     }
 
-    public GameAgentStats(int characterRace, int characterClass, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
+    public GameAgentController(int characterRace, int characterClass, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
 
         this.characterRace = characterRace;

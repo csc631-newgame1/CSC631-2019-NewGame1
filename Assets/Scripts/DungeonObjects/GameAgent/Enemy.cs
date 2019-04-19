@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MapUtils;
 using UnityEngine;
+using static Constants;
 
 public class Enemy : GameAgent
 {
@@ -46,7 +47,7 @@ public class Enemy : GameAgent
 		}
 	}
 
-    public override void init_agent(Pos position, GameAgentStats stats, string name = null) 
+    public override void init_agent(Pos position, GameAgentController stats, string name = null) 
 	{
         map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;

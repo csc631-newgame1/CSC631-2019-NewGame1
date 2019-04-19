@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using static Constants;
 
 public class Healer : CharacterClass
 {
     public Healer() {
-        baseStats = new GameAgentStats(15, 32, 7, 10, true);
+        baseStats = new GameAgentController(15, 32, 7, 10, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
