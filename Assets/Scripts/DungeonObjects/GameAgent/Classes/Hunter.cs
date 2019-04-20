@@ -41,7 +41,7 @@ public class Hunter : CharacterClass
         return new GameAgentAction[] { GameAgentAction.RangedAttack, GameAgentAction.RangedAttackMultiShot };
     }
 
-    public override void HandleAct(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
+    public override void HandleAction(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
     }
 
     public override void LevelUp() {

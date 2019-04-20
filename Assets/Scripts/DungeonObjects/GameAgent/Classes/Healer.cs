@@ -41,7 +41,7 @@ public class Healer : CharacterClass
         return new GameAgentAction[] { GameAgentAction.MagicAttackSingleTarget, GameAgentAction.Heal };
     }
 
-    public override void HandleAct(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
+    public override void HandleAction(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
     }
 
     public override void LevelUp() {

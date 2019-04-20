@@ -1,21 +1,17 @@
 ﻿using MapUtils;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using static CharacterClass;
-using static Utility;
 
 public class MeleeAttack : MonoBehaviour {
+    public static int range = 1;
 
-    public static void attack(GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source, ActionEnded actionEnded) {
+    public static void attack(GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
         StaticCoroutineManager staticCoroutineManager = new StaticCoroutineManager();
-        staticCoroutineManager.StartNewCoroutine(PerformAttack(staticCoroutineManager, target, grid_pos, damage, animator, source, actionEnded));
-        //StaticCoroutine.DoCoroutine(PerformAttack(target, grid_pos, damage, animator, source, actionEnded));
+        staticCoroutineManager.StartNewCoroutine(PerformAttack(staticCoroutineManager, target, grid_pos, damage, animator, source));
     }
 
-    public static IEnumerator PerformAttack(StaticCoroutineManager staticCoroutineManager, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source, ActionEnded actionEnded) {
-        Debug.Log("Starting attack");
-
+    public static IEnumerator PerformAttack(StaticCoroutineManager staticCoroutineManager, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
         MapManager map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 
         // insert audio sound here
@@ -30,23 +26,16 @@ public class MeleeAttack : MonoBehaviour {
         map_manager.GetUnitTransform(grid_pos).LookAt(targetPos);
         animator.PlayAttackAnimation();
         staticCoroutineManager.StartNewCoroutine(animator.PlayAttackAnimation());
-        //StaticCoroutine.DoCoroutine(animator.PlayAttackAnimation());
 
         // wait for animation trigger
-        Debug.Log("BEFORE Is attacking?: " + map_manager.GetGameAgentAttackState(grid_pos));
         while (map_manager.GetGameAgentAttackState(grid_pos)) {
-            Debug.Log("INSIDE Is attacking?: " + map_manager.GetGameAgentAttackState(grid_pos));
             yield return null;
         }
-        Debug.Log("AFTER Is attacking?: " + map_manager.GetGameAgentAttackState(grid_pos));
+
         // wait a little longer based on projectile distance
         yield return new WaitForSeconds(distance / 10f);
 
         target.take_damage(damage);
         map_manager.GetUnitTransform(grid_pos).position = ownPos; // reset position after animation, which sometimes offsets it
-
-        actionEnded?.Invoke();
-        Debug.Log("Ended attack");
-
     }
 }

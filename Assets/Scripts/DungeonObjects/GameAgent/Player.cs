@@ -42,8 +42,6 @@ public class Player : GameAgent {
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
 
-    ActionEnded actionEnded;
-
     //sound effects
     private AudioSource source;
     public AudioClip[] swordSwing;
@@ -72,12 +70,10 @@ public class Player : GameAgent {
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
         classDefiner.init(controller.characterRace, controller.characterClassOption, controller.playerCharacterClass.weapon);
-        actionEnded = controller.GetActionEndedDelegate();
 
         selectableTiles = new List<Pos>();
 
         currentState = GameAgentState.Alive;
-		animating = false;
 
         source = GetComponent<AudioSource>();
 
@@ -105,59 +101,55 @@ public class Player : GameAgent {
 
 	public override IEnumerator animate_attack(GameAgent target)
 	{
-        animating = true;
-        attacking = true;
         if (true) {
-            HandleAction(0, target);
+            HandleAction(GameAgentAction.MeleeAttack, target);
             yield break;
         }
+
+        /// DO NOT USE
 		//Debug.Log("Starting attack");
-		animating = true;
-		attacking = true;
+		//attacking = true;
 		
-        switch (weapon)
-        {
-            case 1:
-                source.PlayOneShot(randomSFX(swordSwing));
-                break;
-            case 2:
-                source.PlayOneShot(randomSFX(bowShot));
-                break;
-            case 3:
-                source.PlayOneShot(randomSFX(fireSpell));
-                break;
-            default:
-				source.PlayOneShot(randomSFX(axeSwing));
-                break;
-        }
-        // get target position, and distance between us and the enemy
-        Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
-		Vector3 ownPos = map_manager.grid_to_world(grid_pos);
-		float distance = Vector3.Distance(ownPos, targetPos);
+  //      switch (weapon)
+  //      {
+  //          case 1:
+  //              source.PlayOneShot(randomSFX(swordSwing));
+  //              break;
+  //          case 2:
+  //              source.PlayOneShot(randomSFX(bowShot));
+  //              break;
+  //          case 3:
+  //              source.PlayOneShot(randomSFX(fireSpell));
+  //              break;
+  //          default:
+		//		source.PlayOneShot(randomSFX(axeSwing));
+  //              break;
+  //      }
+  //      // get target position, and distance between us and the enemy
+  //      Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
+		//Vector3 ownPos = map_manager.grid_to_world(grid_pos);
+		//float distance = Vector3.Distance(ownPos, targetPos);
 		
-		// look at enemy and start attack animation
-		transform.LookAt(targetPos);
-		StartCoroutine(animator.PlayAttackAnimation());
+		//// look at enemy and start attack animation
+		//transform.LookAt(targetPos);
+		//StartCoroutine(animator.PlayAttackAnimation());
 		
-		// wait for animation trigger
-		while (attacking) yield return null;
-		// wait a little longer based on projectile distance
-		yield return new WaitForSeconds(distance / 10f);
+		//// wait for animation trigger
+		//while (attacking) yield return null;
+		//// wait a little longer based on projectile distance
+		//yield return new WaitForSeconds(distance / 10f);
 		
-		target.take_damage(controller.DealDamage());
-		transform.position = ownPos; // reset position after animation, which sometimes offsets it
+		//target.take_damage(controller.DealDamage());
+		//transform.position = ownPos; // reset position after animation, which sometimes offsets it
 		
-		animating = false;
+		//animating = false;
 		//Debug.Log("Ended attack");
 	}
 
-    public void HandleAction(int action, GameAgent target) {
-        actionEnded += ActionEnded;
-        Debug.Log("First HandleAction");
-        animating = true;
+    public void HandleAction(GameAgentAction action, GameAgent target) {
         attacking = true;
 
-        controller.HandleAct(GameAgentAction.MeleeAttack, target, grid_pos, animator, source);
+        controller.HandleAction(action, target, grid_pos, animator, source);
     }
 	
 	public void Hit(){ attacking = false; }
@@ -234,8 +226,6 @@ public class Player : GameAgent {
 
     public override IEnumerator smooth_movement(List<Pos> path)
 	{
-		animating = true;
-
         StartCoroutine(animator.StartMovementAnimation());
         //source.PlayOneShot(footsteps);
 			Vector3 origin, target;
@@ -258,7 +248,6 @@ public class Player : GameAgent {
 			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
 
         StartCoroutine(animator.StopMovementAnimation());
-        animating = false;
 		grid_pos = path.Last();
 		
         playerMovedThisTurn = true;
@@ -286,7 +275,7 @@ public class Player : GameAgent {
 		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
     }
 	
-	public bool can_take_action() { return !animating && !turn_over(); }
+	public bool can_take_action() { return !animator.AnimatorIsPlaying() && !turn_over(); }
 	
 	public void SetCharacterClass(string classname) {
 		
@@ -329,14 +318,6 @@ public class Player : GameAgent {
 	{
 		return library[nextSFX++%library.Length];
 	}
-
-    // Event called by a child of the Action class
-    private void ActionEnded() {
-        actionEnded -= ActionEnded;
-        Debug.Log("GOT EM");
-        animating = false;
-        attacking = false;
-    }
 
     // VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
     // 			INTRUDERS WILL BE EXECUTED			  //

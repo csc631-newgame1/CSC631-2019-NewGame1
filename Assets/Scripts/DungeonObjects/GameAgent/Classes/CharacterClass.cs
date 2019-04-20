@@ -10,11 +10,8 @@ public abstract class CharacterClass
 
     public abstract void LevelUp();
 
-    public delegate void ActionEnded();
-    public ActionEnded actionEnded;
-
     public abstract GameAgentAction[] GetAvailableActs();
-    public abstract void HandleAct(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source);
+    public abstract void HandleAction(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source);
 
     public abstract int GetAttackStatIncreaseFromLevelUp(int level = -1);
     public abstract int GetHealthStatIncreaseFromLevelUp(int level = -1);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Constants;
 
 public class Utility {
 
@@ -39,6 +40,28 @@ public class Utility {
             random++;
         }
         return random;
+    }
+
+    // Get range of the Action given the GameAgentAction
+    public static int GetActionRange(GameAgentAction action) {
+        switch (action) {
+            case GameAgentAction.MeleeAttack:
+                return MeleeAttack.range;
+            case GameAgentAction.Taunt:
+                //return Taunt.range;
+            case GameAgentAction.RangedAttack:
+                //return RangedAttack.range;
+            case GameAgentAction.RangedAttackMultiShot:
+                //return RangedAttackMultiShot.range;
+            case GameAgentAction.MagicAttackSingleTarget:
+                //return MagicAttackSingleTarget.range;
+            case GameAgentAction.MagicAttackAOE:
+                //return MagicAttackAOE.range;
+            case GameAgentAction.Heal:
+                //return Heal.range;
+                break;
+        }
+        return 1;
     }
 
     // To use this static class, call it like this:
@@ -87,51 +110,51 @@ public class Utility {
         }
     }
 
-    // To use this static class, call it like this:
-    // StaticAnimationCoroutine.DoCoroutine(MyScript.MyStaticCoroutine());
-    public class StaticAnimationCoroutine : MonoBehaviour {
-        private static StaticAnimationCoroutine mInstance = null;
+    //// To use this static class, call it like this:
+    //// StaticAnimationCoroutine.DoCoroutine(MyScript.MyStaticCoroutine());
+    //public class StaticSingletonCoroutine : MonoBehaviour {
+    //    private static StaticSingletonCoroutine mInstance = null;
 
-        private static StaticAnimationCoroutine instance {
-            get {
-                if (mInstance == null) {
-                    mInstance = GameObject.FindObjectOfType(typeof(StaticAnimationCoroutine)) as StaticAnimationCoroutine;
+    //    private static StaticSingletonCoroutine instance {
+    //        get {
+    //            if (mInstance == null) {
+    //                mInstance = GameObject.FindObjectOfType(typeof(StaticSingletonCoroutine)) as StaticSingletonCoroutine;
 
-                    if (mInstance == null) {
-                        string gameObjectName = "StaticAnimationCoroutine: " + Time.time;
-                        mInstance = new GameObject(gameObjectName).AddComponent<StaticAnimationCoroutine>();
-                    }
-                }
-                return mInstance;
-            }
-        }
+    //                if (mInstance == null) {
+    //                    string gameObjectName = "StaticAnimationCoroutine: " + Time.time;
+    //                    mInstance = new GameObject(gameObjectName).AddComponent<StaticSingletonCoroutine>();
+    //                }
+    //            }
+    //            return mInstance;
+    //        }
+    //    }
 
-        void Awake() {
-            if (mInstance == null) {
-                mInstance = this as StaticAnimationCoroutine;
-            }
-        }
+    //    void Awake() {
+    //        if (mInstance == null) {
+    //            mInstance = this as StaticSingletonCoroutine;
+    //        }
+    //    }
 
-        IEnumerator Perform(IEnumerator coroutine) {
-            yield return StartCoroutine(coroutine);
-            Die();
-        }
+    //    IEnumerator Perform(IEnumerator coroutine) {
+    //        yield return StartCoroutine(coroutine);
+    //        Die();
+    //    }
 
-        /// <summary>
-        /// Place your lovely static IEnumerator in here and witness magic!
-        /// </summary>
-        /// <param name="coroutine">Static IEnumerator</param>
-        public static void DoCoroutine(IEnumerator coroutine) {
-            instance.StartCoroutine(instance.Perform(coroutine)); //this will launch the coroutine on our instance
-        }
+    //    /// <summary>
+    //    /// Place your lovely static IEnumerator in here and witness magic!
+    //    /// </summary>
+    //    /// <param name="coroutine">Static IEnumerator</param>
+    //    public static void DoCoroutine(IEnumerator coroutine) {
+    //        instance.StartCoroutine(instance.Perform(coroutine)); //this will launch the coroutine on our instance
+    //    }
 
-        void Die() {
-            mInstance = null;
-            Destroy(gameObject);
-        }
+    //    void Die() {
+    //        mInstance = null;
+    //        Destroy(gameObject);
+    //    }
 
-        void OnApplicationQuit() {
-            mInstance = null;
-        }
-    }
+    //    void OnApplicationQuit() {
+    //        mInstance = null;
+    //    }
+    //}
 }

@@ -115,13 +115,9 @@ public class GameAgentController
         CheckLevelProgression();
     }
 
-    public ActionEnded GetActionEndedDelegate() {
-        return playerCharacterClass.actionEnded;
-    }
-
-    public void HandleAct(GameAgentAction action, GameAgent target, Pos grid_pos, CharacterAnimator animator, AudioSource source) {
-        Debug.Log("Controller HandleAction");
-        playerCharacterClass.HandleAct(action, target, grid_pos, DealDamage(), animator, source);
+    // Directs Action to be handled by the character class
+    public void HandleAction(GameAgentAction action, GameAgent target, Pos grid_pos, CharacterAnimator animator, AudioSource source) {
+        playerCharacterClass.HandleAction(action, target, grid_pos, DealDamage(), animator, source);
     }
 
     public void TakeDamage(int damage) {
