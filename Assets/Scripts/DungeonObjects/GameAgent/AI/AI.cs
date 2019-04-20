@@ -75,7 +75,7 @@ public class AIComponent
 			break;
 		case STATE.ATTACK: 
 			// pathfind towards attacker, attack if possible
-			int result = pathTowards(attacking, (int)parent.stats.range, 1);
+			int result = pathTowards(attacking, (int)parent.controller.range, 1);
 			if (result == -1) {
 				state = STATE.IDLE;
 				attacking = null;

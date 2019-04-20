@@ -9,7 +9,7 @@ public abstract class GameAgent : DungeonObject
 {
     public float speed;
 	public string nickname;
-    public GameAgentController stats;
+    public GameAgentController controller;
     public GameAgentAction currentAction;
 	
     public GameAgentState currentState;
@@ -19,6 +19,7 @@ public abstract class GameAgent : DungeonObject
 
     public Inventory inventory = new Inventory();
 	public bool animating;
+    public bool attacking;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
@@ -27,7 +28,7 @@ public abstract class GameAgent : DungeonObject
     public abstract void GetHealed(int amount);
 	
 	public abstract void init_agent(Pos position, GameAgentController stats, string name = null);
-	
+
 	// for enemies, this will make them go through their AI motions
 	// for players, this will trigger the boolean value that allows them to take their turn
 	public abstract void take_turn();
@@ -45,5 +46,9 @@ public abstract class GameAgent : DungeonObject
         Item item = inventory.GetItemFromSlot(slot);
         InventoryManager.instance.UseItem(item, this);
         inventory.DecrementItemAtSlot(slot);
+    }
+
+    public bool IsAttacking() {
+        return attacking;
     }
 }

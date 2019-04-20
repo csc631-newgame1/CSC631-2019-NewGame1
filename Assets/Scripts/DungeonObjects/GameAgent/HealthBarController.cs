@@ -40,12 +40,12 @@ public class HealthBarController : MonoBehaviour
         bar.SetSliderValue(1);
 		
 		RectTransform barTransform = instance.transform.Find("HPBar").GetComponent<RectTransform>();
-		barTransform.sizeDelta = new Vector2(parent.stats.maxHealth, 20);
+		barTransform.sizeDelta = new Vector2(parent.controller.maxHealth, 20);
     }
 
     void LateUpdate()
     {
-        bar.SetSliderValue(parent.stats.currentHealth / parent.stats.maxHealth);
+        bar.SetSliderValue(parent.controller.currentHealth / parent.controller.maxHealth);
 		float camera_zoom_ratio = 10 / CameraControl.currentZoom;
         Vector3 offset = new Vector3(0, 50, 0) * camera_zoom_ratio;
         Vector3 wantedPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position) + offset;

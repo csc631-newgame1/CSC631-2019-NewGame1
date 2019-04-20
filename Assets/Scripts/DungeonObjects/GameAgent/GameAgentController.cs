@@ -1,6 +1,9 @@
 ﻿// Holds information regarding the GameAgents ingame stats
+using MapUtils;
 using System;
 using UnityEngine;
+using static Action;
+using static CharacterClass;
 using static Constants;
 
 public class GameAgentController
@@ -73,7 +76,6 @@ public class GameAgentController
 
     public GameAgentController(int characterRace, int characterClass, int desiredLevel, int characterWeapon = CharacterClassOptions.RandomClassWeapon) {
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
-
         this.characterRace = characterRace;
         characterClassOption = characterClass;
         SetGameAgentCharacterClass(characterWeapon);
@@ -115,6 +117,15 @@ public class GameAgentController
         CheckLevelProgression();
     }
 
+    public ActionEnded GetActionEndedDelegate() {
+        return playerCharacterClass.actionEnded;
+    }
+
+    public void HandleAct(GameAgentAction action, GameAgent target, Pos grid_pos, CharacterAnimator animator, AudioSource source) {
+        Debug.Log("Controller HandleAction");
+        playerCharacterClass.HandleAct(action, target, grid_pos, DealDamage(), animator, source);
+    }
+
     public void TakeDamage(int damage) {
         int damageDealt = damage - defense;
         if (damageDealt < 1) {
@@ -131,7 +142,7 @@ public class GameAgentController
     public void SetTauntingStatus(bool active) {
         if (active) {
             if (currentStatus != GameAgentStatusEffect.Taunting) {
-                defenseFromTaunting = Mathf.RoundToInt(attack * 0.33f);
+                //defenseFromTaunting = Mathf.RoundToInt(attack * 0.33f);
             }
         } else {
             // remove defenseFromTaunting

@@ -5,7 +5,6 @@ using UnityEngine;
 
 using static MapUtils.Dir;
 using static MapUtils.Type;
-using static Constants.GameAgentAction;
 using static Constants;
 
 namespace MapUtils 
@@ -79,34 +78,34 @@ namespace MapUtils
 		public static string GetString(this GameAgentAction action)
 		{
 			switch (action) {
-				case Move: return "MOVE";
-				case Wait: return "WAIT";
-				case Potion: return "POTION";
-				case MeleeAttack: return "ATTACK";
-				case Taunt: return "TAUNT";
-				case RangedAttack: return "SHOOT";
-				case RangedAttackMultiShot: return "MULTISHOT";
-				case MagicAttackSingleTarget: return "BOLT";
-				case MagicAttackAOE: return "STORM";
-				case Heal: return "HEAL";
-				case Neutral: return "NEUTRAL";
+				case GameAgentAction.Move: return "MOVE";
+				case GameAgentAction.Wait: return "WAIT";
+				case GameAgentAction.Potion: return "POTION";
+				case GameAgentAction.MeleeAttack: return "ATTACK";
+				case GameAgentAction.Taunt: return "TAUNT";
+				case GameAgentAction.RangedAttack: return "SHOOT";
+				case GameAgentAction.RangedAttackMultiShot: return "MULTISHOT";
+				case GameAgentAction.MagicAttackSingleTarget: return "BOLT";
+				case GameAgentAction.MagicAttackAOE: return "STORM";
+				case GameAgentAction.Heal: return "HEAL";
+				case GameAgentAction.Neutral: return "NEUTRAL";
 			}
 			return "NONE";
 		}
 		public static string GetMode(this GameAgentAction action)
 		{
 			switch (action) {
-				case Move: return "MOVE";
-				case Wait: return "NONE";
-				case Potion: return "NONE";
-				case MeleeAttack: return "ACT";
-				case Taunt: return "ACT";
-				case RangedAttack: return "ACT";
-				case RangedAttackMultiShot: return "ACT";
-				case MagicAttackSingleTarget: return "ACT";
-				case MagicAttackAOE: return "AOE";
-				case Heal: return "ACT";
-				case Neutral: return "NONE";
+				case GameAgentAction.Move: return "MOVE";
+				case GameAgentAction.Wait: return "NONE";
+				case GameAgentAction.Potion: return "NONE";
+				case GameAgentAction.MeleeAttack: return "ACT";
+				case GameAgentAction.Taunt: return "ACT";
+				case GameAgentAction.RangedAttack: return "ACT";
+				case GameAgentAction.RangedAttackMultiShot: return "ACT";
+				case GameAgentAction.MagicAttackSingleTarget: return "ACT";
+				case GameAgentAction.MagicAttackAOE: return "AOE";
+				case GameAgentAction.Heal: return "ACT";
+				case GameAgentAction.Neutral: return "NONE";
 			}
 			return "NONE";
 		}

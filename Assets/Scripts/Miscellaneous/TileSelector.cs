@@ -153,7 +153,7 @@ public class TileSelector : MonoBehaviour
     public void CreateListOfSelectableActTiles()//, GameAgentAction action) 
 	{
 		Pos position = player_main.grid_pos;
-		int range = (int) player_main.stats.range;
+		int range = (int) player_main.controller.range;
 		
         selectableActTiles = new List<Pos>();
         nonselectableActTiles = new List<Pos>();

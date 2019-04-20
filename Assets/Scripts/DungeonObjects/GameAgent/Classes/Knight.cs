@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using MapUtils;
+using UnityEngine;
 using static Constants;
 
 public class Knight : CharacterClass {
@@ -37,7 +38,20 @@ public class Knight : CharacterClass {
         return 0;
     }
 
-    public override void HandleAct(GameAgentAction action) {
+    public override void HandleAct(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
+        Debug.Log("Knight HandleAction");
+        switch (action) {
+            case GameAgentAction.MeleeAttack:
+                UseMeleeAttack(target, grid_pos, damage, animator, source);
+                break;
+            case GameAgentAction.Taunt:
+                break;
+        }
+    }
+
+    public void UseMeleeAttack(GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
+        Debug.Log("Knight UseMeleeAttack");
+        MeleeAttack.attack(target, grid_pos, damage, animator, source, actionEnded);
     }
 
     public override void LevelUp() {

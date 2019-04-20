@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using MapUtils;
+using UnityEngine;
 using static Constants;
 
 public class Mage : CharacterClass
@@ -40,7 +41,7 @@ public class Mage : CharacterClass
         return new GameAgentAction[] { GameAgentAction.MagicAttackSingleTarget, GameAgentAction.MagicAttackAOE };
     }
 
-    public override void HandleAct(GameAgentAction action) {
+    public override void HandleAct(GameAgentAction action, GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
     }
 
     public override void LevelUp() {

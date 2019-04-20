@@ -7,15 +7,15 @@ using UnityEngine;
 using MapUtils;
 using static MapUtils.EnumUtils;
 using static Constants;
+using static CharacterClass;
 
-public class Player : GameAgent
-{	
-	private MapManager map_manager; // reference to MapManager instance with map data
+public class Player : GameAgent {
+    private MapManager map_manager; // reference to MapManager instance with map data
     private MapConfiguration config;
-	private TileSelector tile_selector; // reference to map tile selector
+    private TileSelector tile_selector; // reference to map tile selector
     private List<Pos> selectableTiles;
-	
-	public bool godMode = false;
+
+    public bool godMode = false;
 
     // player turn options
     private bool playerMovedThisTurn = false;
@@ -36,11 +36,13 @@ public class Player : GameAgent
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
 
-	CharacterAnimator animator;
+    CharacterAnimator animator;
     CharacterClassDefiner classDefiner;
 
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
+
+    ActionEnded actionEnded;
 
     //sound effects
     private AudioSource source;
@@ -53,13 +55,14 @@ public class Player : GameAgent
 	public AudioClip[] hitNoise;
 	public AudioClip[] armorHitNoise;
 
+
     // Gets references to necessary game components
-    public override void init_agent(Pos position, GameAgentController stats, string name = null)
+    public override void init_agent(Pos position, GameAgentController controller, string name = null)
     {
 		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
         grid_pos = position;
 
-        this.stats = stats;
+        this.controller = controller;
         UpdateViewableEditorPlayerStats();
 		move_budget = 25;
 		speed = 10;
@@ -68,7 +71,8 @@ public class Player : GameAgent
         animator = GetComponent<CharacterAnimator>();
         classDefiner = GetComponent<CharacterClassDefiner>();
         animator.init();
-        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
+        classDefiner.init(controller.characterRace, controller.characterClassOption, controller.playerCharacterClass.weapon);
+        actionEnded = controller.GetActionEndedDelegate();
 
         selectableTiles = new List<Pos>();
 
@@ -98,11 +102,13 @@ public class Player : GameAgent
             case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;*/
         }
     }
-	
-	private bool attacking = false;
-	
+
 	public override IEnumerator animate_attack(GameAgent target)
 	{
+        if (true) {
+            HandleAction(0, target);
+            yield break;
+        }
 		//Debug.Log("Starting attack");
 		animating = true;
 		attacking = true;
@@ -136,22 +142,31 @@ public class Player : GameAgent
 		// wait a little longer based on projectile distance
 		yield return new WaitForSeconds(distance / 10f);
 		
-		target.take_damage(stats.DealDamage());
+		target.take_damage(controller.DealDamage());
 		transform.position = ownPos; // reset position after animation, which sometimes offsets it
 		
 		animating = false;
 		//Debug.Log("Ended attack");
 	}
+
+    public void HandleAction(int action, GameAgent target) {
+        actionEnded += ActionEnded;
+        Debug.Log("First HandleAction");
+        animating = true;
+        attacking = true;
+
+        controller.HandleAct(GameAgentAction.MeleeAttack, target, grid_pos, animator, source);
+    }
 	
 	public void Hit(){ attacking = false; }
 	public void Shoot(){ attacking = false; }
 	
 	public override void take_damage(int amount)
 	{
-        if (stats.currentState == GameAgentState.Alive) {
-            if (!godMode) stats.TakeDamage(amount);
+        if (controller.currentState == GameAgentState.Alive) {
+            if (!godMode) controller.TakeDamage(amount);
 
-            if (stats.currentState == GameAgentState.Unconscious) {
+            if (controller.currentState == GameAgentState.Unconscious) {
                 StartCoroutine(animator.PlayKilledAimation());
 				GameManager.kill(this);
             } else {
@@ -173,8 +188,8 @@ public class Player : GameAgent
 	}*/
 
     public override void GetHealed(int amount) {
-        if (stats.currentState == GameAgentState.Alive) {
-            if (!godMode) stats.GetHealed(amount);
+        if (controller.currentState == GameAgentState.Alive) {
+            if (!godMode) controller.GetHealed(amount);
 
             StartCoroutine(animator.PlayUseItemAnimation());
         }
@@ -184,7 +199,7 @@ public class Player : GameAgent
 
     public override void take_turn()
 	{
-        if (stats.currentState == GameAgentState.Alive) {
+        if (controller.currentState == GameAgentState.Alive) {
             playerMovedThisTurn = false;
             playerActedThisTurn = false;
             playerUsedPotionThisTurn = false;
@@ -195,14 +210,14 @@ public class Player : GameAgent
     }
 
     private void UpdateViewableEditorPlayerStats() {
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
-        currentHealth = stats.currentHealth;
-        range = stats.range;
-        _speed = stats.speed;
-        level = stats.level;
+        attack = controller.attack;
+        maxHealth = controller.maxHealth;
+        currentHealth = controller.currentHealth;
+        range = controller.range;
+        _speed = controller.speed;
+        level = controller.level;
 
-        switch (stats.currentState) {
+        switch (controller.currentState) {
             case GameAgentState.Alive:
                 viewableState = "Alive";
                 break;
@@ -256,7 +271,7 @@ public class Player : GameAgent
 	public string[] getActions()
 	{
 		List<string> actionNames = new List<string>();
-		foreach (GameAgentAction act in stats.playerCharacterClass.GetAvailableActs())
+		foreach (GameAgentAction act in controller.playerCharacterClass.GetAvailableActs())
 			actionNames.Add(act.GetString()); // GetString() defined in MapUtils.EnumUtils
 		return actionNames.ToArray();
 	}
@@ -297,14 +312,14 @@ public class Player : GameAgent
 				break;
 		}
 
-        stats = new GameAgentController(CharacterRaceOptions.Human, classID, 1, weapon);
-        attack = stats.attack;
-        maxHealth = stats.maxHealth;
+        controller = new GameAgentController(CharacterRaceOptions.Human, classID, 1, weapon);
+        attack = controller.attack;
+        maxHealth = controller.maxHealth;
         currentHealth = maxHealth;
-        range = stats.range;
-        _speed = stats.speed;
+        range = controller.range;
+        _speed = controller.speed;
 
-        classDefiner.init(stats.characterRace, stats.characterClassOption, stats.playerCharacterClass.weapon);
+        classDefiner.init(controller.characterRace, controller.characterClassOption, controller.playerCharacterClass.weapon);
     }
 	
 	private static int nextSFX = 0;
@@ -312,20 +327,27 @@ public class Player : GameAgent
 	{
 		return library[nextSFX++%library.Length];
 	}
-	
-	
-	// VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
-	// 			INTRUDERS WILL BE EXECUTED			  //
-	
-	// disabling this for now while I test changes
-	/*public string getActionMode(int action)
+
+    // Event called by a child of the Action class
+    private void ActionEnded() {
+        actionEnded -= ActionEnded;
+        Debug.Log("GOT EM");
+        animating = false;
+        attacking = false;
+    }
+
+    // VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
+    // 			INTRUDERS WILL BE EXECUTED			  //
+
+    // disabling this for now while I test changes
+    /*public string getActionMode(int action)
 	{
 		GameAgentAction[] actions = stats.playerCharacterClass.GetAvailableActs();
 		return actions[action].GetMode(); // mode can be ACT or AOE
 	}*/
-	
-	// a lot of the WaitForXXX functions seemed redundant... we can add this functionality back later if necessary
-	/*IEnumerator WaitForAttackEnd(Pos attackPos)
+
+    // a lot of the WaitForXXX functions seemed redundant... we can add this functionality back later if necessary
+    /*IEnumerator WaitForAttackEnd(Pos attackPos)
 	{
 		isAttacking = true;
         // Have player look at the target it's attacking
@@ -403,7 +425,7 @@ public class Player : GameAgent
         playerActedThisTurn = true;
     }*/
 
-	// if right mouse button is pressed, move player model to hover position
+    // if right mouse button is pressed, move player model to hover position
     /*public void RespondToMouseClick()
     {
 		if (!moving && !isAttacking && hoveringActionTileSelector) {
@@ -450,7 +472,7 @@ public class Player : GameAgent
             }
 		}
 	}*/
-	
+
     /*public override void move() {
 		if (playerMovedThisTurn || turn_over())
             return;
@@ -637,5 +659,5 @@ public class Player : GameAgent
         return sortedPlayersIndex;
     }*/
 
-   
+
 }

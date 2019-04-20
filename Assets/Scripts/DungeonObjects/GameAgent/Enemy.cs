@@ -54,7 +54,7 @@ public class Enemy : GameAgent
 
         animator = GetComponent<CharacterAnimator>();
 
-        this.stats = stats;
+        this.controller = stats;
         attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = maxHealth;
@@ -113,8 +113,6 @@ public class Enemy : GameAgent
 		//Debug.Log("ended...");
     }
 	
-	private bool attacking = false;
-	
 	public override IEnumerator animate_attack(GameAgent target)
 	{
 		//Debug.Log("started...");
@@ -151,7 +149,7 @@ public class Enemy : GameAgent
 		// wait a little longer based on projectile distance
 		yield return new WaitForSeconds(distance / 100f);
 		
-		target.take_damage(stats.DealDamage());
+		target.take_damage(controller.DealDamage());
 		transform.position = ownPos; // reset to previous position after animation
 		
 		//Debug.Log("ended...");
@@ -163,11 +161,11 @@ public class Enemy : GameAgent
 	
     public override void take_damage(int amount) 
 	{	
-        stats.TakeDamage(amount);
+        controller.TakeDamage(amount);
 
-        if (stats.currentState == GameAgentState.Unconscious) {
+        if (controller.currentState == GameAgentState.Unconscious) {
             StartCoroutine(animator.PlayKilledAimation());
-            stats.currentState = GameAgentState.Dead;
+            controller.currentState = GameAgentState.Dead;
 			source.PlayOneShot(randomSFX(deathRattle));
 			GameManager.kill(this);
         } else {
@@ -176,7 +174,7 @@ public class Enemy : GameAgent
         }
 		
 		//StartCoroutine(wait_to_reset_position());
-        currentHealth = stats.currentHealth;
+        currentHealth = controller.currentHealth;
     }
 	
 	/*private IEnumerator wait_to_reset_position()
@@ -188,12 +186,12 @@ public class Enemy : GameAgent
 
     public override void GetHealed(int amount) 
 	{
-        if (stats.currentState == GameAgentState.Alive) {
-            stats.GetHealed(amount);
+        if (controller.currentState == GameAgentState.Alive) {
+            controller.GetHealed(amount);
 
             StartCoroutine(animator.PlayUseItemAnimation());
         }
-        currentHealth = stats.currentHealth;
+        currentHealth = controller.currentHealth;
     }
 
     public override void take_turn() 

@@ -457,7 +457,7 @@ public class MapManager : MonoBehaviour
 		
 		GameAgent agent = obj as GameAgent;
 
-        return agent.stats.currentState;
+        return agent.controller.currentState;
     }
 
     public bool GetHealed(Pos dest, int healAmount) {
@@ -476,6 +476,15 @@ public class MapManager : MonoBehaviour
         if (!map[pos.x, pos.y].occupied)
             return null;
         return map[pos.x, pos.y].resident.transform;
+    }
+
+    public bool GetGameAgentAttackState(Pos pos) {
+        DungeonObject obj = map[pos.x, pos.y].resident;
+        if (obj == null || !(obj is GameAgent))
+            return false;
+
+        GameAgent agent = obj as GameAgent;
+        return agent.IsAttacking();
     }
 
     public Transform GetNearestUnitTransform(Pos pos, List<Pos> agents) {
