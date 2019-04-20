@@ -1,6 +1,7 @@
 ﻿using MapUtils;
 using UnityEngine;
 using static Constants;
+using static Utility;
 
 public class Knight : CharacterClass {
 
@@ -52,6 +53,8 @@ public class Knight : CharacterClass {
     public void UseMeleeAttack(GameAgent target, Pos grid_pos, int damage, CharacterAnimator animator, AudioSource source) {
         Debug.Log("Knight UseMeleeAttack");
         MeleeAttack.attack(target, grid_pos, damage, animator, source, actionEnded);
+        //MeleeAttack.attack(target, grid_pos, damage, animator, source, actionEnded);
+        //MeleeAttack.Sup();
     }
 
     public override void LevelUp() {
