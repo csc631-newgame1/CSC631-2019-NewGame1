@@ -1,8 +1,6 @@
 ﻿// Holds information regarding the GameAgents ingame stats
 using MapUtils;
-using System;
 using UnityEngine;
-using static Action;
 using static CharacterClass;
 using static Constants;
 

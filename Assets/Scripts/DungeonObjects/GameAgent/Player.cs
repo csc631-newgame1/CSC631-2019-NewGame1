@@ -105,6 +105,8 @@ public class Player : GameAgent {
 
 	public override IEnumerator animate_attack(GameAgent target)
 	{
+        animating = true;
+        attacking = true;
         if (true) {
             HandleAction(0, target);
             yield break;
