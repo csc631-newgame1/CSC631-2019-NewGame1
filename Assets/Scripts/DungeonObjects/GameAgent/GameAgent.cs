@@ -11,7 +11,7 @@ public abstract class GameAgent : DungeonObject
     public float speed;
 	public string nickname;
     public GameAgentStats stats;
-    public GameAgentAction currentAction;
+    //public GameAgentAction currentAction;
 	
     public GameAgentState currentState;
 	public AIComponent AI;
