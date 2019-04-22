@@ -35,8 +35,8 @@ public class Mage : CharacterClass
         return 0;
     }
 
-    public override GameAgentAction[] GetAvailableActs() {
-        return new GameAgentAction[] { GameAgentAction.MagicAttackSingleTarget, GameAgentAction.MagicAttackAOE };
+    public override Attack[] GetAvailableActs() {
+        return new Attack[] { Attack.Get["Fire"] };
     }
 
     public override void HandleAct(GameAgentAction action) {

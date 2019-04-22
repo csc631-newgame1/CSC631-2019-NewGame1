@@ -14,8 +14,8 @@ public class Knight : CharacterClass {
         return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
-    public override GameAgentAction[] GetAvailableActs() {
-        return new GameAgentAction[] {GameAgentAction.MeleeAttack, GameAgentAction.Taunt};
+    public override Attack[] GetAvailableActs() {
+        return new Attack[] { Attack.Get["Melee"] };
     }
 
     public override int GetHealthStatIncreaseFromLevelUp(int level = -1) {
