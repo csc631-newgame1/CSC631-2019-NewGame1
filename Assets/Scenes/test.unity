@@ -2896,6 +2896,8 @@ GameObject:
   - component: {fileID: 530004656}
   - component: {fileID: 530004654}
   - component: {fileID: 530004652}
+  - component: {fileID: 530004660}
+  - component: {fileID: 530004658}
   m_Layer: 0
   m_Name: dragon
   m_TagString: Untagged
@@ -3105,6 +3107,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &530004658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530004651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e206dd06ce44480c8fc65e52a333271, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthbar: {fileID: 5278810090580189768, guid: 09c1ecfec1f594509bbf269330362b01,
+    type: 3}
 --- !u!1 &530004659
 GameObject:
   m_ObjectHideFlags: 0
@@ -3121,6 +3137,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &530004660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530004651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10533dce209499149bb2504cdf87fd67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeWeapon: {fileID: 0}
+  weaponNum: 0
+  sword: {fileID: 0}
+  bow: {fileID: 0}
+  staff: {fileID: 0}
+  axe: {fileID: 0}
+  club: {fileID: 0}
 --- !u!1 &530004661
 GameObject:
   m_ObjectHideFlags: 0
