@@ -86,12 +86,12 @@ public class AIComponent
 				}
 			}
 			else if (result == 1) {
-				while (parent.animating) yield return null; // waits for move animation to finish before moving on
+				while (!parent.animationFinished()) yield return null; // waits for move animation to finish before moving on
 				mapManager.attack(parent.grid_pos, attacking.grid_pos); // attack enemy
-				while (parent.animating) yield return null; // waits for attack animation to finish
+				while (!parent.animationFinished()) yield return null; // waits for attack animation to finish
 			}
 			else if (result == 2) {
-				while (parent.animating) yield return null; // waits for move animation to finish
+				while (!parent.animationFinished()) yield return null; // waits for move animation to finish
 			}
 			break;
 		case STATE.REINFORCE: 
@@ -101,7 +101,7 @@ public class AIComponent
 				state = STATE.IDLE;
 			}
 			else {
-				while (parent.animating) yield return null; // waits for move animation to finish before moving on
+				while (!parent.animationFinished()) yield return null; // waits for move animation to finish before moving on
 			}
 			break;
 		case STATE.FLEE: 

@@ -21,7 +21,7 @@ public class MapManager : MonoBehaviour
         }
     }
 
-	public GameObject mapPrefab;
+	public GameObject mapPrefab, fireProjectile, arrowProjectile;
 	//public MapManager instance;
 
 	// config variables
@@ -40,7 +40,7 @@ public class MapManager : MonoBehaviour
 	private TileSelector tileSelector = null;
 	private System.Random rng;
 	private List<GameObject> environmentObjects;
-	private MapManager instance;
+	private static MapManager instance;
 
     // called by gamemanager, initializes map components
     public void Init(GameManager parent)
@@ -198,7 +198,25 @@ public class MapManager : MonoBehaviour
 		GameAgent attacker = obj_attacker as GameAgent;
 		GameAgent target = obj_target as GameAgent;
 		
-		StartCoroutine(attacker.animate_attack(target));
+		attacker.attack(target);
+	}
+	
+	public static Projectile AnimateProjectile(Pos start, Pos end, string type = "fire")
+	{
+		Vector3 startPos = instance.grid_to_world(start);
+		Vector3 endPos = instance.grid_to_world(end);
+		GameObject projectilePrefab;
+		
+		switch (type) {
+			case "fire": projectilePrefab = instance.fireProjectile; break;
+			case "arrow": projectilePrefab = instance.arrowProjectile; break;
+			default: projectilePrefab = instance.fireProjectile; break;
+		}	
+		
+		var clone = Instantiate(projectilePrefab, startPos, Quaternion.identity);
+		var projectile = clone.GetComponent<Projectile>();
+		projectile	.Init(startPos, endPos);
+		return projectile;
 	}
 	
 	/*************************/

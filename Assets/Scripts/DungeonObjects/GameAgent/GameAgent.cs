@@ -11,7 +11,7 @@ public abstract class GameAgent : DungeonObject
     public float speed;
 	public string nickname;
     public GameAgentStats stats;
-    public GameAgentAction currentAction;
+    //public GameAgentAction currentAction;
 	
     public GameAgentState currentState;
 	public AIComponent AI;
@@ -23,7 +23,12 @@ public abstract class GameAgent : DungeonObject
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
-	public abstract IEnumerator animate_attack(GameAgent target);
+	public abstract void attack(GameAgent target);
+	public abstract void playAttackAnimation();
+	public abstract void playHitAnimation();
+	public abstract void playAttackNoise(string type);
+	public abstract void playHitNoise(string type);
+	public abstract bool animationFinished();
 
     public abstract void GetHealed(int amount);
 	

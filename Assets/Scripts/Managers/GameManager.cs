@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour
 
 		tileSelector.setPlayer(localPlayer);
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
-		UI_BattleMenu.SetActButtons(localPlayer.getActions());
+		UI_BattleMenu.SetActButtons(localPlayer.getActionNames());
 
 		turn_manager = GetComponent<TurnManager>();
 		turn_manager.Init(this);
@@ -89,9 +89,7 @@ public class GameManager : MonoBehaviour
 		}
 		
 		foreach (char key in Input.inputString) {
-
-			localPlayer.RespondToKeyboardInput(key);
-
+			
 			switch (key) {
 			case 'r':
 				NextLevel();
@@ -133,6 +131,7 @@ public class GameManager : MonoBehaviour
 	public static void ActionPlayer(int action) {
 		if (!instance.localPlayer.can_take_action()) return;
 		
+		instance.localPlayer.SetCurrentAction(action);
         //instance.tileSelector.setMode(instance.localPlayer.getActionMode(action));
 		if (instance.tileSelector.mode == "ACT" && action == last_action)
 			instance.tileSelector.mode = "NONE";

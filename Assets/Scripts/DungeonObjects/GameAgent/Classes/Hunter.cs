@@ -35,8 +35,8 @@ public class Hunter : CharacterClass
         return 0;
     }
 
-    public override GameAgentAction[] GetAvailableActs() {
-        return new GameAgentAction[] { GameAgentAction.RangedAttack, GameAgentAction.RangedAttackMultiShot };
+    public override Attack[] GetAvailableActs() {
+        return new Attack[] { Attack.Get["Shortbow"], Attack.Get["Longbow"] };
     }
 
     public override void HandleAct(GameAgentAction action) {
