@@ -216,6 +216,26 @@ public class WaitCommand : NetworkCommand
 	}
 }
 
+public class InteractCommand : NetworkCommand
+{
+	public const int ID = 10;
+	
+	public Pos a, b;
+	public InteractCommand(Pos a, Pos b)
+	{
+		this.directive = Directive.ECHO;
+		this.a = a;
+		this.b = b;
+	}
+	public override string getString() { return ID + "$" + a.x + "," + a.y + "," + b.x + "," + b.y; }
+	// parse everything to the right of the '$' in the string returned by getString() for this object
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		int[] pts = Array.ConvertAll(cmdString.Split(','), int.Parse);
+		return new InteractCommand(new Pos(pts[0], pts[1]), new Pos(pts[2], pts[3]));
+	}
+}
+
 /* #######################
  * ## NON-ECHO Commands ##
  * #######################

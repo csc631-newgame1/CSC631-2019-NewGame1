@@ -12,7 +12,7 @@ public class Enemy : GameAgent
 	private bool enemy_turn = false;
 
     private CharacterAnimator animator;
-    private CharacterClassDefiner classDefiner;
+    //private CharacterClassDefiner classDefiner; // moved to GameAgent
 
     [Header("Enemy Stats")]
     public float _attack;
@@ -123,7 +123,8 @@ public class Enemy : GameAgent
 	{
 		animating = true;
 		currentAttack = stats.playerCharacterClass.GetAvailableActs()[0];
-		currentAttack.Execute(this, target);
+		Debug.Log(currentAttack);
+		StartCoroutine(currentAttack.Execute(this, target));
 	}
 	
     public void Hit() { animating = false; }
@@ -235,17 +236,5 @@ public class Enemy : GameAgent
 	private AudioClip randomSFX(AudioClip[] library)
 	{
 		return library[nextSFX++%library.Length];
-	}
-	
-	public void DisableRendering()
-	{
-		GetComponent<HealthBarController>().Disable();
-		classDefiner.DisableRendering();
-	}
-	
-	public void EnableRendering()
-	{
-		GetComponent<HealthBarController>().Enable();
-		classDefiner.EnableRendering();
 	}
 }

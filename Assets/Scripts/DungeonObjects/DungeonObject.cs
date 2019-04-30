@@ -8,5 +8,4 @@ using MapUtils;
 public abstract class DungeonObject : MonoBehaviour
 {
     public Pos grid_pos;
-	public abstract void take_damage(int amount);
 }

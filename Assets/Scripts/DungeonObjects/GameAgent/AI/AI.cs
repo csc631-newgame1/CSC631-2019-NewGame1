@@ -89,9 +89,11 @@ public class AIComponent
 				while (!parent.animationFinished()) yield return null; // waits for move animation to finish before moving on
 				mapManager.attack(parent.grid_pos, attacking.grid_pos); // attack enemy
 				while (!parent.animationFinished()) yield return null; // waits for attack animation to finish
+				Debug.Log("attacked!");
 			}
 			else if (result == 2) {
 				while (!parent.animationFinished()) yield return null; // waits for move animation to finish
+				Debug.Log("only move...");
 			}
 			break;
 		case STATE.REINFORCE: 

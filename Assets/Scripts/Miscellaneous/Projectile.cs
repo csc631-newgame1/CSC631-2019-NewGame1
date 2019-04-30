@@ -5,6 +5,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
 	private Vector3 start, end;
+	private float distance;
 	private bool initialized = false;
 	private MeshRenderer projectileRender;
 	
@@ -13,6 +14,7 @@ public class Projectile : MonoBehaviour
     public void Init(Vector3 start, Vector3 end) { 
 		this.start = start;
 		this.end = end;
+		this.distance = Vector3.Distance(start, end);
 		initialized = true;
 		transform.LookAt(end);
 		projectileRender = GetComponent<MeshRenderer>();
@@ -28,10 +30,10 @@ public class Projectile : MonoBehaviour
 			reachedDestination = true;
 			initialized = false;
 			projectileRender.enabled = false;
-			Destroy(this.gameObject, 3.0f); // applies slight delay to destruction so that reachedDestination variable can be read
+			Destroy(this.gameObject, 3.0f); // applies slight delay to destruction so that reachedDestination variable can be read in time
 		}
 		
 		transform.position = Vector3.Lerp(start, end, progress) + Vector3.up;
-		progress += 0.05f;
+		progress += 1f / (distance * 5f);
     }
 }

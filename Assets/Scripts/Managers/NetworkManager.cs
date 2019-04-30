@@ -44,6 +44,12 @@ public class NetworkManager : MonoBehaviour
 					Client waitingClient = Network.getPeer(wait.clientID);
 					waitingClient.playerObject.wait();
 				}
+				if (cmd is InteractCommand) {
+					InteractCommand interact = (InteractCommand) cmd;
+					Debug.Log("Interact received! From " + interact.a + " to " + interact.b);
+					
+					mapManager.interact(interact.a, interact.b);
+				}
 				/*** LOBBY ACTIONS ***/
 				if (cmd is ReadyCommand) {
 					ReadyCommand ready = (ReadyCommand) cmd;

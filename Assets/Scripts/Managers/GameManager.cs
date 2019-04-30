@@ -46,16 +46,20 @@ public class GameManager : MonoBehaviour
 		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
 		
 		Pos level_end = spawn_locations[0];
-		MapManager.setEndPos(level_end);
 		map_manager.instantiate_environment(endportal, level_end);
 		
 		Debug.Log("Spawned " + players.Count + " players");
 		// spawn players
 		for (int i = 0; i < players.Count; i++) {
-			Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
-			instance.SetCharacterClass(players[i].classname);
-			players[i].playerObject = instance;
-			if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
+			if (players[i].playerObject == null) {
+				Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
+				instance.SetCharacterClass(players[i].classname);
+				players[i].playerObject = instance;
+				if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
+			}
+			else {
+				map_manager.re_instantiate(players[i].playerObject.gameObject, spawn_locations[i+1]);
+			}
 		}
 		// spawn enemies
 		enemySpawner.Init(map_manager);
@@ -112,6 +116,12 @@ public class GameManager : MonoBehaviour
 						tileSelector.mode = "NONE";
 					}
 					break;
+				case "INTERACT":
+					if (tileSelector.hoveringValidActTile()) {
+						Network.submitCommand(new InteractCommand(localPlayer.grid_pos, tileSelector.grid_position));
+						tileSelector.mode = "NONE";
+					}
+					break;
 				case "NONE": 
 					break;
 			}
@@ -143,6 +153,15 @@ public class GameManager : MonoBehaviour
 	
 	public static void ClearPlayerAction() {
 		instance.tileSelector.mode = "NONE";
+	}
+	
+	public static void InteractPlayer() {
+		if (!instance.localPlayer.can_take_action()) return;
+		
+		if (instance.tileSelector.mode == "INTERACT")
+			instance.tileSelector.mode = "NONE";
+		else
+			instance.tileSelector.mode = "INTERACT";
 	}
 	
 	public static void WaitPlayer() {

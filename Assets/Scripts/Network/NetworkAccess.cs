@@ -35,7 +35,8 @@ public class Network : NetworkBase
 		[UpdateClientInfoCommand.ID] = UpdateClientInfoCommand.ConvertFromString,
 		[AttackCommand.ID]		= AttackCommand		.ConvertFromString,
 		[SetSeedCommand.ID]		= SetSeedCommand	.ConvertFromString,
-		[WaitCommand.ID]		= WaitCommand		.ConvertFromString
+		[WaitCommand.ID]		= WaitCommand		.ConvertFromString,
+		[InteractCommand.ID]	= InteractCommand	.ConvertFromString
 	};
 	
 	private static List<Client> peers = new List<Client>();

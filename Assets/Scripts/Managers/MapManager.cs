@@ -34,7 +34,6 @@ public class MapManager : MonoBehaviour
 	private Region region_tree_root; // the root node of the region tree for the map
     private MapCell[,] map;
 	private NavigationHandler nav_map;
-	public static Pos endPos;
 
 	private GameManager parentManager = null;
 	private TileSelector tileSelector = null;
@@ -130,13 +129,27 @@ public class MapManager : MonoBehaviour
 			map[pos.x, pos.y].traversable = false;
 		}
 		
-		EnvironmentObject env = clone.GetComponent<EnvironmentObject>();
-		env.init_environment(pos);
+		DungeonObject env = clone.GetComponent<DungeonObject>();
+		(env as Environment).init_environment(pos);
 		
 		map[pos.x, pos.y].occupied = true;
 		map[pos.x, pos.y].resident = env;
 		
 		return clone;
+	}
+	
+	// place a player's object back onto the map
+	public void re_instantiate(GameObject agentObject, Pos pos)
+	{
+		agentObject.transform.position = grid_to_world(pos);
+		agentObject.transform.rotation = Quaternion.identity;
+		
+		Player player = agentObject.GetComponent<Player>();
+		player.re_init(pos);
+		
+		nav_map.removeTraversableTile(pos);
+		map[pos.x, pos.y].resident = player;
+		map[pos.x, pos.y].occupied = true;
 	}
 
 	// removes an object from the map, destroying its game object
@@ -201,6 +214,21 @@ public class MapManager : MonoBehaviour
 		attacker.attack(target);
 	}
 	
+	public void interact(Pos source, Pos dest)
+	{
+		DungeonObject obj_interactor = map[source.x, source.y].resident;
+		DungeonObject obj_interactee = map[dest.x, dest.y].resident;
+		if (obj_interactor == null || obj_interactee == null || !(obj_interactor is GameAgent) || !(obj_interactee is Interactable)) {
+			Debug.Log("Interact command was invalid!");
+			return;
+		}
+		
+		GameAgent interactor = obj_interactor as GameAgent;
+		Interactable interactee = obj_interactee as Interactable;
+		
+		interactee.interact(interactor);
+	}
+	
 	public static Projectile AnimateProjectile(Pos start, Pos end, string type = "fire")
 	{
 		Vector3 startPos = instance.grid_to_world(start);
@@ -217,6 +245,14 @@ public class MapManager : MonoBehaviour
 		var projectile = clone.GetComponent<Projectile>();
 		projectile	.Init(startPos, endPos);
 		return projectile;
+	}
+	
+	public static void ExtractAgent(Player agent)
+	{
+		Pos agentPos = agent.grid_pos;
+		instance.map[agentPos.x, agentPos.y].resident = null;
+		instance.map[agentPos.x, agentPos.y].occupied = false;
+		agent.extract();
 	}
 	
 	/*************************/
@@ -428,11 +464,6 @@ public class MapManager : MonoBehaviour
 		
 		return spawnPositions;
 	}
-	
-	public static void setEndPos(Pos endpos)
-	{
-		MapManager.endPos = endpos;
-	}
 
 	// returns true if tile terrain at position is traversable
     public bool IsTraversable(Pos pos)
@@ -441,6 +472,13 @@ public class MapManager : MonoBehaviour
 			return false;
 		return map[pos.x, pos.y].traversable;
     }
+	
+	public bool IsInteractable(Pos pos)
+	{
+		if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+			return false;
+		return map[pos.x, pos.y].resident is Interactable;
+	}
 
     public bool IsTileInRegion(Pos tile, int ID) {
         return (map_raw[tile.x, tile.y] == ID);

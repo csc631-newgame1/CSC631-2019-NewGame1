@@ -36,11 +36,15 @@ public class TurnManager : MonoBehaviour
 			
 			yield return null;
 			for (int team = 0; team < 16; team++) {
+				if (teamRoster[team].Count == 0) {
+					continue;
+				}
 				
 				StartCoroutine(AIManager.update(team));
 				while (!AIManager.turnOver(team)) {
 					yield return null;
 				}
+				Debug.Log("Next turn!");
 			}
 		}
     }

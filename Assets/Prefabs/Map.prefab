@@ -182,11 +182,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e200e9a9eb6534f918eb71dcac6113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _width: 60
-  _height: 60
+  _width: 50
+  _height: 50
   _padding: 15
   fill_percent: 51
-  smoothness: 8
+  smoothness: 7
   region_cull_threshold: 16
   cell_size: 1
   wall_height: 4

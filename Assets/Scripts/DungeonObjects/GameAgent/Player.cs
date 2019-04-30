@@ -21,6 +21,7 @@ public class Player : GameAgent
     private bool playerActedThisTurn = false;
     private bool playerUsedPotionThisTurn = false;
     private bool playerWaitingThisTurn = false;
+	private bool playerExtracted = false;
 
     [Header("Player Stats")]
     public string name;
@@ -36,7 +37,7 @@ public class Player : GameAgent
     public int weapon = 1;
 
 	CharacterAnimator animator;
-    CharacterClassDefiner classDefiner;
+    //CharacterClassDefiner classDefiner; // moved to GameAgent
 
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
@@ -83,6 +84,14 @@ public class Player : GameAgent
 		AI = null; // players don't have AI
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
+	
+	public void re_init(Pos position)
+	{
+		grid_pos = position;
+		playerExtracted = false;
+		TurnManager.instance.addToRoster(this); //add player to player list
+		EnableRendering();
+	}
 	
 	private bool moving = false;
     public override IEnumerator smooth_movement(List<Pos> path)
@@ -258,8 +267,12 @@ public class Player : GameAgent
 	public override bool turn_over() {
 		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
     }
+	public void extract() {
+		playerExtracted = true;
+		DisableRendering();
+	}
 	
-	public bool can_take_action() { return (currentAttack == null || !currentAttack.attacking) && !animating && !turn_over(); }
+	public bool can_take_action() { return !playerExtracted && animationFinished() && !turn_over(); }
 	
 	public void SetCurrentAction(int action)
 	{
