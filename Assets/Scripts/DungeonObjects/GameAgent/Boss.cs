@@ -21,7 +21,7 @@ public class Boss : GameAgent
     private CharacterClassDefiner classDefiner;
 
     [Header("Enemy Stats")]
-    public float attack;
+    public float _attack;
     public float maxHealth;
     public float currentHealth;
     public float range;
@@ -38,6 +38,8 @@ public class Boss : GameAgent
     public AudioClip[] footsteps;
     public AudioClip[] deathRattle;
     public AudioClip[] hitNoise;
+
+    private Attack currentAttack;
 
     void Update()
     {
@@ -65,7 +67,7 @@ public class Boss : GameAgent
         animator = GetComponent<BossAnimator>();
 
         this.stats = stats;
-        attack = stats.attack;
+        _attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = maxHealth;
         range = stats.range;
@@ -91,11 +93,12 @@ public class Boss : GameAgent
         TurnManager.instance.addToRoster(this);
     }
 
+    private bool moving = false;
     public override IEnumerator smooth_movement(List<Pos> path)
     {
         //Debug.Log("started...");
         grid_pos = path.Last();
-        animating = true;
+        moving = true;
         StartCoroutine(animator.StartMovementAnimation());
 
         //source.PlayOneShot(footsteps);
@@ -121,13 +124,13 @@ public class Boss : GameAgent
         transform.position = map_manager.grid_to_world(path[path.Count - 1]);
 
         StartCoroutine(animator.StopMovementAnimation());
-        animating = false;
+        moving = false;
         //Debug.Log("ended...");
     }
 
     private bool attacking = false;
 
-    public override IEnumerator animate_attack(GameAgent target)
+    public IEnumerator animate_attack(GameAgent target)
     {
         //Debug.Log("started...");
         animating = true;
@@ -154,6 +157,43 @@ public class Boss : GameAgent
 
         //Debug.Log("ended...");
         animating = false;
+    }
+
+    public override void attack(GameAgent target)
+    {
+        animating = true;
+        currentAttack = stats.playerCharacterClass.GetAvailableActs()[0];
+        currentAttack.Execute(this, target);
+    }
+
+    public override void playAttackAnimation()
+    {
+        StartCoroutine(animator.PlayAttackAnimation());
+    }
+
+    public override void playHitAnimation()
+    {
+        StartCoroutine(animator.PlayHitAnimation());
+    }
+
+    public override void playAttackNoise(string type)
+    {
+        source.PlayOneShot(randomSFX(axeSwing));
+    }
+
+    public override void playHitNoise(string type)
+    {
+        switch (type)
+        {
+            default:
+                source.PlayOneShot(randomSFX(hitNoise));
+                break;
+        }
+    }
+
+    public override bool animationFinished()
+    {
+        return (currentAttack == null || !currentAttack.attacking) && !moving;
     }
 
     public void Hit() { attacking = false; }
