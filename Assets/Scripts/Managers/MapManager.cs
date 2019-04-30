@@ -102,6 +102,7 @@ public class MapManager : MonoBehaviour
 
     public void setTileSpawn(Pos position)
     {
+        map[position.x, position.y].reserved = true;
         map[position.x, position.y].spawn = true;
     }
 
@@ -112,13 +113,11 @@ public class MapManager : MonoBehaviour
 
         int x = rng.Next(0, width - 1);
         int y = rng.Next(0, height - 1);
-        Pos position = new Pos(x, y);
 
-        while (!IsSpawnPoint(position) || IsOccupied(position))
+        while (!IsSpawnPoint(new Pos(x, y)))
         {
             x = rng.Next(0, width - 1);
             y = rng.Next(0, height - 1);
-            position = new Pos(x, y);
         }
 
         return instantiate(type, new Pos(x, y));
@@ -177,7 +176,7 @@ public class MapManager : MonoBehaviour
 	{
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)
-				if (map[x, y].resident != null)
+				if (map[x, y].resident != null && map[x, y].resident.tag != "Player")
 					Destroy(map[x, y].resident.gameObject);
 	}
 	
