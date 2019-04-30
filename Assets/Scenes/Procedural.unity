@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -363,20 +363,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   environmentDensity: 50
-  traversableEnvironmentDensity: 0.1
-  nonTraversableEnvironmentDensity: 0
-  particleEnvironmentDensity: 0
-  traversableEnvironmentObject:
-  - {fileID: 190188, guid: 87874848711c372419e6cf6ca05d9ea1, type: 3}
-  - {fileID: 122248, guid: c55ee685bfc996649b14f14e08783def, type: 3}
-  - {fileID: 157244, guid: 7271a03a849e78a419f3c572eaea346d, type: 3}
-  - {fileID: 124028, guid: 30d00bb7fb067de4c99cc3b87f401945, type: 3}
-  - {fileID: 151472, guid: fd119028d2a0bc64c860463357262b1c, type: 3}
-  nonTraversableEnvironmentObject:
-  - {fileID: 173134, guid: 0a40fb4ee1314fc4892f4cb8b77576d4, type: 3}
-  - {fileID: 172248, guid: 741f1739761e2d64f8da104d700a2180, type: 3}
-  particleEnvironmentObject:
-  - {fileID: 127426, guid: ea41b4418e01f504d8548256ce387570, type: 3}
+  traversableFolliagDensity: 0.1
+  nonTraversableFolliageDensity: 0.1
+  traversableObjectDensity: 0.1
+  nonTraversableObjectDensity: 0
+  traversableStructureDensity: 0
+  nonTraversableStructureDensity: 0
+  particleDensity: 0
+  startPortal: {fileID: 7417347344031258363, guid: 7efc91f809ea7554b8996da0297fe626,
+    type: 3}
+  exitPortal: {fileID: 8111570494698579907, guid: 646ecf90590c8c146acf3e9a014c1feb,
+    type: 3}
+  portalMargin: 0.5
+  spawnAreaRadius: 3
+  reserveAreaRadius: 3
+  traversableFolliageObject:
+  - {fileID: 178538, guid: d6267d2e6296e7946afb915ef648ed67, type: 3}
+  - {fileID: 198516, guid: a03e2dd3dba33b9418311d00a91cf378, type: 3}
+  nonTraversableFolliageObject:
+  - {fileID: 164760, guid: 8ed44b12ca34ce34e9754ece5b325562, type: 3}
+  - {fileID: 122796, guid: 146879b9a407b4947a38bacaa6fc4dd8, type: 3}
+  traversableObjectObject:
+  - {fileID: 168602, guid: 3e0f6b0ee51e6eb42a731a26210989b9, type: 3}
+  - {fileID: 113888, guid: 6b8ef567fab8aae4fb47c66e41111903, type: 3}
+  nonTraversableObjectObject: []
+  traversableStructureObject: []
+  nonTraversableStructureObject: []
+  particleObject: []
 --- !u!4 &1591538337
 Transform:
   m_ObjectHideFlags: 0

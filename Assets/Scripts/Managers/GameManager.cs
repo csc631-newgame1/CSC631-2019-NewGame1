@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
 
 		map_manager.Init(this);
 		tileSelector.Init(map_manager);
-        //environmentSpawner.Init(map_manager);
+        environmentSpawner.Init(map_manager);
 		
 		List<Client> players = Network.getPeers();
 		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
