@@ -377,6 +377,19 @@ MonoBehaviour:
   portalMargin: 0.5
   spawnAreaRadius: 3
   reserveAreaRadius: 3
+  maxRadius: 5
+  minRadius: 1
+  minArea: 10
+  portraitMargin: 10
+  structureDensity: 0.1
+  objectDensity: 0.4
+  foliageDensity: 0
+  structures:
+  - {fileID: 2323257002581249288, guid: f7acbad6c88c6b24c913cd2cd153c97d, type: 3}
+  - {fileID: 1636403203436941618, guid: 1d7164ad4afddf64cba83c8bf829eec4, type: 3}
+  objects:
+  - {fileID: 2792807113820430882, guid: cd36dba5b408ca9439b9ffaef38fb77d, type: 3}
+  - {fileID: 2947852130367026337, guid: 3e57725251ffc164186a512479ae8a43, type: 3}
   traversableFolliageObject:
   - {fileID: 178538, guid: d6267d2e6296e7946afb915ef648ed67, type: 3}
   - {fileID: 198516, guid: a03e2dd3dba33b9418311d00a91cf378, type: 3}

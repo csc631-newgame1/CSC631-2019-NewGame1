@@ -35,6 +35,27 @@ public class EnvironmentSpawner : MonoBehaviour
     public int spawnAreaRadius = 3;
     public int reserveAreaRadius = 3;
 
+    [Header("Portrait Settings")]
+    List<Pos> paintedList = new List<Pos>();
+    public int maxRadius = 5;
+    public int minRadius = 1;
+    public int minArea = 10;
+    public int portraitMargin = 5;
+    public float structureDensity;
+    public float objectDensity;
+    public float foliageDensity;
+
+    [Header("Portrait Prefabs")]
+    public GameObject[] folliageStructure;
+    public GameObject[] folliageObject;
+    public GameObject[] folliageRubble;
+    public GameObject[] orcStructure;
+    public GameObject[] orcObject;
+    public GameObject[] orcRubble;
+    public GameObject[] undeadStructure;
+    public GameObject[] undeadObject;
+    public GameObject[] undeadRubble;
+
     [Header("Environment Prefabs")]
     public GameObject[] traversableFolliageObject;
     public GameObject[] nonTraversableFolliageObject;
@@ -54,7 +75,7 @@ public class EnvironmentSpawner : MonoBehaviour
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
         spawnPortals();
-        //spawnEnvironment();
+        spawnEnvironment();
     }
 
     // spawnEnvironment(), spawnEnvironmentObject(Vector3 cellPosition), GameObject getRandomEnvironmentObject()
@@ -66,13 +87,125 @@ public class EnvironmentSpawner : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 Pos position = new Pos(x, y);
-                if (mapManager.IsWalkable(position) && !mapManager.IsReserved(position))
+                if (isValidPotraitSpawn(position))
                 {
-                    spawnRandomEnvironmentObject(position);
+                    spawnPortrait(position);
                 }
             }
         }
     }
+
+    // Portrait
+    void spawnPortrait(Pos position)
+    {
+        int radius = Random.Range(minRadius, maxRadius);
+
+        Pos startPos = new Pos(position.x - radius, position.y - radius);
+        Pos endPos = new Pos(position.x + radius, position.y + radius);
+        List<Pos> validPosList = getListOfValidPositions(startPos, endPos);
+
+        int targetStructureQuota = (int)(validPosList.Count * structureDensity);
+        int targetObjectQuota = (int)(validPosList.Count * objectDensity);
+
+        Pos spawnPos;
+        int i, randomIndex;
+
+        if (validPosList.Count < minArea) return;
+
+        for (i = targetStructureQuota; i > 0; i--)
+        {
+            if (validPosList.Count == 0) break;
+            randomIndex = Random.Range(1, validPosList.Count);
+            spawnPos = validPosList[randomIndex];
+            spawnStructure(spawnPos);
+            validPosList.RemoveAt(randomIndex);
+        }
+
+        for (i = targetObjectQuota; i > 0; i--)
+        {
+            if (validPosList.Count == 0) break;
+            randomIndex = Random.Range(1, validPosList.Count);
+            spawnPos = validPosList[randomIndex];
+            spawnObject(spawnPos);
+            validPosList.RemoveAt(randomIndex);
+        }
+
+        updatePaintedList(position, radius + portraitMargin);
+        Debug.Log(targetObjectQuota + ", " + targetStructureQuota + ", " + radius + ", " + validPosList.Count);
+    }
+
+    List<Pos> getListOfValidPositions (Pos startPos, Pos endPos) {
+        List<Pos> tempPosList = new List<Pos>();
+        Pos tempPos;
+        int x, y;
+
+        for (x = startPos.x; x < endPos.x; x++)
+        {
+            for (y = startPos.y; y < endPos.y; y++)
+            {
+                tempPos = new Pos(x, y);
+                if (isValidPotraitSpawn(tempPos)) {
+                    tempPosList.Add(tempPos);
+                }
+            }
+        }
+
+        return tempPosList;
+    }
+
+    bool isValidPotraitSpawn(Pos position)
+    {
+        return mapManager.IsWalkable(position) && !mapManager.IsReserved(position) && !paintedList.Contains(position);
+    }
+
+    void spawnStructure(Pos position)
+    {
+        int randomIndex = Random.Range(0, traversableFolliageObject.Length);
+        GameObject randomStructure = structures[randomIndex];
+        allEnvironmentObject.Add(mapManager.instantiate_environment(randomStructure, position, true));
+    }
+
+    void spawnObject(Pos position)
+    {
+        int randomIndex = Random.Range(0, traversableFolliageObject.Length);
+        GameObject randomObject = objects[randomIndex];
+        allEnvironmentObject.Add(mapManager.instantiate_environment(randomObject, position, true));
+    }
+
+    void updatePaintedList(Pos position, int margin)
+    {
+        List<Pos> tempPosList = new List<Pos>();
+        Pos startPos = new Pos(position.x - margin, position.y - margin);
+        Pos endPos = new Pos(position.x + margin, position.y + margin);
+        Pos tempPos;
+        int x, y;
+
+        for (x = startPos.x; x < endPos.x; x++)
+        {
+            for (y = startPos.y; y < endPos.y; y++)
+            {
+                tempPos = new Pos(x, y);
+                paintedList.Add(tempPos);
+            }
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void clearEnvironment()
     {
@@ -107,7 +240,7 @@ public class EnvironmentSpawner : MonoBehaviour
         spawnTraversableObject(startPortal, position);
         setSpawnAreaAroundPosition(position, spawnAreaRadius);
         reserveAreaAroundPoistion(position, reserveAreaRadius);
-        
+
         do
         {
             randomX = Random.Range(endRegionPosition.x - endRegionMargin, endRegionPosition.x + endRegionMargin);
@@ -254,7 +387,6 @@ public class EnvironmentSpawner : MonoBehaviour
                 return null;
         }
     }
-
 
     #endregion
 
