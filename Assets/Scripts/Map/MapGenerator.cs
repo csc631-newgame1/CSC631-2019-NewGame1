@@ -453,10 +453,10 @@ public class MapGenerator : MonoBehaviour
         if (map != null && debug) {
             for (int x = 0; x < width; x ++) {
                 for (int y = 0; y < height; y++) {
-					if (map[x, y] == main_region.ID)
-						Gizmos.color = Color.cyan;
-					else
-					switch (map[x, y]) {
+					/*if (map[x, y] == main_region.ID)
+						Gizmos.color = Color.cyan;*/
+					//else
+					/*switch (map[x, y]) {
 						case -3: Gizmos.color = Color.grey; break;
 						case -2: Gizmos.color = Color.red; break;
 						case -1: Gizmos.color = Color.red; break;
@@ -466,6 +466,19 @@ public class MapGenerator : MonoBehaviour
 						case 3 : Gizmos.color = Color.blue; break;
 						case 4 : Gizmos.color = Color.green; break;
 						case 5 : Gizmos.color = Color.magenta; break;
+						//case 6 : Gizmos.color = Color.cyan; break;
+						default : Gizmos.color = Color.black; break;
+					}*/
+					switch (map[x, y]) {
+						case -3: Gizmos.color = Color.white; break;
+						case -2: Gizmos.color = Color.white; break;
+						case -1: Gizmos.color = Color.white; break;
+						case 0 : Gizmos.color = Color.white; break;
+						case 1 : Gizmos.color = Color.black; break;
+						case 2 : Gizmos.color = Color.black; break;
+						case 3 : Gizmos.color = Color.black; break;
+						case 4 : Gizmos.color = Color.black; break;
+						case 5 : Gizmos.color = Color.black; break;
 						//case 6 : Gizmos.color = Color.cyan; break;
 						default : Gizmos.color = Color.black; break;
 					}

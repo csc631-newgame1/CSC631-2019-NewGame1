@@ -55,6 +55,11 @@ public class CameraControl : MonoBehaviour
     {
         // Basic camera follow; updates the camera transform a certain position
         // away from the player.
+		if (target_transform == null) {
+			Debug.Log("No target!");
+			return;
+		}
+		
 		Vector3 target_pos = new Vector3(target_transform.position.x, 0, target_transform.position.z);
 		if (target_transform != null && !camera.orthographic) {
 			transform.position = target_pos - offset * currentZoom;

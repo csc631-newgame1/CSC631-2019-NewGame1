@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2466407552752878221}
-  - component: {fileID: 5513905389098381100}
+  - component: {fileID: 702272131497715899}
   m_Layer: 0
   m_Name: ExitPortal
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5513905389098381100
+--- !u!114 &702272131497715899
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,10 +41,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1506806999855239151}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60c144c4c8c46a844849961ad19ad405, type: 3}
+  m_Script: {fileID: 11500000, guid: 30832096843b1c64db1552e0a6e94d33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 0
 --- !u!1001 &4235479020399289990
 PrefabInstance:
   m_ObjectHideFlags: 0

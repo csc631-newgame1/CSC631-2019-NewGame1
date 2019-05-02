@@ -10,9 +10,14 @@ public class NetworkManager : MonoBehaviour
 {
 	public static int clientID = 0;
 	public static MapManager mapManager = null; // networkmanager needs to interface with the map
+	public static NetworkManager instance;
 	
     void Awake()
     {
+		if (instance == null)
+			instance = this;
+		else
+			Destroy(gameObject);
 		DontDestroyOnLoad(this.gameObject);
     }
 
@@ -27,15 +32,19 @@ public class NetworkManager : MonoBehaviour
 				/*** IN-GAME ACTIONS ***/
 				if (cmd is MoveCommand) {
 					MoveCommand move = (MoveCommand) cmd;
-					Debug.Log("Move received! From " + move.a + " to " + move.b);
+					Pos start = Network.getPlayer(move.clientID).grid_pos;
+					Pos end = move.end;
+					Debug.Log("Move received! From " + start + " to " + end);
 					
-					mapManager.move(move.a, move.b);
+					mapManager.move(start, end);
 				}
 				if (cmd is AttackCommand) {
 					AttackCommand attack = (AttackCommand) cmd;
-					Debug.Log("Attack received! From " + attack.a + " to " + attack.b);
+					Pos start = Network.getPlayer(attack.clientID).grid_pos;
+					Pos end = attack.end;
+					Debug.Log("Attack received! From " + start + " to " + end + " action No: " + attack.actionNo);
 					
-					mapManager.attack(attack.a, attack.b);
+					mapManager.attack(start, end, attack.actionNo);
 				}
 				if (cmd is WaitCommand) {
 					WaitCommand wait = (WaitCommand) cmd;
@@ -43,6 +52,14 @@ public class NetworkManager : MonoBehaviour
 					
 					Client waitingClient = Network.getPeer(wait.clientID);
 					waitingClient.playerObject.wait();
+				}
+				if (cmd is InteractCommand) {
+					InteractCommand interact = (InteractCommand) cmd;
+					Pos start = Network.getPlayer(interact.clientID).grid_pos;
+					Pos end = interact.end;
+					Debug.Log("Interact received! From " + start + " to " + end);
+					
+					mapManager.interact(start, end);
 				}
 				/*** LOBBY ACTIONS ***/
 				if (cmd is ReadyCommand) {
@@ -95,7 +112,7 @@ public class NetworkManager : MonoBehaviour
 					SetSeedCommand seed = (SetSeedCommand) cmd;
 					Debug.Log("Received seed!");
 					
-					Settings.Seed = seed.seed;
+					Settings.MasterSeed = seed.seed;
 				}
 				/*** NETWORK ACTIONS ***/
 				if (cmd is JoinCommand) {
@@ -106,7 +123,8 @@ public class NetworkManager : MonoBehaviour
 					} else {
 						Debug.Log("New player with client ID #" + _join.clientID + " joined!");
 						Network.submitCommand(new UpdateClientInfoCommand(Network.getPeer(clientID)));
-						Network.submitCommand(new SetSeedCommand(Settings.Seed));
+						if (clientID == 0)
+							Network.submitCommand(new SetSeedCommand(Settings.MasterSeed));
 					}
 					Network.setPeer(_join.clientID);
 				}

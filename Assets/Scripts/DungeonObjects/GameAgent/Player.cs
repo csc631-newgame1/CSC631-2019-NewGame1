@@ -21,6 +21,7 @@ public class Player : GameAgent
     private bool playerActedThisTurn = false;
     private bool playerUsedPotionThisTurn = false;
     private bool playerWaitingThisTurn = false;
+	private bool playerExtracted = false;
 
     [Header("Player Stats")]
     public string name;
@@ -36,7 +37,7 @@ public class Player : GameAgent
     public int weapon = 1;
 
 	CharacterAnimator animator;
-    CharacterClassDefiner classDefiner;
+    //CharacterClassDefiner classDefiner; // moved to GameAgent
 
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
@@ -52,8 +53,6 @@ public class Player : GameAgent
 	public AudioClip[] hitNoise;
 	public AudioClip[] armorHitNoise;
 	
-	public Attack currentAttack;
-
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
@@ -83,6 +82,14 @@ public class Player : GameAgent
 		AI = null; // players don't have AI
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
+	
+	public void re_init(Pos position)
+	{
+		grid_pos = position;
+		playerExtracted = false;
+		TurnManager.instance.addToRoster(this); //add player to player list
+		EnableRendering();
+	}
 	
 	private bool moving = false;
     public override IEnumerator smooth_movement(List<Pos> path)
@@ -256,17 +263,15 @@ public class Player : GameAgent
 	public override void move() { playerMovedThisTurn = true; }
 	public override void act() { playerActedThisTurn = true; }
 	public override bool turn_over() {
-		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
+		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn || playerExtracted;
     }
-	
-	public bool can_take_action() { return (currentAttack == null || !currentAttack.attacking) && !animating && !turn_over(); }
-	
-	public void SetCurrentAction(int action)
-	{
-		Attack[] attacks = stats.playerCharacterClass.GetAvailableActs();
-		if (action >= attacks.Length) return;
-		else currentAttack = attacks[action];
+	public void extract() {
+		playerExtracted = true;
+		DisableRendering();
+		TurnManager.instance.removeFromRoster(this);
 	}
+	
+	public bool can_take_action() { return !playerExtracted && animationFinished() && !turn_over(); }
 	
 	public void SetCharacterClass(string classname) {
 		

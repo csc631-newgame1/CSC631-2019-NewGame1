@@ -6,7 +6,7 @@ using MapUtils;
 
 public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
 
-public abstract class GameAgent : DungeonObject
+public abstract class GameAgent : DungeonObject, Damageable, Renderable
 {
     public float speed;
 	public string nickname;
@@ -20,6 +20,8 @@ public abstract class GameAgent : DungeonObject
 
     public Inventory inventory = new Inventory();
 	public bool animating;
+	protected CharacterClassDefiner classDefiner;
+	public Attack currentAttack;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
@@ -45,6 +47,14 @@ public abstract class GameAgent : DungeonObject
     public abstract void act();
     public abstract void wait();
     public abstract void potion();
+	public abstract void take_damage(int amount);
+	public bool SetCurrentAction(int action)
+	{
+		Attack[] attacks = stats.playerCharacterClass.GetAvailableActs();
+		if (action >= attacks.Length) return false;
+		else currentAttack = attacks[action];
+		return true;
+	}
 
     public void UseItemOnSelf(int slot)
     {
@@ -52,4 +62,19 @@ public abstract class GameAgent : DungeonObject
         InventoryManager.instance.UseItem(item, this);
         inventory.DecrementItemAtSlot(slot);
     }
+	
+	protected bool renderingEnabled = true;
+	public void DisableRendering()
+	{
+		GetComponent<HealthBarController>().Disable();
+		classDefiner.DisableRendering();
+		renderingEnabled = false;
+	}
+	
+	public void EnableRendering()
+	{
+		GetComponent<HealthBarController>().Enable();
+		classDefiner.EnableRendering();
+		renderingEnabled = true;
+	}
 }

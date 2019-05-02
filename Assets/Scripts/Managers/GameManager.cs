@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
 	{
 		Init();
         instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 	
     void Init()
@@ -40,22 +39,27 @@ public class GameManager : MonoBehaviour
 
 		map_manager.Init(this);
 		tileSelector.Init(map_manager);
-        //environmentSpawner.Init(map_manager);
+        environmentSpawner.Init(map_manager);
 		
 		List<Client> players = Network.getPeers();
 		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
 		
 		Pos level_end = spawn_locations[0];
-		MapManager.setEndPos(level_end);
-		map_manager.instantiate_environment(endportal, level_end);
+		map_manager.instantiate_environment(endportal, level_end, false);
 		
 		Debug.Log("Spawned " + players.Count + " players");
 		// spawn players
 		for (int i = 0; i < players.Count; i++) {
-			Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
-			instance.SetCharacterClass(players[i].classname);
-			players[i].playerObject = instance;
-			if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
+			if (players[i].playerObject == null) {
+				Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
+				instance.SetCharacterClass(players[i].classname);
+				players[i].playerObject = instance;
+				if (players[i].ID == NetworkManager.clientID) localPlayer = instance;
+			}
+			else {
+				Debug.Log("Respawning player");
+				map_manager.re_instantiate(players[i].playerObject.gameObject, spawn_locations[i+1]);
+			}
 		}
 		// spawn enemies
 		enemySpawner.Init(map_manager);
@@ -79,19 +83,31 @@ public class GameManager : MonoBehaviour
 		instance.DeInit();
 		instance.Init();
 	}
+	
+	public static void GameOver()
+	{
+		Quit();
+	}
+	
+	private static void Quit()
+	{
+		Network.disconnectFromServer();
+		instance.DeInit();
+		SceneManager.LoadScene("NewMenu");
+	}
 
     void Update()
 	{
 		if (Input.GetKeyDown("escape")) {
-			Network.disconnectFromServer();
-			DeInit();
-			SceneManager.LoadScene("NewMenu");
+			Quit();
 		}
 		
 		foreach (char key in Input.inputString) {
 			
 			switch (key) {
 			case 'r':
+				foreach (Player player in Network.getPlayers())
+					MapManager.ExtractAgent(player);
 				NextLevel();
 				break;
 			}
@@ -102,13 +118,19 @@ public class GameManager : MonoBehaviour
 			switch (tileSelector.mode) {
 				case "MOVE":
 					if (tileSelector.hoveringValidMoveTile()) {
-						Network.submitCommand(new MoveCommand(localPlayer.grid_pos, tileSelector.grid_position));
+						Network.submitCommand(new MoveCommand(NetworkManager.clientID, tileSelector.grid_position));
 						tileSelector.mode = "NONE";
 					}
 					break;
 				case "ACT":
 					if (tileSelector.hoveringValidActTile()) {
-						Network.submitCommand(new AttackCommand(localPlayer.grid_pos, tileSelector.grid_position));
+						Network.submitCommand(new AttackCommand(NetworkManager.clientID, tileSelector.grid_position, last_action));
+						tileSelector.mode = "NONE";
+					}
+					break;
+				case "INTERACT":
+					if (tileSelector.hoveringValidActTile()) {
+						Network.submitCommand(new InteractCommand(NetworkManager.clientID, tileSelector.grid_position));
 						tileSelector.mode = "NONE";
 					}
 					break;
@@ -131,18 +153,28 @@ public class GameManager : MonoBehaviour
 	public static void ActionPlayer(int action) {
 		if (!instance.localPlayer.can_take_action()) return;
 		
-		instance.localPlayer.SetCurrentAction(action);
-        //instance.tileSelector.setMode(instance.localPlayer.getActionMode(action));
-		if (instance.tileSelector.mode == "ACT" && action == last_action)
-			instance.tileSelector.mode = "NONE";
-		else
-			instance.tileSelector.mode = "ACT";
-		
-		last_action = action;
+		if(instance.localPlayer.SetCurrentAction(action)) {
+			//instance.tileSelector.setMode(instance.localPlayer.getActionMode(action));
+			if (instance.tileSelector.mode == "ACT" && action == last_action)
+				instance.tileSelector.mode = "NONE";
+			else
+				instance.tileSelector.mode = "ACT";
+			
+			last_action = action;
+		}
     }
 	
 	public static void ClearPlayerAction() {
 		instance.tileSelector.mode = "NONE";
+	}
+	
+	public static void InteractPlayer() {
+		if (!instance.localPlayer.can_take_action()) return;
+		
+		if (instance.tileSelector.mode == "INTERACT")
+			instance.tileSelector.mode = "NONE";
+		else
+			instance.tileSelector.mode = "INTERACT";
 	}
 	
 	public static void WaitPlayer() {
@@ -154,7 +186,7 @@ public class GameManager : MonoBehaviour
     public static void PotionPlayer() {
 		if (!instance.localPlayer.can_take_action()) return;
 		
-        instance.localPlayer.potion();
+        //instance.localPlayer.potion();
     }
 	
 	public static void kill(DungeonObject obj)
