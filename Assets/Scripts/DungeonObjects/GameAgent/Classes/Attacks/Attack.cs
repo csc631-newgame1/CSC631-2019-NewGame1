@@ -38,6 +38,7 @@ public class MeleeAttack : Attack
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Melee");
 		
+		Debug.Log("Waiting for animation to finish");
 		while (attacker.animating) yield return null;
 		
 		target.playHitAnimation();

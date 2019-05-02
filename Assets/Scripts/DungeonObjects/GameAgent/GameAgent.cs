@@ -19,7 +19,7 @@ public abstract class GameAgent : DungeonObject, Damageable, Renderable
 	public int move_budget;
 
     public Inventory inventory = new Inventory();
-	public bool animating;
+	public bool animating = false;
 	protected CharacterClassDefiner classDefiner;
 	public Attack currentAttack;
 	

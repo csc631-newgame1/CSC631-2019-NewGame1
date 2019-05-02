@@ -125,17 +125,16 @@ public class Enemy : GameAgent
 	
 	public override void attack(GameAgent target)
 	{
-		animating = true;
-		currentAttack = stats.playerCharacterClass.GetAvailableActs()[0];
 		Debug.Log(currentAttack);
 		StartCoroutine(currentAttack.Execute(this, target));
 	}
 	
-    public void Hit() { animating = false; }
-    public void Shoot() { animating = false; }
+    public void Hit() { animating = false; Debug.Log("Just set animating to false"); }
+    public void Shoot() { animating = false; Debug.Log("Just set animating to false"); }
 	
 	public override void playAttackAnimation()
 	{
+		animating = true;
 		StartCoroutine(animator.PlayAttackAnimation());
 	}
 	
@@ -178,7 +177,8 @@ public class Enemy : GameAgent
 	
 	public override bool animationFinished()
 	{
-		return (currentAttack == null || !currentAttack.attacking) && !moving;
+		Debug.Log(!currentAttack.attacking + ", " + !moving);
+		return (!currentAttack.attacking) && !moving;
 	}
 	
     public override void take_damage(int amount) 

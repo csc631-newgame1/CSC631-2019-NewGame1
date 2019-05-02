@@ -22,11 +22,16 @@ public class TurnManager : MonoBehaviour
 	
 	public void Init(GameManager parent)
 	{
+		instance = this;
 		parentManager = parent;
 		
 		AIManager.roster = teamRoster;
-		
 		mainLoop = TurnLoop();
+	}
+	
+	public void StartLoop()
+	{
+		
 		StartCoroutine(mainLoop);
 	}
 	
@@ -48,9 +53,11 @@ public class TurnManager : MonoBehaviour
 				if (teamsLeft() == 1 && teamRoster[0].Count == 0) {
 					if (EndPortal.AllPlayersExtracted()) {
 						GameManager.NextLevel();
+						yield break;
 					}
 					else {
 						GameManager.GameOver();
+						yield break;
 					}
 				}
 				
@@ -87,6 +94,6 @@ public class TurnManager : MonoBehaviour
 	{
 		foreach (List<GameAgent> faction in teamRoster)
 			faction.Clear();
-		StopAllCoroutines(); // terminate any running coroutines
+		StopCoroutine(mainLoop);
 	}
 }

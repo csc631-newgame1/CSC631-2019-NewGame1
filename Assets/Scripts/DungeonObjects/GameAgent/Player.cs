@@ -87,6 +87,10 @@ public class Player : GameAgent
 	{
 		grid_pos = position;
 		playerExtracted = false;
+		playerMovedThisTurn = false;
+		playerActedThisTurn = false;
+		playerUsedPotionThisTurn = false;
+		playerWaitingThisTurn = false;
 		TurnManager.instance.addToRoster(this); //add player to player list
 		EnableRendering();
 	}

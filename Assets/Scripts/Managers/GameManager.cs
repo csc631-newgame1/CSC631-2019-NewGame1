@@ -41,6 +41,9 @@ public class GameManager : MonoBehaviour
 		tileSelector.Init(map_manager);
         environmentSpawner.Init(map_manager);
 		
+		turn_manager = GetComponent<TurnManager>();
+		turn_manager.Init(this);
+		
 		List<Client> players = Network.getPeers();
 		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
 		
@@ -67,9 +70,8 @@ public class GameManager : MonoBehaviour
 		tileSelector.setPlayer(localPlayer);
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
 		UI_BattleMenu.SetActButtons(localPlayer.getActionNames());
-
-		turn_manager = GetComponent<TurnManager>();
-		turn_manager.Init(this);
+		
+		turn_manager.StartLoop();
     }
 	
 	void DeInit()
