@@ -17,6 +17,8 @@ public class EnvironmentSpawner : MonoBehaviour
     int width;
     int height;
     enum environmentType { traversableFolliage, nonTraversableFolliage, traversableObject, nonTraversableObject, traversableStructure, nonTraversableStructure, particle, portal };
+    enum portraitType { folliage, orc, undead };
+    List<Pos> paintedList = new List<Pos>();
 
     // Environment object variables.
     public int environmentDensity = 50;
@@ -36,16 +38,16 @@ public class EnvironmentSpawner : MonoBehaviour
     public int reserveAreaRadius = 3;
 
     [Header("Portrait Settings")]
-    List<Pos> paintedList = new List<Pos>();
     public int maxRadius = 5;
     public int minRadius = 1;
     public int minArea = 10;
-    public int portraitMargin = 5;
+    public int smallArea = 30;
+    public int minPortraitMargin = 2;
+    public int maxPortraitMargin = 5;
+    static int structureRadius = 1;
     public float structureDensity = 0.1f;
     public float objectDensity = 0.3f;
     public float rubbleDensity = 0.5f;
-    enum portraitType { folliage, orc, undead };
-
 
     [Header("Portrait Prefabs")]
     public GameObject[] folliageStructures;
@@ -57,6 +59,8 @@ public class EnvironmentSpawner : MonoBehaviour
     public GameObject[] undeadStructures;
     public GameObject[] undeadObjects;
     public GameObject[] undeadRubble;
+
+
 
     [Header("Environment Prefabs")]
     public GameObject[] traversableFolliageObject;
@@ -80,25 +84,8 @@ public class EnvironmentSpawner : MonoBehaviour
         spawnEnvironment();
     }
 
-    // spawnEnvironment(), spawnEnvironmentObject(Vector3 cellPosition), GameObject getRandomEnvironmentObject()
-    #region Main methods
-    public void spawnEnvironment()
-    {
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                Pos position = new Pos(x, y);
-                if (isValidPotraitSpawn(position))
-                {
-                    portraitType type = getRandomPortraitType();
-                    spawnPortrait(position, type);
-                }
-            }
-        }
-    }
+    #region Portraits
 
-    // Portrait
     void spawnPortrait(Pos position, portraitType type)
     {
         int radius = Random.Range(minRadius, maxRadius);
@@ -113,9 +100,10 @@ public class EnvironmentSpawner : MonoBehaviour
         int targetObjectQuota = (int)(validPosList.Count * objectDensity);
 
         Pos spawnPos;
-        int i, randomIndex;
+        int i, randomIndex, portraitMargin;
 
         if (validPosList.Count < minArea) return;
+        if (validPosList.Count < smallArea) type = portraitType.folliage;
 
         for (i = targetRubbleQuota; i > 0; i--)
         {
@@ -129,10 +117,18 @@ public class EnvironmentSpawner : MonoBehaviour
         for (i = targetStructureQuota; i > 0; i--)
         {
             if (validPosList.Count <= 0) break;
-            randomIndex = Random.Range(0, validPosList.Count);
-            spawnPos = validPosList[randomIndex];
-            spawnStructure(spawnPos, type);
-            validPosList.RemoveAt(randomIndex);
+            int attempt = validPosList.Count;
+            do
+            {
+                randomIndex = Random.Range(0, validPosList.Count);
+                spawnPos = validPosList[randomIndex];
+                attempt--;
+            } while (!isValidStructureSpawn(spawnPos, validPosList, structureRadius) && attempt > 0);
+            if (isValidStructureSpawn(spawnPos, validPosList, structureRadius))
+            {
+                spawnStructure(spawnPos, type);
+                validPosList.RemoveAt(randomIndex);
+            }
         }
 
         for (i = targetObjectQuota; i > 0; i--)
@@ -144,10 +140,12 @@ public class EnvironmentSpawner : MonoBehaviour
             validPosList.RemoveAt(randomIndex);
         }
 
+        portraitMargin = Random.Range(minPortraitMargin, maxPortraitMargin);
         updatePaintedList(position, radius + portraitMargin);
     }
 
-    List<Pos> getListOfValidPositions (Pos startPos, Pos endPos) {
+    List<Pos> getListOfValidPositions(Pos startPos, Pos endPos)
+    {
         List<Pos> tempPosList = new List<Pos>();
         Pos tempPos;
         int x, y;
@@ -157,7 +155,8 @@ public class EnvironmentSpawner : MonoBehaviour
             for (y = startPos.y; y < endPos.y; y++)
             {
                 tempPos = new Pos(x, y);
-                if (isValidPotraitSpawn(tempPos)) {
+                if (isValidPotraitSpawn(tempPos))
+                {
                     tempPosList.Add(tempPos);
                 }
             }
@@ -169,6 +168,24 @@ public class EnvironmentSpawner : MonoBehaviour
     bool isValidPotraitSpawn(Pos position)
     {
         return mapManager.IsWalkable(position) && !mapManager.IsReserved(position) && !paintedList.Contains(position);
+    }
+
+    bool isValidStructureSpawn(Pos position, List<Pos> referenceList, int radius)
+    {
+        Pos startPos = new Pos(position.x - radius, position.y - radius);
+        Pos endPos = new Pos(position.x + radius, position.y + radius);
+        Pos tempPos;
+        int x, y;
+
+        for (x = startPos.x; x < endPos.x; x++)
+        {
+            for (y = startPos.y; y < endPos.y; y++)
+            {
+                tempPos = new Pos(x, y);
+                if (!referenceList.Contains(tempPos) && !paintedList.Contains(tempPos)) return false;
+            }
+        }
+        return true;
     }
 
     portraitType getRandomPortraitType()
@@ -185,20 +202,20 @@ public class EnvironmentSpawner : MonoBehaviour
         switch (type)
         {
             case portraitType.orc:
-                randomIndex = Random.Range(1, orcStructures.Length);
+                randomIndex = Random.Range(0, orcStructures.Length);
                 randomObject = orcStructures[randomIndex];
                 break;
             case portraitType.undead:
-                randomIndex = Random.Range(1, undeadStructures.Length);
+                randomIndex = Random.Range(0, undeadStructures.Length);
                 randomObject = undeadStructures[randomIndex];
                 break;
             default:
-                randomIndex = Random.Range(1, folliageStructures.Length);
+                randomIndex = Random.Range(0, folliageStructures.Length);
                 randomObject = folliageStructures[randomIndex];
                 break;
         }
 
-        allEnvironmentObject.Add(mapManager.instantiate_environment(randomObject, position, false));
+        allEnvironmentObject.Add(mapManager.instantiate_environment(randomObject, position, true));
 
     }
 
@@ -210,15 +227,15 @@ public class EnvironmentSpawner : MonoBehaviour
         switch (type)
         {
             case portraitType.orc:
-                randomIndex = Random.Range(1, orcObjects.Length);
+                randomIndex = Random.Range(0, orcObjects.Length);
                 randomObject = orcObjects[randomIndex];
                 break;
             case portraitType.undead:
-                randomIndex = Random.Range(1, undeadObjects.Length);
+                randomIndex = Random.Range(0, undeadObjects.Length);
                 randomObject = undeadObjects[randomIndex];
                 break;
             default:
-                randomIndex = Random.Range(1, folliageObjects.Length);
+                randomIndex = Random.Range(0, folliageObjects.Length);
                 randomObject = folliageObjects[randomIndex];
                 break;
         }
@@ -235,15 +252,15 @@ public class EnvironmentSpawner : MonoBehaviour
         switch (type)
         {
             case portraitType.orc:
-                randomIndex = Random.Range(1, orcRubble.Length);
+                randomIndex = Random.Range(0, orcRubble.Length);
                 randomObject = orcRubble[randomIndex];
                 break;
             case portraitType.undead:
-                randomIndex = Random.Range(1, undeadRubble.Length);
+                randomIndex = Random.Range(0, undeadRubble.Length);
                 randomObject = undeadRubble[randomIndex];
                 break;
             default:
-                randomIndex = Random.Range(1, folliageRubble.Length);
+                randomIndex = Random.Range(0, folliageRubble.Length);
                 randomObject = folliageRubble[randomIndex];
                 break;
         }
@@ -271,16 +288,26 @@ public class EnvironmentSpawner : MonoBehaviour
 
     }
 
+    #endregion
 
+    #region Main methods
 
+    public void spawnEnvironment()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Pos position = new Pos(x, y);
+                if (isValidPotraitSpawn(position))
+                {
+                    portraitType type = getRandomPortraitType();
+                    spawnPortrait(position, type);
+                }
+            }
+        }
+    }
 
-
-
-
-
-
-
-    // Others
     public void clearEnvironment()
     {
         for (int i = 0; i < allEnvironmentObject.Count; i++)
@@ -355,6 +382,10 @@ public class EnvironmentSpawner : MonoBehaviour
             }
         }
     }
+
+    #endregion
+
+    #region Depreciated methods
 
     void spawnRandomEnvironmentObject(Pos position)
     {

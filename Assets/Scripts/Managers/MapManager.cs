@@ -136,7 +136,8 @@ public class MapManager : MonoBehaviour
 	
 	public GameObject instantiate_environment(GameObject prefab, Pos pos, bool traversable = true)
 	{
-		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
+        int randomY = rng.Next(1, 4) * 90;
+        GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.Euler(new Vector3(0, randomY, 0)));
 		
 		if (!traversable) {
 			nav_map.removeTraversableTile(pos);
