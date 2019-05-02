@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour
 					break;
 				case "ACT":
 					if (tileSelector.hoveringValidActTile()) {
-						Network.submitCommand(new AttackCommand(NetworkManager.clientID, tileSelector.grid_position, last_action));
+						Network.submitCommand(new AttackCommand(NetworkManager.clientID, tileSelector.grid_position, localPlayer.GetCurrentAction()));
 						tileSelector.mode = "NONE";
 					}
 					break;
