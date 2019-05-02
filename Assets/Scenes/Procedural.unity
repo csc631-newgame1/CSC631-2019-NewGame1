@@ -377,19 +377,62 @@ MonoBehaviour:
   portalMargin: 0.5
   spawnAreaRadius: 3
   reserveAreaRadius: 3
-  maxRadius: 5
-  minRadius: 1
+  maxRadius: 10
+  minRadius: 2
   minArea: 10
-  portraitMargin: 10
-  structureDensity: 0.1
-  objectDensity: 0.4
-  foliageDensity: 0
-  structures:
+  portraitMargin: 5
+  structureDensity: 0.05
+  objectDensity: 0.1
+  rubbleDensity: 0.2
+  folliageStructures:
   - {fileID: 2323257002581249288, guid: f7acbad6c88c6b24c913cd2cd153c97d, type: 3}
   - {fileID: 1636403203436941618, guid: 1d7164ad4afddf64cba83c8bf829eec4, type: 3}
-  objects:
+  folliageObjects:
+  - {fileID: 8485322010304906062, guid: f771c4557756c654e902ac663e0fd937, type: 3}
+  - {fileID: 7547340557822055362, guid: b373a95d61bcd3c42a0242f93f1a160c, type: 3}
+  - {fileID: 4119539667499740074, guid: 3bd2bd0cd7b3f724f8ace7969607676e, type: 3}
+  - {fileID: 4735723241619277991, guid: c09fa38dd75b9654d9300560957fd704, type: 3}
+  - {fileID: 5309839873291892276, guid: d1246235279ec7f4e8d264dfd0e385ff, type: 3}
+  folliageRubble:
   - {fileID: 2792807113820430882, guid: cd36dba5b408ca9439b9ffaef38fb77d, type: 3}
   - {fileID: 2947852130367026337, guid: 3e57725251ffc164186a512479ae8a43, type: 3}
+  orcStructures:
+  - {fileID: 8572881499844158578, guid: 306e920ce0b77554dbaeb3fb553f342b, type: 3}
+  - {fileID: 933425110586781869, guid: 5ab9ab47f9598e240bbd06f8aa498add, type: 3}
+  - {fileID: 8469535282140148390, guid: decde2f2b776bfb43b2bd995fd05f20d, type: 3}
+  - {fileID: 4571464803538913043, guid: 1f3c42f7c64976546b05f2a4fb2f2d92, type: 3}
+  orcObjects:
+  - {fileID: 4985937897100583893, guid: 99e26e769a446214197db0eba53120c2, type: 3}
+  - {fileID: 1556437293426254037, guid: 29e66698384a68846aac87337041c673, type: 3}
+  - {fileID: 4131550778696149822, guid: 20cd216969784474d8c8ada20668a9cd, type: 3}
+  - {fileID: 439609963360342617, guid: 33fb9525b70000a47991ff00e2ae1eba, type: 3}
+  - {fileID: 5302094694859202692, guid: a4acf849652914341a4062ed1a502fe8, type: 3}
+  - {fileID: 1819780892454208520, guid: a01f8a97376ab7f4abd65c6741ef12d9, type: 3}
+  - {fileID: 7186463922202179058, guid: 086cfdb0921ccf143ae395d0b1233ca1, type: 3}
+  - {fileID: 640458407001986562, guid: 48ed0ebbd681bd0418710ab27c6090e9, type: 3}
+  - {fileID: 3220319763108563136, guid: 7cb606c6673068e4d9f24cb1ed52f62c, type: 3}
+  - {fileID: 5309839873291892276, guid: d1246235279ec7f4e8d264dfd0e385ff, type: 3}
+  orcRubble:
+  - {fileID: 7456845081601792134, guid: 097857244cf0ca548aaf1a9dca7dc2fb, type: 3}
+  - {fileID: 4957752674886763894, guid: 1a87e648e4791c74086530393e2e37be, type: 3}
+  - {fileID: 2820082967804697642, guid: fcf15b6d5c8ac9b4bb6f2b8a6b1c49f9, type: 3}
+  - {fileID: 137036469532478715, guid: 6d9d4164170de5e4fac1ade1dceb0c5d, type: 3}
+  - {fileID: 7614523188491749316, guid: b7381fb994b557d4eb5c48892cb5d7a1, type: 3}
+  undeadStructures:
+  - {fileID: 1150172302673021951, guid: 00402576e5c0e544997f46c837e380c2, type: 3}
+  - {fileID: 2144565815282551751, guid: 6c0e71352bfc65d4f8dc56a92b01c595, type: 3}
+  undeadObjects:
+  - {fileID: 4349911964153051597, guid: 080492e428b6d504e85499ff6acf8677, type: 3}
+  - {fileID: 7026675060670021900, guid: 84133e2a83c628d44b88a52f64c7f3a7, type: 3}
+  - {fileID: 1296241472309072182, guid: 6cb6a4a79b8d7704e84205d023fe10e5, type: 3}
+  - {fileID: 5309839873291892276, guid: d1246235279ec7f4e8d264dfd0e385ff, type: 3}
+  undeadRubble:
+  - {fileID: 4173684828446685415, guid: a6019ec87610c994fbd3af03f82c5ad3, type: 3}
+  - {fileID: 4394567935517873060, guid: d42926ea641b29c4f98571fef4c9b069, type: 3}
+  - {fileID: 7956972597776916276, guid: 39e2413d25d388d4da0d81b4aa38a3ee, type: 3}
+  - {fileID: 4952123220551692483, guid: 689f6c432c4f2dd4bab460ccb1a68a7b, type: 3}
+  - {fileID: 6546157965800851129, guid: 6a0851fc405936d448be0ac9bc92c257, type: 3}
+  - {fileID: 9119488559256541672, guid: 75c30962bf5f22741ac34610d8c6b0fc, type: 3}
   traversableFolliageObject:
   - {fileID: 178538, guid: d6267d2e6296e7946afb915ef648ed67, type: 3}
   - {fileID: 198516, guid: a03e2dd3dba33b9418311d00a91cf378, type: 3}
