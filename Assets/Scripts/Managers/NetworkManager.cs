@@ -123,7 +123,7 @@ public class NetworkManager : MonoBehaviour
 					} else {
 						Debug.Log("New player with client ID #" + _join.clientID + " joined!");
 						Network.submitCommand(new UpdateClientInfoCommand(Network.getPeer(clientID)));
-						if (clientID == 0)
+						if (clientID == 1)
 							Network.submitCommand(new SetSeedCommand(Settings.MasterSeed));
 					}
 					Network.setPeer(_join.clientID);
