@@ -37,11 +37,9 @@ public class Enemy : GameAgent
 	public AudioClip[] deathRattle;
 	public AudioClip[] hitNoise;
 	
-	private Attack currentAttack;
-	
 	void Update()
 	{
-		if (FogOfWar.IsVisible(grid_pos)) {
+		if (FogOfWar.IsVisible(map_manager.world_to_grid(transform.position))) {
 			EnableRendering();
 		}
 		else {
@@ -83,6 +81,7 @@ public class Enemy : GameAgent
         team = 1;
 		AI = new AIComponent(this); // AI component that decides the actions for this enemy to take
 		TurnManager.instance.addToRoster(this);
+		SetCurrentAction(0);
     }
 
 	private bool moving = false;
@@ -90,6 +89,11 @@ public class Enemy : GameAgent
 	{
 		//Debug.Log("started...");
 		grid_pos = path.Last();
+		if (!FogOfWar.IsVisible(grid_pos)) {
+			transform.position = map_manager.grid_to_world(grid_pos);
+			yield break;
+		}
+		
         moving = true;
         StartCoroutine(animator.StartMovementAnimation());
 

@@ -13,7 +13,8 @@ public class MapManager : MonoBehaviour
 	private class MapCell {
         public bool traversable;
         public bool occupied;
-        public DungeonObject resident;
+        public DungeonObject resident; // foreground objects that can be interacted with & block tiles
+		public DungeonObject environment; // background objects that cannot be interacted with
         public MapCell(bool traversable) {
             this.traversable = traversable;
             occupied = false;
@@ -28,6 +29,16 @@ public class MapManager : MonoBehaviour
 	private int width;
 	private int height;
 	private float cell_size;
+	public static int MapWidth {
+		get {
+			return instance.width;
+		}
+	}
+	public static int MapHeight {
+		get {
+			return instance.height;
+		}
+	}
 
 	// map data
 	private int[,] map_raw;
@@ -67,7 +78,7 @@ public class MapManager : MonoBehaviour
 			}
 		}
 		
-		rng = new System.Random(Settings.Seed);
+		rng = new System.Random(Settings.MasterSeed);
 		environmentObjects = new List<GameObject>();
 	}
 	
@@ -124,16 +135,21 @@ public class MapManager : MonoBehaviour
 	{
 		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
 		
-		if (!traversable) {
-			nav_map.removeTraversableTile(pos);
-			map[pos.x, pos.y].traversable = false;
-		}
-		
 		DungeonObject env = clone.GetComponent<DungeonObject>();
 		(env as Environment).init_environment(pos);
 		
-		map[pos.x, pos.y].occupied = true;
-		map[pos.x, pos.y].resident = env;
+		if (!traversable) {
+			nav_map.removeTraversableTile(pos);
+			map[pos.x, pos.y].traversable = true;
+			map[pos.x, pos.y].occupied = true;
+			map[pos.x, pos.y].resident = env;
+		}
+		else {
+			nav_map.insertTraversableTile(pos);
+			map[pos.x, pos.y].traversable = true;
+			map[pos.x, pos.y].occupied = false;
+			map[pos.x, pos.y].environment = env;
+		}
 		
 		return clone;
 	}
@@ -166,12 +182,15 @@ public class MapManager : MonoBehaviour
 	public void clear_map()
 	{
 		for (int x = 0; x < width; x++)
-			for (int y = 0; y < height; y++) 
+			for (int y = 0; y < height; y++)  {
+				if (map[x, y].environment != null)
+					Destroy(map[x, y].environment.gameObject);
 				if (map[x, y].resident != null) {
 					Destroy(map[x, y].resident.gameObject);
 					map[x, y].occupied = false;
 					map[x, y].resident = null;
 				}
+			}
 	}
 	
 	// move a character from source to dest
@@ -199,19 +218,26 @@ public class MapManager : MonoBehaviour
 	}
 	
 	// applies damage to agent at position, if one is there
-	public void attack(Pos source, Pos dest)
+	public void attack(Pos source, Pos dest, int actionNo=0)
 	{
 		DungeonObject obj_attacker = map[source.x, source.y].resident;
 		DungeonObject obj_target = map[dest.x, dest.y].resident;
-		if (obj_attacker == null || obj_target == null || !(obj_attacker is GameAgent) || !(obj_target is GameAgent)) {
+		if (obj_attacker == null || obj_target == null || !(obj_attacker is GameAgent) || !((obj_target is GameAgent) || (obj_target is Damageable))) {
 			Debug.Log("Attack command was invalid!");
 			return;
 		}
 		
 		GameAgent attacker = obj_attacker as GameAgent;
-		GameAgent target = obj_target as GameAgent;
+		attacker.SetCurrentAction(actionNo);
 		
-		attacker.attack(target);
+		if (obj_target is GameAgent) {
+			GameAgent target = obj_target as GameAgent;
+			attacker.attack(target);
+		}
+		else if (obj_target is Damageable) {
+			Damageable target = obj_target as Damageable;
+			target.take_damage(attacker.stats.DealDamage());
+		}
 	}
 	
 	public void interact(Pos source, Pos dest)
@@ -341,7 +367,7 @@ public class MapManager : MonoBehaviour
 	 *		the maximum allowed distance for resulting distances. By default this value is zero, which means there is no limit to distance </param>
 	 *		enabling this can significantly improve pathfinding performance
 	 * <returns>
-	 * A list of distances from the source to each o the destination points </returns> */
+	 * A list of distances from the source to each o the destination points, or null if no results were found </returns> */
 	public List<int> getDistances(Pos source, List<Pos> destinations, bool preserve_null = false, int maxDistance=0)
 	{
 		// getDistances will ignore whether or not the destination tiles are traversable, just gets distances to them

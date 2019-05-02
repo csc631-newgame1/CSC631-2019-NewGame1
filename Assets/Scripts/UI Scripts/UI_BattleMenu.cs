@@ -57,9 +57,10 @@ public class UI_BattleMenu : MonoBehaviour
 	
 	public static void SetActButtons(string[] actionNames)
 	{
+		string[] actHotkeys = { "[A]", "[S]", "[D]", "[F]" };
 		for (int i = 0; i < 4; i++) {
 			if (i < actionNames.Length)
-				instance.action_buttons[i].GetComponentInChildren<Text>().text = actionNames[i];
+				instance.action_buttons[i].GetComponentInChildren<Text>().text = actionNames[i] + " " + actHotkeys[i];
 			else
 				instance.action_buttons[i].GetComponentInChildren<Text>().text = "";
 		}

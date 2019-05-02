@@ -5,10 +5,19 @@ using UnityEngine;
 public abstract class Attack
 {
 	public int range;
-	public int AOE;
+	protected int AOE;
+	protected float damageModifier;
+	
 	public bool attacking;
 	public abstract IEnumerator Execute(GameAgent attacker, GameAgent target);
 	public abstract string toString();
+	
+	public Attack(int range, int AOE, float damageModifier) {
+		this.range = range;
+		this.AOE = AOE;
+		this.damageModifier = damageModifier;
+	}
+	public Attack(){}
 	
 	public static Dictionary<string, Attack> Get = new Dictionary<string, Attack>() {
 		["Melee"] = new MeleeAttack(),
@@ -20,7 +29,7 @@ public abstract class Attack
 
 public class MeleeAttack : Attack
 {
-	public MeleeAttack() { this.range = 1; this.AOE = 1; }
+	public MeleeAttack() : base(1, 1, 3) {}
 	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
 	{
 		attacking = true;
@@ -33,7 +42,7 @@ public class MeleeAttack : Attack
 		
 		target.playHitAnimation();
 		target.playHitNoise("Melee");
-		target.take_damage(attacker.stats.DealDamage());
+		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
 		
 		attacking = false;
 	}
@@ -42,7 +51,7 @@ public class MeleeAttack : Attack
 
 public class ShortbowAttack : Attack
 {
-	public ShortbowAttack() { this.range = 7; this.AOE = 1; }
+	public ShortbowAttack() : base(7, 1, 1) {}
 	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
 	{
 		attacking = true;
@@ -55,11 +64,11 @@ public class ShortbowAttack : Attack
 		
 		Projectile arrow = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "arrow");
 		
-		while (!arrow.reachedDestination) yield return null;
+		while (!(arrow == null)) yield return null;
 		
 		target.playHitAnimation();
 		target.playHitNoise("Bow");
-		target.take_damage(attacker.stats.DealDamage());
+		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
 		
 		attacking = false;
 	}
@@ -68,7 +77,7 @@ public class ShortbowAttack : Attack
 
 public class LongbowAttack : Attack
 {
-	public LongbowAttack() { this.range = 11; this.AOE = 1; }
+	public LongbowAttack() : base(11, 1, 0.75f) {}
 	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
 	{
 		attacking = true;
@@ -81,11 +90,11 @@ public class LongbowAttack : Attack
 		
 		var arrow = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "arrow");
 		
-		while (!arrow.reachedDestination) yield return null;
+		while (!(arrow == null)) yield return null;
 		
 		target.playHitAnimation();
 		target.playHitNoise("Bow");
-		target.take_damage(attacker.stats.DealDamage());
+		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
 		
 		attacking = false;
 	}
@@ -94,7 +103,7 @@ public class LongbowAttack : Attack
 
 public class FireSpell : Attack
 {
-	public FireSpell() { this.range = 6; this.AOE = 0; }
+	public FireSpell() : base(6, 1, 2) {}
 	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
 	{
 		attacking = true;
@@ -107,11 +116,11 @@ public class FireSpell : Attack
 		
 		Projectile fire = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "fire");
 		
-		while (!fire.reachedDestination) yield return null;
+		while (!(fire == null)) yield return null;
 		
 		target.playHitAnimation();
 		target.playHitNoise("Fire");
-		target.take_damage(attacker.stats.DealDamage());
+		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
 		
 		attacking = false;
 	}

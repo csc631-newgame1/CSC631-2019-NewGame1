@@ -28,7 +28,7 @@ public class MapConfiguration : MonoBehaviour
 	public float floor_texture_scale;
     public float object_size_scale;
 	
-	public int seed { get { return Settings.Seed; } }
+	public int seed { get { return Settings.MapSeed; } }
 
     public Vector3 GetCenter() {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));

@@ -89,7 +89,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BaseIntensity: 1
-    - _Bias: -0.033
+    - _Bias: -0.107
     - _BlendOp: 0
     - _BumpScale: 1
     - _CameraFadingEnabled: 0

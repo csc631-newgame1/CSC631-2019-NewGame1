@@ -88,6 +88,16 @@ public class Network : NetworkBase
 		return players;
 	}
 	
+	public static Player getPlayer(int clientID)
+	{
+		return getPeer(clientID).playerObject;
+	}
+	
+	public static int playerCount()
+	{
+		return peers.Count;
+	}
+	
 	public static List<Client> getPeers()
 	{
 		// sorts list by ID before returning so that list order is the same on all clients

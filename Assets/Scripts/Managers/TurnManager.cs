@@ -44,10 +44,29 @@ public class TurnManager : MonoBehaviour
 				while (!AIManager.turnOver(team)) {
 					yield return null;
 				}
-				Debug.Log("Next turn!");
+				Debug.Log("turn over! " + teamsLeft());
+				if (teamsLeft() == 1 && teamRoster[0].Count == 0) {
+					if (EndPortal.AllPlayersExtracted()) {
+						GameManager.NextLevel();
+					}
+					else {
+						GameManager.GameOver();
+					}
+				}
+				
 			}
 		}
     }
+	
+	private int teamsLeft()
+	{
+		int teams = 0;
+		foreach (List<GameAgent> faction in teamRoster)
+			if (faction.Count > 0)
+				teams++;
+		
+		return teams;
+	}
 	
 	public void removeFromRoster(GameAgent agent)
 	{

@@ -53,8 +53,6 @@ public class Player : GameAgent
 	public AudioClip[] hitNoise;
 	public AudioClip[] armorHitNoise;
 	
-	public Attack currentAttack;
-
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
@@ -265,21 +263,15 @@ public class Player : GameAgent
 	public override void move() { playerMovedThisTurn = true; }
 	public override void act() { playerActedThisTurn = true; }
 	public override bool turn_over() {
-		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
+		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn || playerExtracted;
     }
 	public void extract() {
 		playerExtracted = true;
 		DisableRendering();
+		TurnManager.instance.removeFromRoster(this);
 	}
 	
 	public bool can_take_action() { return !playerExtracted && animationFinished() && !turn_over(); }
-	
-	public void SetCurrentAction(int action)
-	{
-		Attack[] attacks = stats.playerCharacterClass.GetAvailableActs();
-		if (action >= attacks.Length) return;
-		else currentAttack = attacks[action];
-	}
 	
 	public void SetCharacterClass(string classname) {
 		

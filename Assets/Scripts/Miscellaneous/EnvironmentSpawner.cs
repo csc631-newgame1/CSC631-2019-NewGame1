@@ -49,20 +49,27 @@ public class EnvironmentSpawner : MonoBehaviour
             {
                 Pos position = new Pos(x, y);
                 if (mapManager.IsTraversable(position)) {
-                    spawnEnvironmentObject(mapManager.grid_to_world(position));
+                    spawnEnvironmentObject(position);
                 }
             }
         }
     }
 
-    void spawnEnvironmentObject(Vector3 cellPosition)
+    void spawnEnvironmentObject(Pos cellPosition)
     {
         float random = Random.Range(0, environmentDensity);
-        var clone = new GameObject();
-        clone.transform.position = cellPosition;
-        if (random < environmentDensity * particleEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.particle), clone.transform) as GameObject);
-        else if (random < environmentDensity * nonTraversableEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversable), clone.transform) as GameObject);
-        else if (random < environmentDensity * traversableEnvironmentDensity) allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversable), clone.transform) as GameObject);
+		if (random < traversableEnvironmentDensity) {
+			mapManager.instantiate_environment(getRandomEnvironmentObject(environmentType.traversable), cellPosition);
+		}
+		else if (random < nonTraversableEnvironmentDensity) {
+			mapManager.instantiate_environment(getRandomEnvironmentObject(environmentType.nonTraversable), cellPosition);
+		}
+        /*if (random < environmentDensity * particleEnvironmentDensity) 
+			mapManager.instantiate_environment(getRandomEnvironmentObject(environmentType.
+        else if (random < environmentDensity * nonTraversableEnvironmentDensity) 
+			allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.nonTraversable), clone.transform) as GameObject);
+        else if (random < environmentDensity * traversableEnvironmentDensity) 
+			allEnvironmentObject.Add(Instantiate(getRandomEnvironmentObject(environmentType.traversable), clone.transform) as GameObject);*/
     }
 
     public void clearEnvironment()

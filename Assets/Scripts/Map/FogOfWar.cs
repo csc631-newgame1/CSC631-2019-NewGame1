@@ -74,4 +74,23 @@ public class FogOfWar : MonoBehaviour
 	{
 		return instance.fog[position.y * instance.width + position.x] == VISIBLE;
 	}
+	
+	public static bool IsSemiVisible(Pos position)
+	{
+		return instance.fog[position.y * instance.width + position.x] != INVISIBLE;
+	}
+	
+	public static bool VisibleInRange(int sx, int sy, int _width, int _height)
+	{
+		for (int x = sx; x < sx + _width; x++) {
+			for (int y = sy; y < sy + _height; y++) {
+				int index = y * instance.width + x;
+				if (index >= instance.width * instance.height)
+					return false;
+				if (instance.fog[index] == VISIBLE)
+					return true;
+			}
+		}
+		return false;
+	}
 }

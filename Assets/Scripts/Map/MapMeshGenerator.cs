@@ -17,6 +17,7 @@ public class MapMeshGenerator : MonoBehaviour
 	private float wall_height;
 	
 	public float steepness;
+	public GameObject chunkPrefab;
 	
 	[Tooltip("The color gradient for the map, coloring based on height. Values towards 0 are closer to the map's surface, values towards 1 are closer to the map's floor")]
 	public Gradient gradient;
@@ -193,12 +194,165 @@ public class MapMeshGenerator : MonoBehaviour
 					}
 				}
 			}
-		
-		/* STEP 4: CREATE TRIANGLES & FINALIZE MESH
-		 * Once the mesh nodes are created, an array of triangles, representing the map surface, is constructed from it 
+			
+		/* STEP 4: GRADIENT TEXTURE CREATION
+		 * Applies gradient to main texture, initializes render material
 		 */
+		
+		Renderer rend = GetComponent<Renderer>();
+		Texture2D texture = new Texture2D(512, 1);
+		texture.wrapMode = TextureWrapMode.Repeat;
+		rend.material.SetTexture("_FluidGradient", texture);
+		
+		Color[] colors = new Color[512];
+		for (int x = 0; x < 512; x++) {
+			colors[x] = gradient.Evaluate((float) x / 512f);
+		}
+		
+		texture.SetPixels(colors);
+		texture.Apply(true);
+		
+		rend.material.SetTexture("_FOWTex", FogOfWar.fogTex);
+		rend.material.SetVector("_MapWidthHeight", new Vector4(width, height, 0, 0));
+		
+		/* STEP 5: CHUNK CREATION
+		 * Divides map mesh into smaller mesh "chunks" to make rendering more efficient
+		 */
+		 
+		// destroy old chunks
+		foreach (Transform child in transform) {
+			Destroy(child.gameObject);
+		}
+		
+		int chunkWidth = 8;
+		int chunkHeight = 8;
+		int chunkXCount = width / chunkWidth;
+		int chunkYCount = height / chunkHeight;
+		
+		for (int chunkX = 0; chunkX < chunkXCount; chunkX++) {
+			for (int chunkY = 0; chunkY < chunkYCount; chunkY++) {
+				
+				/* STEP 6: CREATE TRIANGLES & FINALIZE MESH
+				 * Once the mesh nodes are created, an array of triangles, representing the map surface, is constructed from it 
+				 */
+				
+				int startX = chunkX * chunkWidth * 2;
+				int startY = chunkY * chunkHeight * 2;
+				int finalX = (chunkX + 1) * chunkWidth * 2 > width * 2 ? width * 2 : (chunkX + 1) * chunkWidth * 2;
+				int finalY = (chunkY + 1) * chunkHeight * 2 > height * 2 ? height * 2 : (chunkY + 1) * chunkHeight * 2;
+				
+				int num_vertices = chunkWidth * chunkHeight * 4 * 2 * 3; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
+				Vector3[] vertices = new Vector3[num_vertices];
+				Vector2[] uvs = new Vector2[num_vertices];
+				int[] triangles = new int[num_vertices];
+				
+				int i = 0; // keeps track of triangles index
+				
+				for (int x = startX; x < finalX; x++) {
+					for (int y = startY; y < finalY; y++) {
+						
+						Vector3 v0 = vertex_map[x + 0, y + 0];
+						Vector3 v1 = vertex_map[x + 1, y + 0];
+						Vector3 v2 = vertex_map[x + 0, y + 1];
+						Vector3 v3 = vertex_map[x + 1, y + 1];
 
-		Vector3[] vertices = new Vector3[width * height * 4 * 2 * 3]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
+						// orientation of triangles changes in a regular pattern according to which corner of each tile it occupies
+						// a final tile face will be triangulated something like this (excuse the bad text drawing):
+						/*
+						 * -----------
+						 * | \  |   /|  8 triangles, 4 faces per tile, 2 triangles per face
+						 * |  \ | /  |
+						 * |---------|  All hypotenuse aim towards the center of the tile
+						 * |  / | \  |
+						 * |/   |   \|
+						 * |-----------
+						 * 
+						 * This creates a repeating pattern in the tile geometry, so that it is not biased towards any particular orientation
+						 */   
+						 
+						if ((x % 2) == 1) {
+							SWAPv(ref v0, ref v1);
+							SWAPv(ref v2, ref v3);
+						}
+						
+						if ((y % 2) == 1) {
+							SWAPv(ref v0, ref v2);
+							SWAPv(ref v1, ref v3);
+						}
+							// because of this re-ordering of vertices, the winding order of the triangles needs to be taken into account
+							// With an odd number of swaps, the winding order for the triangles is reversed
+							if (((x + y) % 2) == 1) {
+								vertices[i + 0] = v0;
+								vertices[i + 1] = v1;
+								vertices[i + 2] = v3;
+								
+								vertices[i + 3] = v2;
+								vertices[i + 4] = v0;
+								vertices[i + 5] = v3;
+								
+								uvs[i + 0] = new Vector2(v0.x, v0.z);
+								uvs[i + 1] = new Vector2(v1.x, v1.z);
+								uvs[i + 2] = new Vector2(v3.x, v3.z);
+								
+								uvs[i + 3] = new Vector2(v2.x, v2.z);
+								uvs[i + 4] = new Vector2(v0.x, v0.z);
+								uvs[i + 5] = new Vector2(v3.x, v3.z);
+							}
+							else {
+								vertices[i + 0] = v3;
+								vertices[i + 1] = v1;
+								vertices[i + 2] = v0;
+								
+								vertices[i + 3] = v3;
+								vertices[i + 4] = v0;
+								vertices[i + 5] = v2;
+								
+								uvs[i + 0] = new Vector2(v3.x, v3.z);
+								uvs[i + 1] = new Vector2(v1.x, v1.z);
+								uvs[i + 2] = new Vector2(v0.x, v0.z);
+								
+								uvs[i + 3] = new Vector2(v3.x, v3.z);
+								uvs[i + 4] = new Vector2(v0.x, v0.z);
+								uvs[i + 5] = new Vector2(v2.x, v2.z);
+							}
+						
+							triangles[i + 0] = i;
+							triangles[i + 1] = i + 1;
+							triangles[i + 2] = i + 2;
+							
+							triangles[i + 3] = i + 3;
+							triangles[i + 4] = i + 4;
+							triangles[i + 5] = i + 5;
+						
+						i += 6;
+					}
+				}
+				
+				/* STEP 7: FINALISATION
+				 * Assigns vertices, triangles, and uvs to chunk mesh
+				 */
+						
+				GameObject chunk = Instantiate(chunkPrefab, Vector3.zero, Quaternion.identity, this.transform);
+				
+				Renderer chunkRend = chunk.GetComponent<Renderer>();
+				chunkRend.material = rend.material;
+				
+				// this turns out to not help at all
+				//chunk.GetComponent<ChunkOptimizer>().Init(startX, startY, finalX - startX, finalY - startY);
+				
+				MeshFilter mf = chunk.GetComponent<MeshFilter>();
+				// unless indexFormat Uint32 is specified, mesh index goes up to only 65536 (16-bit)
+				//mf.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+				mf.mesh.triangles = null;
+				
+				mf.mesh.vertices = vertices;
+				mf.mesh.uv = uvs;
+				mf.mesh.triangles = triangles;
+				mf.mesh.RecalculateNormals();
+			}
+		}
+
+		/*Vector3[] vertices = new Vector3[width * height * 4 * 2 * 3]; // width * height tiles, 4 faces per tile, 2 triangles per face, 3 verts/triangle, 
 		Vector2[] uvs = new Vector2[width * height * 4 * 2 * 3];
 		//Vector2[] uv2s = new Vector2[width * height * 4 * 2 * 3];
 		int[] triangles = new int[width * height * 4 * 2 * 3];
@@ -227,7 +381,7 @@ public class MapMeshGenerator : MonoBehaviour
 				 * This creates a repeating pattern in the tile geometry, so that it is not biased towards any particular orientation
 				 */   
 				 
-				if ((x % 2) == 1) {
+				/*if ((x % 2) == 1) {
 					SWAPv(ref v0, ref v1);
 					SWAPv(ref v2, ref v3);
 				}
@@ -285,31 +439,7 @@ public class MapMeshGenerator : MonoBehaviour
 			}
 		}
 		
-		/* STEP 6: GRADIENT TEXTURE CREATION
-		 * Applies gradient to main texture
-		 */
-		
-		Renderer rend = GetComponent<Renderer>();
-		Texture2D texture = new Texture2D(512, 1);
-		texture.wrapMode = TextureWrapMode.Repeat;
-		rend.material.SetTexture("_FluidGradient", texture);
-		
-		Color[] colors = new Color[512];
-		for (int x = 0; x < 512; x++) {
-			colors[x] = gradient.Evaluate((float) x / 512f);
-		}
-		
-		texture.SetPixels(colors);
-		texture.Apply(true);
-		
-		rend.material.SetTexture("_FOWTex", FogOfWar.fogTex);
-		rend.material.SetVector("_MapWidthHeight", new Vector4(width, height, 0, 0));
-		
-		/* STEP 7: FINALISATION
-		 * Assigns vertices, triangles, and uvs to mesh
-		 */
-		
-		MeshFilter mf = GetComponent<MeshFilter>();
+		/*MeshFilter mf = GetComponent<MeshFilter>();
 		
 		// unless indexFormat Uint32 is specified, mesh index goes up to only 65536 (16-bit)
 		mf.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
@@ -319,7 +449,7 @@ public class MapMeshGenerator : MonoBehaviour
 		mf.mesh.uv = uvs;
 		//mf.mesh.uv2 = uv2s;
 		mf.mesh.triangles = triangles;
-		mf.mesh.RecalculateNormals();
+		mf.mesh.RecalculateNormals();*/
 	}
 	
 	private void SWAPv(ref Vector3 a, ref Vector3 b)

@@ -7,7 +7,6 @@ public class Projectile : MonoBehaviour
 	private Vector3 start, end;
 	private float distance;
 	private bool initialized = false;
-	private MeshRenderer projectileRender;
 	
 	public bool reachedDestination = false;
 	
@@ -17,7 +16,6 @@ public class Projectile : MonoBehaviour
 		this.distance = Vector3.Distance(start, end);
 		initialized = true;
 		transform.LookAt(end);
-		projectileRender = GetComponent<MeshRenderer>();
 	}
 	
 	private float progress = 0f;
@@ -29,11 +27,10 @@ public class Projectile : MonoBehaviour
 		else if (progress >= 1f) {
 			reachedDestination = true;
 			initialized = false;
-			projectileRender.enabled = false;
-			Destroy(this.gameObject, 3.0f); // applies slight delay to destruction so that reachedDestination variable can be read in time
+			Destroy(this.gameObject); // applies slight delay to destruction so that reachedDestination variable can be read in time
 		}
 		
-		transform.position = Vector3.Lerp(start, end, progress) + Vector3.up;
+		transform.position = Vector3.Lerp(start, end, progress);
 		progress += 1f / (distance * 5f);
     }
 }
