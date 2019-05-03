@@ -199,7 +199,7 @@ public class Player : GameAgent
 	public override void take_damage(int amount)
 	{
         if (stats.currentState == GameAgentState.Alive) {
-            if (!godMode) stats.TakeDamage(amount);
+            if (!godMode) stats.TakeDamage((int)(amount * 0.05));
 
             if (stats.currentState == GameAgentState.Unconscious) {
                 StartCoroutine(animator.PlayKilledAimation());
