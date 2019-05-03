@@ -236,7 +236,7 @@ public class MapManager : MonoBehaviour
 		map[source.x, source.y].occupied = false;
 		map[source.x, source.y].resident = null;
 		
-		StartCoroutine(agent.smooth_movement(path.getPositions()));
+		StartCoroutine(agent.smooth_movement(path));
 	}
 	
 	// applies damage to agent at position, if one is there

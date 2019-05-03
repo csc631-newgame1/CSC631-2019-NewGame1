@@ -85,10 +85,10 @@ public class Enemy : GameAgent
     }
 
 	private bool moving = false;
-    public override IEnumerator smooth_movement(List<Pos> path) 
+    public override IEnumerator smooth_movement(Path path) 
 	{
 		//Debug.Log("started...");
-		grid_pos = path.Last();
+		grid_pos = path.endPos();
 		if (!FogOfWar.IsVisible(grid_pos)) {
 			transform.position = map_manager.grid_to_world(grid_pos);
 			yield break;
@@ -100,7 +100,7 @@ public class Enemy : GameAgent
         //source.PlayOneShot(footsteps);
 
 			Vector3 origin, target;
-			foreach(Pos step in path) {
+			foreach(Pos step in path.getPositions()) {
 
 				origin = transform.position;
 				target = map_manager.grid_to_world(step);
@@ -115,7 +115,7 @@ public class Enemy : GameAgent
 						yield return null;
 					}
 			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+			transform.position = map_manager.grid_to_world(path.endPos());
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;

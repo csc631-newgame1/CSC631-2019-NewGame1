@@ -23,7 +23,7 @@ public abstract class GameAgent : DungeonObject, Damageable, Renderable
 	protected CharacterClassDefiner classDefiner;
 	public Attack currentAttack;
 	
-    public abstract IEnumerator smooth_movement(List<Pos> locations);
+    public abstract IEnumerator smooth_movement(Path path);
 	
 	public abstract void attack(Damageable target);
 	public abstract void playAttackAnimation();
