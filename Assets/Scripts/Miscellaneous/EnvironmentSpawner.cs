@@ -83,7 +83,6 @@ public class EnvironmentSpawner : MonoBehaviour
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
         rng = new System.Random(Settings.MasterSeed);
-        spawnPortals();
         //spawnPortals();
 		paintedList.Clear();
         spawnEnvironment();
