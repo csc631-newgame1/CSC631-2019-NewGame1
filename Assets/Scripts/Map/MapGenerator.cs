@@ -14,13 +14,13 @@ public class MapGenerator : MonoBehaviour
 	
 	private int width;
 	private int height;
+	private int padding;
 	private int fill_percent;
 	private int smoothness;
 	private int region_cull_threshold;
 	private float cell_size;
     private float object_size_scale;
-	private string seed;
-	private Vector3 offset;
+	private int seed;
 	
 	[HideInInspector]
 	public int[,] map;
@@ -28,55 +28,64 @@ public class MapGenerator : MonoBehaviour
 	private List<List<Cmd>> cmds;
 	private Region main_region;
 	
+	// debug stuff
 	private List<Connection> debug_connections;
-	
-	[HideInInspector]
-	public int iteration = -1;
+	private MapManager map_manager;
 	
 	void set_variables()
 	{
-		MapConfiguration config = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>();
-		this.width = config.width;
-		this.height = config.height;
+		MapConfiguration config = GetComponent<MapConfiguration>();
+		this.width = config._width;
+		this.height = config._height;
+		this.padding = config._padding;
 		this.fill_percent = config.fill_percent;
 		this.smoothness = config.smoothness;
 		this.region_cull_threshold = config.region_cull_threshold;
 		this.cell_size = config.cell_size;
         this.object_size_scale = config.object_size_scale;
 		this.seed = config.seed;
-		this.offset = config.GetOffset();
+		
+		map_manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<MapManager>();
 	}
 
-    public void generate_map()
+    public int[,] generate_map()
 	{
 		set_variables();
 		map = new int[width,height];
 		
+		Debug.Log("Generating map data...");
+		
 		// binary map generation, using cellular automata method
 		random_fill();
 		smooth(smoothness);
-		pad_edges();
+		pad_edges(); // pads out map to point where edge is not normally visible to player
 		
 		// map post-processing
 		extract_regions();
 		create_adjacency_lists();
 		bridge_all_regions();
+
+		Debug.Log("Done generating map! Creating meshes...");
 		
-		iteration++;
-		Debug.Log("done generating map!");
+		GetComponent<FogOfWar>().Init();
 
 		MapMeshGenerator surface_gen = transform.Find("Surface").GetComponent<MapMeshGenerator>();
 		surface_gen.generate_map_mesh(map);
 		
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
-		bridge_mesh_gen.generate_bridge_mesh(map);
+		bridge_mesh_gen.generateBridgeMesh(map);
 		
-		// init tile hover detector with map data
-		TileSelector tile_select = transform.Find("TileSelector").GetComponent<TileSelector>();
-		tile_select.init_tile_selector(map);
+		Boundary boundary_gen = transform.Find("Boundaries").GetComponent<Boundary>();
+		boundary_gen.generateBoundary();
+		
+		BoxCollider box = GetComponent<BoxCollider>();
+		box.center = GetComponent<MapConfiguration>().GetCenter();
+		box.size = new Vector3(width, 0.5f, height);
+		
+		Debug.Log("Mesh generation complete!");
+		//print_region_tree();
 
-        //RockGenerator rockGenerator = transform.Find("Surfaces").GetComponent<RockGenerator>();
-        //rockGenerator.generateRocks(map, offset, object_size_scale);
+        return map;
 	}
 	
 	/*****************/
@@ -85,14 +94,6 @@ public class MapGenerator : MonoBehaviour
 	
 	void random_fill()
 	{
-		//qwerwthr
-		int seed = 0;
-		if (this.seed == string.Empty) {
-			seed = Time.time.ToString().GetHashCode();
-		}
-		else {
-			seed = this.seed.GetHashCode();
-		}
 		System.Random rng = new System.Random(seed);
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
@@ -133,16 +134,19 @@ public class MapGenerator : MonoBehaviour
 	}
 	
 	void pad_edges()
-	{
-		for (int x = 0; x < width; x++) {
-			map[x,0] = EMPTY;
-			map[x,height-1] = EMPTY;
+	{	
+		this.width = GetComponent<MapConfiguration>().width;
+		this.height = GetComponent<MapConfiguration>().height;
+		
+		int[,] new_map = new int[width, height];
+		
+		for (int x = padding; x < width - padding; x++) {
+			for (int y = padding; y < height - padding; y++) {
+				new_map[x, y] = map[x - padding, y - padding];
+			}
 		}
 		
-		for (int y = 0; y < height; y++) {
-			map[0,y] = EMPTY;
-			map[width-1,y] = EMPTY;
-		}
+		map = new_map;
 	}
 	
 	/************************/
@@ -289,10 +293,12 @@ public class MapGenerator : MonoBehaviour
 		map[conn.endpt1.x, conn.endpt2.y] = PLATFORM;
 		
 		for (int x = conn.endpt1.x + ix; x != conn.endpt2.x; x += ix) {
-			map[x, conn.endpt2.y] = BRIDGE;
+			if (map[x, conn.endpt2.y] != PLATFORM) // don't overwrite platforms
+				map[x, conn.endpt2.y] = BRIDGE;
 		}
 		for (int y = conn.endpt1.y + iy; y != conn.endpt2.y; y += iy) {
-			map[conn.endpt1.x, y] = BRIDGE;
+			if (map[conn.endpt1.x, y] != PLATFORM) // don't overwrite platforms
+				map[conn.endpt1.x, y] = BRIDGE;
 		}
 		
 		return true;
@@ -331,8 +337,27 @@ public class MapGenerator : MonoBehaviour
 	
 	public Vector3 grid_to_world(Pos pos)
 	{
-		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f) - offset;
+		return new Vector3(pos.x * cell_size + cell_size / 2f, 0f, pos.y * cell_size + cell_size / 2f);
 	}
+	
+	public List<Region> getRegions()
+	{
+		return regions;
+	}
+	
+	public Region getMainRegion()
+	{
+		return main_region;
+	}
+
+    public int GetRegionSize(int ID) {
+        foreach (Region region in regions) {
+            if (region.ID == ID) {
+                return region.count;
+            }
+        }
+        return 0;
+    }
 	
 	/*******************/
 	/* DEBUG FUNCTIONS */
@@ -364,14 +389,45 @@ public class MapGenerator : MonoBehaviour
 	void print_region_connections()
 	{
 		for(int i = 0; i < regions.Count; i++) {
-			Debug.Log("REGION " + (i+2).ToString());
-			foreach(Connection c in regions[i].closest) {
+			//Debug.Log("REGION " + (i+2).ToString());
+			/*foreach(Connection c in regions[i].closest) {
 				Debug.Log(
 				   c.endpt1.ToString() + " => " + c.endpt2.ToString() + " "
 				+ "[ " + Pos.abs_dist(c.endpt1, c.endpt2).ToString() + " ] "
 				+ "{ " + c.ID_1.ID.ToString() + " => " + c.ID_2.ID.ToString() + " }");
+			}*/
+			//Connection closest = regions[i].closest[0];
+			//map_manager.DrawLine(closest.endpt1, closest.endpt2);
+		}
+	}
+	
+	void print_region_tree()
+	{
+		Stack<Region> tree = new Stack<Region>();
+		tree.Push(main_region);
+		System.Random rng = new System.Random(0);
+		while (tree.Count > 0) {
+			Region curr = tree.Pop();
+			Pos a = getRegionPoint(curr.ID);
+			foreach (Region child in curr.connections) {
+				Pos b = getRegionPoint(child.ID);
+				Debug.DrawLine(to_vector3(a), to_vector3(b), new Color(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255)), 60f);
+				tree.Push(child);
 			}
 		}
+	}
+	
+	private Vector3 to_vector3(Pos p)
+	{
+		return new Vector3(p.x, 0f, p.y);
+	}
+	
+	Pos getRegionPoint(int ID)
+	{
+		for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+				if (map[x, y] == ID) return new Pos(x, y);
+		return new Pos(0, 0);
 	}
 	
 	void print_cmds()
@@ -397,7 +453,10 @@ public class MapGenerator : MonoBehaviour
         if (map != null && debug) {
             for (int x = 0; x < width; x ++) {
                 for (int y = 0; y < height; y++) {
-					switch (map[x, y]) {
+					/*if (map[x, y] == main_region.ID)
+						Gizmos.color = Color.cyan;*/
+					//else
+					/*switch (map[x, y]) {
 						case -3: Gizmos.color = Color.grey; break;
 						case -2: Gizmos.color = Color.red; break;
 						case -1: Gizmos.color = Color.red; break;
@@ -407,7 +466,20 @@ public class MapGenerator : MonoBehaviour
 						case 3 : Gizmos.color = Color.blue; break;
 						case 4 : Gizmos.color = Color.green; break;
 						case 5 : Gizmos.color = Color.magenta; break;
-						case 6 : Gizmos.color = Color.cyan; break;
+						//case 6 : Gizmos.color = Color.cyan; break;
+						default : Gizmos.color = Color.black; break;
+					}*/
+					switch (map[x, y]) {
+						case -3: Gizmos.color = Color.white; break;
+						case -2: Gizmos.color = Color.white; break;
+						case -1: Gizmos.color = Color.white; break;
+						case 0 : Gizmos.color = Color.white; break;
+						case 1 : Gizmos.color = Color.black; break;
+						case 2 : Gizmos.color = Color.black; break;
+						case 3 : Gizmos.color = Color.black; break;
+						case 4 : Gizmos.color = Color.black; break;
+						case 5 : Gizmos.color = Color.black; break;
+						//case 6 : Gizmos.color = Color.cyan; break;
 						default : Gizmos.color = Color.black; break;
 					}
                     Vector3 pos = new Vector3(-width/2 + x + .5f, 0f, -height/2 + y + .5f);

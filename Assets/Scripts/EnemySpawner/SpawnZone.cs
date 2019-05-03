@@ -1,28 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using MapUtils;
+using System.Collections.Generic;
 using UnityEngine;
 
 // A number of tiles which enemies are able to spawn in
 public class SpawnZone {
     // Center of the Spawn Zone
-    private Vector3 position;
+    private Pos position;
     // Reach of the Spawn Zone
     private float radius;
     // Traversable unpopulated tiles within the Spawn Zone
-    private List<Vector3> unpopulatedZoneTiles;
+    private List<Pos> unpopulatedZoneTiles;
     // Populated tiles within the Spawn Zone
-    private List<Vector3> populatedZoneTiles;
+    private List<Pos> populatedZoneTiles;
+    // Region
+    public int region;
 
     private bool isPopulated = false;
 
-    public SpawnZone(Vector3 position, float radius) {
+    public SpawnZone(Pos position, float radius, int region) {
         this.position = position;
         this.radius = radius;
-        unpopulatedZoneTiles = new List<Vector3>();
-        populatedZoneTiles = new List<Vector3>();
+        this.region = region;
+        unpopulatedZoneTiles = new List<Pos>();
+        populatedZoneTiles = new List<Pos>();
     }
 
     // Returns the center of the Spawn Zone
-    public Vector3 GetPosition() {
+    public Pos GetPosition() {
         return position;
     }
 
@@ -32,12 +36,12 @@ public class SpawnZone {
     }
 
     // Sets the traversable tiles within the radius of the Spawn Zone
-    public void SetZoneTiles(List<Vector3> unpopulatedZoneTiles) {
+    public void SetZoneTiles(List<Pos> unpopulatedZoneTiles) {
         this.unpopulatedZoneTiles = unpopulatedZoneTiles;
     }
 
     // Gets the traversable tiles within the radius of the Spawn Zone
-    public List<Vector3> GetUnpopulatedZoneTiles() {
+    public List<Pos> GetUnpopulatedZoneTiles() {
         return unpopulatedZoneTiles;
     }
 
@@ -58,10 +62,14 @@ public class SpawnZone {
     }
 
     // Creates tiles that are populated with objects
-    public void PopulateTiles(List<Vector3> populatedZoneTiles) {
+    public void PopulateTiles(List<Pos> populatedZoneTiles) {
         if (populatedZoneTiles.Count > 0) {
             isPopulated = true;
             this.populatedZoneTiles = populatedZoneTiles;
         }
+    }
+
+    public void SetPosition (Pos pos) {
+        position = pos;
     }
 }

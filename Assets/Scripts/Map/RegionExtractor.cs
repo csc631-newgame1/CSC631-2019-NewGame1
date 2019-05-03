@@ -36,16 +36,20 @@ namespace RegionUtils
 	{
 		public int count;
 		public int ID;
+        public int numOfSpawnZones = 0;
 		public Pos startpos;
 		public List<Connection> closest; // stores closest connections of each region
 		public List<Cmd> cmds; // stores geometry of the wall of each region
 		public List<Region> connections; // stores list or regions that connect to this one (only one way)
 		public bool connected_to_main;
-		
+
+        private int[,] map;
+        private static int VISITED = 1;
 		private static int START_REGION_ID = 2;
 		
 		public Region(int[,] map, int ID, int count, Pos pos)
 		{
+            this.map = map;
 			this.ID = ID;
 			this.count = count;
 			this.startpos = pos;
@@ -55,6 +59,40 @@ namespace RegionUtils
 			this.connected_to_main = false;
 			this.connections = new List<Region>();
 		}
+
+        public List<Pos> GetRegionTiles() {
+            int width = map.GetLength(0);
+            int height = map.GetLength(1);
+            int[,] visitedMap = new int[width, height];
+            List<Pos> regionTiles = new List<Pos>();
+
+            AddRegionTile(startpos.x, startpos.y, visitedMap, regionTiles);
+
+            return regionTiles;
+        }
+
+        public void AddRegionTile(int sx, int sy, int[,] visitedMap, List<Pos> regionTiles) {
+            if (sx > 0 && map[sx - 1, sy] == ID && visitedMap[sx - 1, sy] != VISITED) {
+                visitedMap[sx - 1, sy] = VISITED;
+                AddRegionTile(sx - 1, sy, visitedMap, regionTiles);
+                regionTiles.Add(new Pos(sx - 1, sy));
+            }
+            if (sy > 0 && map[sx, sy - 1] == ID && visitedMap[sx, sy - 1] != VISITED) {
+                visitedMap[sx, sy - 1] = VISITED;
+                AddRegionTile(sx, sy - 1, visitedMap, regionTiles);
+                regionTiles.Add(new Pos(sx, sy - 1));
+            }
+            if (sx < map.GetLength(0) - 1 && map[sx + 1, sy] == ID && visitedMap[sx + 1, sy] != VISITED) {
+                visitedMap[sx + 1, sy] = VISITED;
+                AddRegionTile(sx + 1, sy, visitedMap, regionTiles);
+                regionTiles.Add(new Pos(sx + 1, sy));
+            }
+            if (sy < map.GetLength(1) - 1 && map[sx, sy + 1] == ID && visitedMap[sx, sy + 1] != VISITED) {
+                visitedMap[sx, sy + 1] = VISITED;
+                AddRegionTile(sx, sy + 1, visitedMap, regionTiles);
+                regionTiles.Add(new Pos(sx, sy + 1));
+            }
+        }
 		
 		public bool has_connection_to(Region reg)
 		{
@@ -70,7 +108,7 @@ namespace RegionUtils
 		{
 			return "Region #" + (ID - START_REGION_ID).ToString() + " | count = " + count.ToString() + " | start = " + startpos.ToString();
 		}
-		
+                
 		private static int flood_fill(int[,] map, int x, int y, int ID, int fill_ID)
 		{
 			int count = 1;

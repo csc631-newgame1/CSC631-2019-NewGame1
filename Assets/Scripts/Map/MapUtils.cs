@@ -5,6 +5,7 @@ using UnityEngine;
 
 using static MapUtils.Dir;
 using static MapUtils.Type;
+using static GameAgentAction;
 
 namespace MapUtils 
 {
@@ -64,6 +65,50 @@ namespace MapUtils
 			}
 			return "NONE  ";
 		}
+		public static Pos toVector(this Dir dir)
+		{
+			switch (dir) {
+				case LEFT  : return Pos.LEFT;
+				case UP    : return Pos.UP;
+				case RIGHT : return Pos.RIGHT;
+				case DOWN  : return Pos.DOWN;
+			}
+			return Pos.NONE;
+		}
+		/*public static string GetString(this GameAgentAction action)
+		{
+			switch (action) {
+				case Move: return "MOVE";
+				case Wait: return "WAIT";
+				case Potion: return "POTION";
+				case MeleeAttack: return "ATTACK";
+				case Taunt: return "TAUNT";
+				case RangedAttack: return "SHOOT";
+				case RangedAttackMultiShot: return "MULTISHOT";
+				case MagicAttackSingleTarget: return "BOLT";
+				case MagicAttackAOE: return "STORM";
+				case Heal: return "HEAL";
+				case Neutral: return "NEUTRAL";
+			}
+			return "NONE";
+		}*/
+		/*public static string GetMode(this GameAgentAction action)
+		{
+			switch (action) {
+				case Move: return "MOVE";
+				case Wait: return "NONE";
+				case Potion: return "NONE";
+				case MeleeAttack: return "ACT";
+				case Taunt: return "ACT";
+				case RangedAttack: return "ACT";
+				case RangedAttackMultiShot: return "ACT";
+				case MagicAttackSingleTarget: return "ACT";
+				case MagicAttackAOE: return "AOE";
+				case Heal: return "ACT";
+				case Neutral: return "NONE";
+			}
+			return "NONE";
+		}*/
 	}
 	
 	public class Pos 
@@ -72,6 +117,8 @@ namespace MapUtils
 		public static Pos UP = new Pos(0, -1);
 		public static Pos RIGHT = new Pos(1, 0);
 		public static Pos DOWN = new Pos(0, 1);
+		public static Pos NONE = new Pos(0, 0);
+		public static Pos[] Directions = new Pos[] { Pos.LEFT, Pos.UP, Pos.RIGHT, Pos.DOWN };
 		
 		public int x;
 		public int y;
@@ -79,6 +126,10 @@ namespace MapUtils
 		{
 			this.x = x;
 			this.y = y;
+		}
+		public static bool in_bounds(Pos p, int width, int height)
+		{
+			return p.x < width && p.x >= 0 && p.y < height && p.y >= 0;
 		}
 		public static int abs_dist(Pos a, Pos b)
 		{
@@ -112,6 +163,31 @@ namespace MapUtils
 		{
 			return "(" + x.ToString() + "," + y.ToString() + ")";
 		}
+		public override bool Equals(object o)
+		{
+			if (o is Pos) {
+				Pos p = (Pos)o;
+				return p.x == x && p.y == y;
+			}
+			return false;
+		}
+		public override int GetHashCode()
+		{
+			return 0; // getting rid of annoying compile warning
+		}
+		public byte[] toBytes()
+		{
+			byte[] bytes = new byte[8];
+			byte[] xBytes = BitConverter.GetBytes(x);
+			byte[] yBytes = BitConverter.GetBytes(y);
+			if (BitConverter.IsLittleEndian) {
+				Array.Reverse(xBytes);
+				Array.Reverse(yBytes);
+			}
+			Array.Copy(xBytes, 0, bytes, 0, 4);
+			Array.Copy(yBytes, 0, bytes, 4, 4);
+			return bytes;
+		}
 	}
 	
 	public class Cmd
@@ -137,6 +213,18 @@ namespace MapUtils
 		{
 			return pos.ToString() + " | " + dir.GetString() + " | " + type.GetString();
 		}
+		public override bool Equals(object o)
+		{
+			if (o is Cmd) {
+				Cmd c = (Cmd)o;
+				return c.dir == dir && c.type == type && c.pos == pos;
+			}
+			return false;
+		}
+		public override int GetHashCode()
+		{
+			return 0; // getting rid of annoying compile warning
+		}
 	}
 	
 	public static class MapConstants
@@ -155,16 +243,15 @@ namespace MapUtils
 				return true;
 			return false;
 		}
+		
+		public static bool isBridge(int tile)
+		{
+			return tile == PLATFORM || tile == BRIDGE;
+		}
+		
+		public static bool isEdge(int tile)
+		{
+			return tile == EDGE;
+		}
 	}
-
-    public class MapCell {
-        public bool traversable;
-        public bool occupied;
-        public GameAgent resident;
-        public MapCell(bool traversable) {
-            this.traversable = traversable;
-            occupied = false;
-            resident = null;
-        }
-    }
 }

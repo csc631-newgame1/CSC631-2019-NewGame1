@@ -7,6 +7,17 @@ TagManager:
   - Map
   - Collide
   - Enemy
+  - PlayerActMenu
+  - PlayerBattleMenu
+  - PlayerStatsMenu
+  - PlayerStats
+  - Level
+  - HP
+  - MP
+  - LevelValue
+  - HPValue
+  - MPValue
+  - Selector
   layers:
   - Default
   - TransparentFX
