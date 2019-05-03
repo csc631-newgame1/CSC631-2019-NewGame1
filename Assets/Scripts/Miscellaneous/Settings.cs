@@ -5,7 +5,7 @@ using UnityEngine;
 public static class Settings
 {
 	private static System.Random rng = new System.Random(MasterSeed);
-	private static int _MasterSeed = 0;
+	private static int _MasterSeed = 1111111;
 	public static int MasterSeed {
 		get {
 			return _MasterSeed;
