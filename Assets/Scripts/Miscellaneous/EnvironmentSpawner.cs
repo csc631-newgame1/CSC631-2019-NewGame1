@@ -48,6 +48,9 @@ public class EnvironmentSpawner : MonoBehaviour
     public float structureDensity = 0.1f;
     public float objectDensity = 0.3f;
     public float rubbleDensity = 0.5f;
+	
+	[Header("Base Environment Prefab")]
+	public GameObject basePrefab;
 
     [Header("Portrait Prefabs")]
     public GameObject[] folliageStructures;
@@ -59,8 +62,6 @@ public class EnvironmentSpawner : MonoBehaviour
     public GameObject[] undeadStructures;
     public GameObject[] undeadObjects;
     public GameObject[] undeadRubble;
-
-
 
     [Header("Environment Prefabs")]
     public GameObject[] traversableFolliageObject;
@@ -80,7 +81,8 @@ public class EnvironmentSpawner : MonoBehaviour
         this.height = config.height;
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
-        spawnPortals();
+        //spawnPortals();
+		paintedList.Clear();
         spawnEnvironment();
     }
 
@@ -167,7 +169,7 @@ public class EnvironmentSpawner : MonoBehaviour
 
     bool isValidPotraitSpawn(Pos position)
     {
-        return mapManager.IsWalkable(position) && !mapManager.IsReserved(position) && !paintedList.Contains(position);
+        return mapManager.IsWalkable(position) && !mapManager.IsReserved(position) && !paintedList.Contains(position) && !mapManager.IsBridge(position);
     }
 
     bool isValidStructureSpawn(Pos position, List<Pos> referenceList, int radius)
@@ -266,7 +268,6 @@ public class EnvironmentSpawner : MonoBehaviour
         }
 
         allEnvironmentObject.Add(mapManager.instantiate_environment(randomObject, position, true));
-
     }
 
     void updatePaintedList(Pos position, int margin)
@@ -440,25 +441,22 @@ public class EnvironmentSpawner : MonoBehaviour
 
     void spawnRandomTraversableObject(environmentType type, Pos position)
     {
-        allEnvironmentObject.Add(mapManager.instantiate_environment(getRandomEnvironmentObject(type), position, true));
+        mapManager.instantiate_environment(getRandomEnvironmentObject(type), position, true);
     }
 
     void spawnRandomNonTraversableObject(environmentType type, Pos position)
     {
-        allEnvironmentObject.Add(mapManager.instantiate_environment(getRandomEnvironmentObject(type), position, false));
-        return;
+        mapManager.instantiate_environment(getRandomEnvironmentObject(type), position, false);
     }
 
     void spawnTraversableObject(GameObject type, Pos position)
     {
-        allEnvironmentObject.Add(mapManager.instantiate_environment(type, position, true));
-        return;
+        mapManager.instantiate_environment(type, position, true);
     }
 
     void spawnNonTraversableObject(GameObject type, Pos position)
     {
-        allEnvironmentObject.Add(mapManager.instantiate_environment(type, position, false));
-        return;
+		mapManager.instantiate_environment(type, position, false);
     }
 
     GameObject getRandomEnvironmentObject(environmentType type)

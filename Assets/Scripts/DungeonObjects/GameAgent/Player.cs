@@ -129,7 +129,7 @@ public class Player : GameAgent
         playerMovedThisTurn = true;
 	}
 
-	public override void attack(GameAgent target)
+	public override void attack(Damageable target)
 	{
 		animating = true;
 		StartCoroutine(currentAttack.Execute(this, target));

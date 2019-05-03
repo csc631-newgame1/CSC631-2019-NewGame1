@@ -123,7 +123,7 @@ public class Enemy : GameAgent
     }
 	
 	
-	public override void attack(GameAgent target)
+	public override void attack(Damageable target)
 	{
 		Debug.Log(currentAttack);
 		StartCoroutine(currentAttack.Execute(this, target));

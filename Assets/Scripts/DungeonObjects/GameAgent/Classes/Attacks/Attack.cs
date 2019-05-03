@@ -10,7 +10,7 @@ public abstract class Attack
 	protected float damageModifier;
 	
 	public bool attacking;
-	public abstract IEnumerator Execute(GameAgent attacker, GameAgent target);
+	public abstract IEnumerator Execute(GameAgent attacker, Damageable target);
 	public abstract string toString();
 	
 	public Attack(int range, int AOE, float damageModifier) {
@@ -31,11 +31,11 @@ public abstract class Attack
 public class MeleeAttack : Attack
 {
 	public MeleeAttack() : base(1, 1, 3) {}
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Melee");
 		
@@ -59,17 +59,17 @@ public class MeleeAttack : Attack
 public class ShortbowAttack : Attack
 {
 	public ShortbowAttack() : base(7, 1, 1) {}
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Bow");
 		
 		while (attacker.animating) yield return null;
 		
-		Projectile arrow = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "arrow");
+		Projectile arrow = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "arrow");
 		
 		while (!(arrow == null)) yield return null;
 		
@@ -90,17 +90,17 @@ public class ShortbowAttack : Attack
 public class LongbowAttack : Attack
 {
 	public LongbowAttack() : base(11, 1, 0.75f) {}
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Bow");
 		
 		while (attacker.animating) yield return null;
 		
-		var arrow = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "arrow");
+		var arrow = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "arrow");
 		
 		while (!(arrow == null)) yield return null;
 		
@@ -121,17 +121,17 @@ public class LongbowAttack : Attack
 public class FireSpell : Attack
 {
 	public FireSpell() : base(6, 1, 2) {}
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Fire");
 		
 		while (attacker.animating) yield return null;
 		
-		Projectile fire = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "fire");
+		Projectile fire = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "fire");
 		
 		while (!(fire == null)) yield return null;
 		

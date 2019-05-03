@@ -15,8 +15,8 @@ public class MapManager : MonoBehaviour
         public bool occupied;
         public DungeonObject resident; // foreground objects that can be interacted with & block tiles
 		public DungeonObject environment; // background objects that cannot be interacted with
-        public bool reserved;
-        public bool spawn;
+        public bool reserved = false;
+        public bool spawn = false;
         public MapCell(bool traversable) {
             this.traversable = traversable;
             occupied = false;
@@ -144,12 +144,20 @@ public class MapManager : MonoBehaviour
 		return clone;
 	}
 	
-	public GameObject instantiate_environment(GameObject prefab, Pos pos, bool traversable = true)
+	public GameObject instantiate_environment(GameObject environmentObject, Pos pos, bool traversable = true)
 	{
         int randomY = rng.Next(1, 4) * 90;
-        GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.Euler(new Vector3(0, randomY, 0)));
 		
-		DungeonObject env = clone.GetComponent<DungeonObject>();
+		// detect whether this object is a prefab or has already been spawned
+		if (environmentObject.scene.name != null) {
+			environmentObject.transform.position = grid_to_world(pos);
+			environmentObject.transform.rotation = Quaternion.Euler(new Vector3(0, randomY, 0));
+		}
+		else {
+			environmentObject = Instantiate(environmentObject, grid_to_world(pos), Quaternion.Euler(new Vector3(0, randomY, 0)));
+		}
+		
+		DungeonObject env = environmentObject.GetComponent<DungeonObject>();
 		(env as Environment).init_environment(pos);
 		
 		if (!traversable) {
@@ -165,7 +173,7 @@ public class MapManager : MonoBehaviour
 			map[pos.x, pos.y].environment = env;
 		}
 		
-		return clone;
+		return environmentObject;
 	}
 	
 	// place a player's object back onto the map
@@ -244,13 +252,9 @@ public class MapManager : MonoBehaviour
 		GameAgent attacker = obj_attacker as GameAgent;
 		attacker.SetCurrentAction(actionNo);
 		
-		if (obj_target is GameAgent) {
-			GameAgent target = obj_target as GameAgent;
-			attacker.attack(target);
-		}
-		else if (obj_target is Damageable) {
+		if (obj_target is Damageable) {
 			Damageable target = obj_target as Damageable;
-			target.take_damage(attacker.stats.DealDamage());
+			attacker.attack(target);
 		}
 	}
 	
@@ -599,6 +603,11 @@ public class MapManager : MonoBehaviour
 		if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
 			return false;
 		return map[pos.x, pos.y].resident is Interactable;
+	}
+	
+	public bool IsBridge(Pos pos)
+	{
+		return map_raw[pos.x, pos.y] == BRIDGE || map_raw[pos.x, pos.y] == PLATFORM;
 	}
 
     public bool IsTileInRegion(Pos tile, int ID) {

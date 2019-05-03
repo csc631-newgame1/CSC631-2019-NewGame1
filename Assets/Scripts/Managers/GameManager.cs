@@ -26,8 +26,8 @@ public class GameManager : MonoBehaviour
     
 	void Start()
 	{
+		instance = this;
 		Init();
-        instance = this;
     }
 	
     void Init()
@@ -195,9 +195,9 @@ public class GameManager : MonoBehaviour
         //instance.localPlayer.potion();
     }
 	
-	public static void kill(DungeonObject obj)
+	public static void kill(DungeonObject obj, float waitTime = 5f)
 	{
-		instance.map_manager.de_instantiate(obj.grid_pos);
+		instance.map_manager.de_instantiate(obj.grid_pos, waitTime);
 		if (obj is GameAgent)
 			instance.turn_manager.removeFromRoster(obj as GameAgent);
 	}
