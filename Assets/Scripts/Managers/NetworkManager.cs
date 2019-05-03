@@ -123,7 +123,7 @@ public class NetworkManager : MonoBehaviour
 					} else {
 						Debug.Log("New player with client ID #" + _join.clientID + " joined!");
 						Network.submitCommand(new UpdateClientInfoCommand(Network.getPeer(clientID)));
-						if (clientID == 0)
+						if (clientID == 1)
 							Network.submitCommand(new SetSeedCommand(Settings.MasterSeed));
 					}
 					Network.setPeer(_join.clientID);
@@ -133,6 +133,9 @@ public class NetworkManager : MonoBehaviour
 					Debug.Log("Received START");
 					if (SceneManager.GetActiveScene().name == "NewMenu") { // only loads new scene if we're in the lobby
 						SceneManager.LoadScene("Procedural");
+						foreach (Client client in Network.getPeers()) {
+							client.ready = false;
+						}
 					}
 				}
 				if (cmd is EndCommand) {

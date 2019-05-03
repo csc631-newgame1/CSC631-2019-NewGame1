@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -41,9 +42,14 @@ public class MeleeAttack : Attack
 		Debug.Log("Waiting for animation to finish");
 		while (attacker.animating) yield return null;
 		
-		target.playHitAnimation();
-		target.playHitNoise("Melee");
-		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		try {
+			target.playHitAnimation();
+			target.playHitNoise("Melee");
+			target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}
@@ -67,9 +73,14 @@ public class ShortbowAttack : Attack
 		
 		while (!(arrow == null)) yield return null;
 		
+		try {
 		target.playHitAnimation();
 		target.playHitNoise("Bow");
 		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}
@@ -93,9 +104,14 @@ public class LongbowAttack : Attack
 		
 		while (!(arrow == null)) yield return null;
 		
+		try {
 		target.playHitAnimation();
 		target.playHitNoise("Bow");
 		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}
@@ -119,9 +135,14 @@ public class FireSpell : Attack
 		
 		while (!(fire == null)) yield return null;
 		
+		try {
 		target.playHitAnimation();
 		target.playHitNoise("Fire");
 		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}

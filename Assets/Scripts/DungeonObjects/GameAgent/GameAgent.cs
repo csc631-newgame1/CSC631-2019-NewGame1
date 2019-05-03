@@ -48,12 +48,18 @@ public abstract class GameAgent : DungeonObject, Damageable, Renderable
     public abstract void wait();
     public abstract void potion();
 	public abstract void take_damage(int amount);
+	private int actionNo;
 	public bool SetCurrentAction(int action)
 	{
 		Attack[] attacks = stats.playerCharacterClass.GetAvailableActs();
 		if (action >= attacks.Length) return false;
 		else currentAttack = attacks[action];
+		actionNo = action;
 		return true;
+	}
+	public int GetCurrentAction()
+	{
+		return actionNo;
 	}
 
     public void UseItemOnSelf(int slot)

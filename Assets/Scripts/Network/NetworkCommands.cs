@@ -75,7 +75,7 @@ public class ReadyCommand : NetworkCommand
 	// parse everything to the right of the '$' in the string returned by getString() for this object
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
-		return new ReadyCommand(Int32.Parse(cmdString));
+		return new ReadyCommand(int.Parse(cmdString));
 	}
 }
 
@@ -176,7 +176,7 @@ public class AttackCommand : NetworkCommand
 		this.end = end;
 		this.actionNo = actionNo;
 	}
-	public override string getString() { return ID + "$" + clientID + "," + end.x + "," + end.y + "," + clientID; }
+	public override string getString() { return ID + "$" + clientID + "," + end.x + "," + end.y + "," + actionNo; }
 	// parse everything to the right of the '$' in the string returned by getString() for this object
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{

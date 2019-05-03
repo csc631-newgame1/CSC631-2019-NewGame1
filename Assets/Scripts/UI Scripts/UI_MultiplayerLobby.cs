@@ -78,10 +78,9 @@ public class UI_MultiplayerLobby : MonoBehaviour
 	
 	public void StartGame()
 	{
-		foreach (Client client in Network.getPeers()) {
-			if (!client.ready) return;
+		if (NetworkManager.clientID == 1 && Network.allPlayersReady()) {
+			Network.submitCommand(new StartCommand());
 		}
-		Network.submitCommand(new StartCommand());
 	}
 	
 	public void Back()
