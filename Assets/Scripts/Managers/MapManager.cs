@@ -576,7 +576,7 @@ public class MapManager : MonoBehaviour
 			do {
 				x = rng.Next(0, width - 1);
 				y = rng.Next(0, height - 1);
-			} while (map_raw[x, y] != spawnRegion.ID);
+			} while (map_raw[x, y] != spawnRegion.ID && IsWalkable(map[x, y]));
 			
 			spawnPositions.Add(new Pos(x, y));
 		}

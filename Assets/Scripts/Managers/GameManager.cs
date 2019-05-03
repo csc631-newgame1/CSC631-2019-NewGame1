@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
 		// spawn players
 		for (int i = 0; i < players.Count; i++) {
 			if (players[i].playerObject == null) {
+				Debug.Log(spawn_locations[i+1] + "," + players.Count);
 				Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
 				instance.SetCharacterClass(players[i].classname);
 				players[i].playerObject = instance;
