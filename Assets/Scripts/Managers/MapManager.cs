@@ -15,6 +15,8 @@ public class MapManager : MonoBehaviour
         public bool occupied;
         public DungeonObject resident; // foreground objects that can be interacted with & block tiles
 		public DungeonObject environment; // background objects that cannot be interacted with
+        public bool reserved;
+        public bool spawn;
         public MapCell(bool traversable) {
             this.traversable = traversable;
             occupied = false;
@@ -90,13 +92,24 @@ public class MapManager : MonoBehaviour
 		this.height = config.height;
 		this.cell_size = config.cell_size;
 	}
-	
-	/*****************/
-	/* MAP FUNCTIONS */
-	/*****************/
 
-	// instantiates an agent into the map at a random position
-	public GameObject instantiate_randomly(GameObject type)
+    /*****************/
+    /* MAP FUNCTIONS */
+    /*****************/
+
+    public void setTileReserved(Pos position)
+    {
+        map[position.x, position.y].reserved = true;
+    }
+
+    public void setTileSpawn(Pos position)
+    {
+        map[position.x, position.y].reserved = true;
+        map[position.x, position.y].spawn = true;
+    }
+
+    // instantiates an agent into the map at a random position
+    public GameObject instantiate_randomly(GameObject type)
 	{
 		int x = rng.Next(0, width - 1);
 		int y = rng.Next(0, height - 1);
@@ -133,7 +146,8 @@ public class MapManager : MonoBehaviour
 	
 	public GameObject instantiate_environment(GameObject prefab, Pos pos, bool traversable = true)
 	{
-		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
+        int randomY = rng.Next(1, 4) * 90;
+        GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.Euler(new Vector3(0, randomY, 0)));
 		
 		DungeonObject env = clone.GetComponent<DungeonObject>();
 		(env as Environment).init_environment(pos);
@@ -385,12 +399,28 @@ public class MapManager : MonoBehaviour
 		}
 		return distances;
 	}
-	
-	/*********************/
-	/* UTILITY FUNCTIONS */
-	/*********************/
-	
-	private class RegionNode
+
+    /*********************/
+    /* UTILITY FUNCTIONS */
+    /*********************/
+
+    // returns true if tile terrain at position is a spawn point.
+    public bool IsSpawnPoint(Pos pos)
+    {
+        if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+            return false;
+        return map[pos.x, pos.y].spawn;
+    }
+
+    // returns true if tile terrain at position is reserved.
+    public bool IsReserved(Pos pos)
+    {
+        if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+            return false;
+        return map[pos.x, pos.y].reserved;
+    }
+
+    private class RegionNode
 	{
 		public Region region;
 		public int height = 0;
@@ -412,10 +442,75 @@ public class MapManager : MonoBehaviour
 			else return children[n].find_nth_furthest_region(0);
 		}
 	}
-	
-	// finds <amount> spawnpoints + 1 endpoint, for initial placement of players/level end. endpoint is always at 0th position in list
-	// traverses region tree to find the two furthest away regions
-	public List<Pos> findSpawnpoints(int amount)
+
+    public Region[] findFurthestRegions(int amount)
+    {
+        RegionNode root = new RegionNode(region_tree_root);
+        Stack<RegionNode> bottom = new Stack<RegionNode>();
+        Stack<RegionNode> top = new Stack<RegionNode>();
+
+        // traverses tree from bottom->top, pushing nodes to a stack so we can traverse them top->bottom later
+        bottom.Push(root);
+        while (bottom.Count > 0)
+        {
+            RegionNode curr = bottom.Pop();
+            top.Push(curr);
+            foreach (RegionNode child in curr.children)
+            {
+                bottom.Push(child);
+            }
+        }
+
+        RegionNode diameterNode = null; // root node of the subtree with the largest diameter
+        int maxDiameter = 0;
+        // gets the node in the region tree where the two furthest-most leaf nodes are from one another
+        while (top.Count > 0)
+        {
+            RegionNode curr = top.Pop();
+            int diameter;
+            // if this node is a leaf node, set height/diameter to 1
+            if (curr.children.Count == 0)
+            {
+                curr.height = 1;
+                diameter = 1;
+            }
+            // if this node only has one child, set height/diameter to child height + 1
+            else if (curr.children.Count == 1)
+            {
+                curr.height = curr.children[0].height + 1;
+                diameter = curr.height;
+            }
+            // otherwise, find the two tallest children, set height to the height of the tallest child, and set diameter to the sum of the tallest children + 1
+            else
+            {
+                curr.children.Sort( // sorts children by height
+                    delegate (RegionNode a, RegionNode b) {
+                        return a.height.CompareTo(b.height);
+                    });
+                curr.children.Reverse(); // sorts from tallest->smallest
+
+                curr.height = curr.children[0].height + 1;
+                diameter = curr.children[0].height + curr.children[1].height + 1;
+                Debug.Log("diameter:" + diameter);
+            }
+            if (diameter > maxDiameter)
+            {
+                maxDiameter = diameter;
+                diameterNode = curr;
+            }
+        }
+
+        Debug.Log("Max diameter: " + maxDiameter);
+        // once the diameter root has been found, get the farthest-most regions
+        Region spawnRegion = diameterNode.find_nth_furthest_region(0);
+        Region endRegion = diameterNode.find_nth_furthest_region(1);
+
+        return new Region[] { spawnRegion, endRegion };
+    }
+
+    // finds <amount> spawnpoints + 1 endpoint, for initial placement of players/level end. endpoint is always at 0th position in list
+    // traverses region tree to find the two furthest away regions
+    public List<Pos> findSpawnpoints(int amount)
 	{
 		RegionNode root = new RegionNode(region_tree_root);
 		Stack<RegionNode> bottom = new Stack<RegionNode>();
