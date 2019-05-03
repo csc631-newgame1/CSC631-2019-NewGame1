@@ -14,6 +14,7 @@ public class EnvironmentSpawner : MonoBehaviour
 
     // Map variables.
     float cell_size;
+    private System.Random rng;
     int width;
     int height;
     enum environmentType { traversableFolliage, nonTraversableFolliage, traversableObject, nonTraversableObject, traversableStructure, nonTraversableStructure, particle, portal };
@@ -80,6 +81,7 @@ public class EnvironmentSpawner : MonoBehaviour
         this.height = config.height;
         this.cell_size = config.cell_size;
         this.mapManager = mapManager;
+        rng = new System.Random(Settings.Seed);
         spawnPortals();
         spawnEnvironment();
     }
@@ -88,7 +90,7 @@ public class EnvironmentSpawner : MonoBehaviour
 
     void spawnPortrait(Pos position, portraitType type)
     {
-        int radius = Random.Range(minRadius, maxRadius);
+        int radius = rng.Next(minRadius, maxRadius);
 
         Pos startPos = new Pos(position.x - radius, position.y - radius);
         Pos endPos = new Pos(position.x + radius, position.y + radius);
@@ -108,7 +110,7 @@ public class EnvironmentSpawner : MonoBehaviour
         for (i = targetRubbleQuota; i > 0; i--)
         {
             if (rubblePosList.Count <= 0) break;
-            randomIndex = Random.Range(0, rubblePosList.Count);
+            randomIndex = rng.Next(0, rubblePosList.Count);
             spawnPos = rubblePosList[randomIndex];
             spawnRubble(spawnPos, type);
             rubblePosList.RemoveAt(randomIndex);
@@ -120,7 +122,7 @@ public class EnvironmentSpawner : MonoBehaviour
             int attempt = validPosList.Count;
             do
             {
-                randomIndex = Random.Range(0, validPosList.Count);
+                randomIndex = rng.Next(0, validPosList.Count);
                 spawnPos = validPosList[randomIndex];
                 attempt--;
             } while (!isValidStructureSpawn(spawnPos, validPosList, structureRadius) && attempt > 0);
@@ -134,13 +136,13 @@ public class EnvironmentSpawner : MonoBehaviour
         for (i = targetObjectQuota; i > 0; i--)
         {
             if (validPosList.Count <= 0) break;
-            randomIndex = Random.Range(0, validPosList.Count);
+            randomIndex = rng.Next(0, validPosList.Count);
             spawnPos = validPosList[randomIndex];
             spawnObject(spawnPos, type);
             validPosList.RemoveAt(randomIndex);
         }
 
-        portraitMargin = Random.Range(minPortraitMargin, maxPortraitMargin);
+        portraitMargin = rng.Next(minPortraitMargin, maxPortraitMargin);
         updatePaintedList(position, radius + portraitMargin);
     }
 
@@ -190,7 +192,7 @@ public class EnvironmentSpawner : MonoBehaviour
 
     portraitType getRandomPortraitType()
     {
-        int randomIndex = Random.Range(1, sizeof(portraitType));
+        int randomIndex = rng.Next(1, sizeof(portraitType));
         return (portraitType)randomIndex;
     }
 
@@ -202,15 +204,15 @@ public class EnvironmentSpawner : MonoBehaviour
         switch (type)
         {
             case portraitType.orc:
-                randomIndex = Random.Range(0, orcStructures.Length);
+                randomIndex = rng.Next(0, orcStructures.Length);
                 randomObject = orcStructures[randomIndex];
                 break;
             case portraitType.undead:
-                randomIndex = Random.Range(0, undeadStructures.Length);
+                randomIndex = rng.Next(0, undeadStructures.Length);
                 randomObject = undeadStructures[randomIndex];
                 break;
             default:
-                randomIndex = Random.Range(0, folliageStructures.Length);
+                randomIndex = rng.Next(0, folliageStructures.Length);
                 randomObject = folliageStructures[randomIndex];
                 break;
         }
@@ -227,15 +229,15 @@ public class EnvironmentSpawner : MonoBehaviour
         switch (type)
         {
             case portraitType.orc:
-                randomIndex = Random.Range(0, orcObjects.Length);
+                randomIndex = rng.Next(0, orcObjects.Length);
                 randomObject = orcObjects[randomIndex];
                 break;
             case portraitType.undead:
-                randomIndex = Random.Range(0, undeadObjects.Length);
+                randomIndex = rng.Next(0, undeadObjects.Length);
                 randomObject = undeadObjects[randomIndex];
                 break;
             default:
-                randomIndex = Random.Range(0, folliageObjects.Length);
+                randomIndex = rng.Next(0, folliageObjects.Length);
                 randomObject = folliageObjects[randomIndex];
                 break;
         }
@@ -252,15 +254,15 @@ public class EnvironmentSpawner : MonoBehaviour
         switch (type)
         {
             case portraitType.orc:
-                randomIndex = Random.Range(0, orcRubble.Length);
+                randomIndex = rng.Next(0, orcRubble.Length);
                 randomObject = orcRubble[randomIndex];
                 break;
             case portraitType.undead:
-                randomIndex = Random.Range(0, undeadRubble.Length);
+                randomIndex = rng.Next(0, undeadRubble.Length);
                 randomObject = undeadRubble[randomIndex];
                 break;
             default:
-                randomIndex = Random.Range(0, folliageRubble.Length);
+                randomIndex = rng.Next(0, folliageRubble.Length);
                 randomObject = folliageRubble[randomIndex];
                 break;
         }
@@ -334,8 +336,8 @@ public class EnvironmentSpawner : MonoBehaviour
 
         do
         {
-            randomX = Random.Range(startRegionPosition.x - startRegionMargin, startRegionPosition.x + startRegionMargin);
-            randomY = Random.Range(startRegionPosition.y - startRegionMargin, startRegionPosition.y + startRegionMargin);
+            randomX = rng.Next(startRegionPosition.x - startRegionMargin, startRegionPosition.x + startRegionMargin);
+            randomY = rng.Next(startRegionPosition.y - startRegionMargin, startRegionPosition.y + startRegionMargin);
             position = new Pos(randomX, randomY);
         } while (!mapManager.IsTraversable(position));
         spawnTraversableObject(startPortal, position);
@@ -344,8 +346,8 @@ public class EnvironmentSpawner : MonoBehaviour
 
         do
         {
-            randomX = Random.Range(endRegionPosition.x - endRegionMargin, endRegionPosition.x + endRegionMargin);
-            randomY = Random.Range(endRegionPosition.y - endRegionMargin, endRegionPosition.y + endRegionMargin);
+            randomX = rng.Next(endRegionPosition.x - endRegionMargin, endRegionPosition.x + endRegionMargin);
+            randomY = rng.Next(endRegionPosition.y - endRegionMargin, endRegionPosition.y + endRegionMargin);
             position = new Pos(randomX, randomY);
         } while (!mapManager.IsTraversable(position));
         spawnTraversableObject(exitPortal, position);
@@ -391,46 +393,46 @@ public class EnvironmentSpawner : MonoBehaviour
     {
         float random;
 
-        random = Random.Range(0, environmentDensity);
+        random = rng.Next(0, environmentDensity);
         if (random < environmentDensity * traversableFolliagDensity)
         {
             spawnRandomTraversableObject(environmentType.traversableFolliage, position);
         }
 
-        random = Random.Range(0, environmentDensity);
+        random = rng.Next(0, environmentDensity);
         if (random < environmentDensity * particleDensity)
         {
             spawnRandomTraversableObject(environmentType.particle, position);
         }
 
-        random = Random.Range(0, environmentDensity);
+        random = rng.Next(0, environmentDensity);
         if (random < environmentDensity * traversableObjectDensity)
         {
             spawnRandomTraversableObject(environmentType.traversableObject, position);
         }
 
-        random = Random.Range(0, environmentDensity);
+        random = rng.Next(0, environmentDensity);
         if (random < environmentDensity * traversableStructureDensity)
         {
             spawnRandomTraversableObject(environmentType.traversableStructure, position);
             return;
         }
 
-        random = Random.Range(0, environmentDensity);
+        random = rng.Next(0, environmentDensity);
         if (random < environmentDensity * nonTraversableFolliageDensity)
         {
             spawnRandomNonTraversableObject(environmentType.nonTraversableFolliage, position);
             return;
         }
 
-        random = Random.Range(0, environmentDensity);
+        random = rng.Next(0, environmentDensity);
         if (random < environmentDensity * nonTraversableObjectDensity)
         {
             spawnRandomNonTraversableObject(environmentType.nonTraversableObject, position);
             return;
         }
 
-        random = Random.Range(0, environmentDensity);
+        random = rng.Next(0, environmentDensity);
         if (random < environmentDensity * nonTraversableStructureDensity)
         {
             spawnRandomNonTraversableObject(environmentType.nonTraversableStructure, position);
@@ -467,25 +469,25 @@ public class EnvironmentSpawner : MonoBehaviour
         switch (type)
         {
             case environmentType.traversableFolliage:
-                index = Random.Range(0, traversableFolliageObject.Length);
+                index = rng.Next(0, traversableFolliageObject.Length);
                 return traversableFolliageObject[index];
             case environmentType.nonTraversableFolliage:
-                index = Random.Range(0, nonTraversableFolliageObject.Length);
+                index = rng.Next(0, nonTraversableFolliageObject.Length);
                 return nonTraversableFolliageObject[index];
             case environmentType.traversableObject:
-                index = Random.Range(0, traversableObjectObject.Length);
+                index = rng.Next(0, traversableObjectObject.Length);
                 return traversableObjectObject[index];
             case environmentType.nonTraversableObject:
-                index = Random.Range(0, nonTraversableObjectObject.Length);
+                index = rng.Next(0, nonTraversableObjectObject.Length);
                 return nonTraversableObjectObject[index];
             case environmentType.traversableStructure:
-                index = Random.Range(0, traversableStructureObject.Length);
+                index = rng.Next(0, traversableStructureObject.Length);
                 return traversableStructureObject[index];
             case environmentType.nonTraversableStructure:
-                index = Random.Range(0, nonTraversableStructureObject.Length);
+                index = rng.Next(0, nonTraversableStructureObject.Length);
                 return nonTraversableStructureObject[index];
             case environmentType.particle:
-                index = Random.Range(0, particleObject.Length);
+                index = rng.Next(0, particleObject.Length);
                 return particleObject[index];
             default:
                 Debug.Log("getRandomEnvironmentObject() error.");
