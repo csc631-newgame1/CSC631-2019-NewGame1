@@ -53,6 +53,8 @@ public class Player : GameAgent
 	public AudioClip[] hitNoise;
 	public AudioClip[] armorHitNoise;
 	
+	private int max_move_budget;
+	
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
@@ -61,7 +63,8 @@ public class Player : GameAgent
 
         this.stats = stats;
         UpdateViewableEditorPlayerStats();
-		move_budget = 25;
+		max_move_budget = 15;
+		move_budget = max_move_budget;
 		speed = 10;
 		this.nickname = name;
 
@@ -96,15 +99,16 @@ public class Player : GameAgent
 	}
 	
 	private bool moving = false;
-    public override IEnumerator smooth_movement(List<Pos> path)
+    public override IEnumerator smooth_movement(Path path)
 	{
 		while (moving) yield return null; // wait for any previous movement to finish
 		moving = true;
+		move_budget -= path.distance();
 
         StartCoroutine(animator.StartMovementAnimation());
         //source.PlayOneShot(footsteps);
 			Vector3 origin, target;
-			foreach(Pos step in path) {
+			foreach(Pos step in path.getPositions()) {
 				grid_pos = step;
 
 				origin = transform.position;
@@ -120,11 +124,11 @@ public class Player : GameAgent
 						yield return null;
 					}
 			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+			transform.position = map_manager.grid_to_world(path.endPos());
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
-		grid_pos = path.Last();
+		grid_pos = path.endPos();
 		
         playerMovedThisTurn = true;
 	}
@@ -133,6 +137,13 @@ public class Player : GameAgent
 	{
 		animating = true;
 		StartCoroutine(currentAttack.Execute(this, target));
+		StartCoroutine(waitForAttackEnd());
+	}
+	
+	private IEnumerator waitForAttackEnd()
+	{
+		while (currentAttack.attacking) yield return null;
+		playerActedThisTurn = true;
 	}
 	
 	public void Hit(){ animating = false; }
@@ -223,6 +234,7 @@ public class Player : GameAgent
             playerActedThisTurn = false;
             playerUsedPotionThisTurn = false;
             playerWaitingThisTurn = false;
+			move_budget = max_move_budget;
         }
 
         UpdateViewableEditorPlayerStats();
