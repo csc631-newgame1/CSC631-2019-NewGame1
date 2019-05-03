@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour
 		UI_BattleMenu.SetActButtons(localPlayer.getActionNames());
 		
 		turn_manager.StartLoop();
+		Network.submitCommand(new ReadyCommand(NetworkManager.clientID));
     }
 	
 	void DeInit()
@@ -82,6 +83,9 @@ public class GameManager : MonoBehaviour
 	
 	public static void NextLevel()
 	{
+		foreach (Client client in Network.getPeers()) {
+			client.ready = false;
+		}
 		instance.DeInit();
 		instance.Init();
 	}

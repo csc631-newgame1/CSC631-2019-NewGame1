@@ -17,6 +17,8 @@ public class FogOfWar : MonoBehaviour
 	const int VIEW_RANGE = 14;
 	
 	public static Texture2D fogTex;
+	private static Texture2D FogClear;
+	private static Texture2D FogActual;
 	
     public void Init()
 	{
@@ -27,9 +29,20 @@ public class FogOfWar : MonoBehaviour
 		height = config.height; // pads out width/height
 		fog = new byte[width * height];
 		
-		fogTex = new Texture2D(width, height, TextureFormat.Alpha8, false);
-		fogTex.wrapMode = TextureWrapMode.Clamp;
+		FogActual = new Texture2D(width, height, TextureFormat.Alpha8, false);
+		FogActual.wrapMode = TextureWrapMode.Clamp;
 		UpdateTexture();
+		
+		fogTex = FogActual;
+		
+		/*FogClear = new Texture2D(width, height, TextureFormat.Alpha8, false);
+		FogClear.wrapMode = TextureWrapMode.Clamp;
+		byte[] visible = new byte[width * height];
+		for (int i = 0; i < width * height; i++) {
+			visible[i] = VISIBLE;
+		}
+		FogClear.LoadRawTextureData(visible);
+		FogClear.Apply();*/
 	}
 	
 	void clearActiveVisibility()
@@ -46,6 +59,12 @@ public class FogOfWar : MonoBehaviour
 			UpdateVisibility(player.grid_pos);
 		}
 		
+		if (Input.GetKeyDown("c")) {
+			fogTex = FogClear;
+		}
+		else if (Input.GetKeyDown("v")) {
+			fogTex = FogActual;
+		}
 		UpdateTexture();
 	}
 	
@@ -66,8 +85,8 @@ public class FogOfWar : MonoBehaviour
 	
 	void UpdateTexture()
 	{
-		fogTex.LoadRawTextureData(fog);
-		fogTex.Apply();
+		FogActual.LoadRawTextureData(fog);
+		FogActual.Apply();
 	}
 	
 	public static bool IsVisible(Pos position)

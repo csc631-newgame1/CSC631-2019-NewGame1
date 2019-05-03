@@ -75,7 +75,7 @@ public class ReadyCommand : NetworkCommand
 	// parse everything to the right of the '$' in the string returned by getString() for this object
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
-		return new ReadyCommand(Int32.Parse(cmdString));
+		return new ReadyCommand(int.Parse(cmdString));
 	}
 }
 

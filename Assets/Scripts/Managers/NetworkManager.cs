@@ -133,6 +133,9 @@ public class NetworkManager : MonoBehaviour
 					Debug.Log("Received START");
 					if (SceneManager.GetActiveScene().name == "NewMenu") { // only loads new scene if we're in the lobby
 						SceneManager.LoadScene("Procedural");
+						foreach (Client client in Network.getPeers()) {
+							client.ready = false;
+						}
 					}
 				}
 				if (cmd is EndCommand) {

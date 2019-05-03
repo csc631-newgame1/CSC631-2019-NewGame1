@@ -98,6 +98,7 @@ public class Player : GameAgent
 	private bool moving = false;
     public override IEnumerator smooth_movement(List<Pos> path)
 	{
+		while (moving) yield return null; // wait for any previous movement to finish
 		moving = true;
 
         StartCoroutine(animator.StartMovementAnimation());
@@ -275,7 +276,7 @@ public class Player : GameAgent
 		TurnManager.instance.removeFromRoster(this);
 	}
 	
-	public bool can_take_action() { return !playerExtracted && animationFinished() && !turn_over(); }
+	public bool can_take_action() { return !playerExtracted && animationFinished() && !turn_over() && Network.allPlayersReady(); }
 	
 	public void SetCharacterClass(string classname) {
 		
