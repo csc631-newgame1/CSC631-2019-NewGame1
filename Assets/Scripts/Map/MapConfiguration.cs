@@ -15,7 +15,7 @@ public class MapConfiguration : MonoBehaviour
 	public int fill_percent;
 	[Range(0, 30)]
 	public int smoothness;
-	[Range(1, 100)]
+	[Range(0, 100)]
 	public int region_cull_threshold;
 	
 	[Range(0, 10)]
@@ -28,7 +28,7 @@ public class MapConfiguration : MonoBehaviour
 	public float floor_texture_scale;
     public float object_size_scale;
 	
-	public int seed { get { return Settings.Seed; } }
+	public int seed { get { return Settings.MapSeed; } }
 
     public Vector3 GetCenter() {
         return new Vector3(width / (2f * cell_size), 0.0f, height / (2f * cell_size));

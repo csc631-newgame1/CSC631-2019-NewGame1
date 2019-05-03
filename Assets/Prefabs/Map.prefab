@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3944264686535409687}
   - component: {fileID: 3944264686535409680}
-  - component: {fileID: 3944264686535409681}
   - component: {fileID: 3944264686535409686}
   m_Layer: 0
   m_Name: Surface
@@ -46,6 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   steepness: 1
+  chunkPrefab: {fileID: 2878730704487881841, guid: 8569604120fe7f149be362028915bc13,
+    type: 3}
   gradient:
     serializedVersion: 2
     key0: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 0.40784314}
@@ -75,14 +76,6 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
---- !u!33 &3944264686535409681
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3944264686535409684}
-  m_Mesh: {fileID: 0}
 --- !u!23 &3944264686535409686
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -182,8 +175,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e200e9a9eb6534f918eb71dcac6113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _width: 60
-  _height: 60
+  _width: 50
+  _height: 50
   _padding: 15
   fill_percent: 51
   smoothness: 8

@@ -6,12 +6,12 @@ using MapUtils;
 
 public enum GameAgentAction { Move, Wait, Potion, MeleeAttack, Taunt, RangedAttack, RangedAttackMultiShot, MagicAttackSingleTarget, MagicAttackAOE, Heal, Neutral };
 
-public abstract class GameAgent : DungeonObject
+public abstract class GameAgent : DungeonObject, Damageable, Renderable
 {
     public float speed;
 	public string nickname;
     public GameAgentStats stats;
-    public GameAgentAction currentAction;
+    //public GameAgentAction currentAction;
 	
     public GameAgentState currentState;
 	public AIComponent AI;
@@ -19,11 +19,18 @@ public abstract class GameAgent : DungeonObject
 	public int move_budget;
 
     public Inventory inventory = new Inventory();
-	public bool animating;
+	public bool animating = false;
+	protected CharacterClassDefiner classDefiner;
+	public Attack currentAttack;
 	
     public abstract IEnumerator smooth_movement(List<Pos> locations);
 	
-	public abstract IEnumerator animate_attack(GameAgent target);
+	public abstract void attack(Damageable target);
+	public abstract void playAttackAnimation();
+	public abstract void playHitAnimation();
+	public abstract void playAttackNoise(string type);
+	public abstract void playHitNoise(string type);
+	public abstract bool animationFinished();
 
     public abstract void GetHealed(int amount);
 	
@@ -40,6 +47,20 @@ public abstract class GameAgent : DungeonObject
     public abstract void act();
     public abstract void wait();
     public abstract void potion();
+	public abstract void take_damage(int amount);
+	private int actionNo;
+	public bool SetCurrentAction(int action)
+	{
+		Attack[] attacks = stats.playerCharacterClass.GetAvailableActs();
+		if (action >= attacks.Length) return false;
+		else currentAttack = attacks[action];
+		actionNo = action;
+		return true;
+	}
+	public int GetCurrentAction()
+	{
+		return actionNo;
+	}
 
     public void UseItemOnSelf(int slot)
     {
@@ -47,4 +68,19 @@ public abstract class GameAgent : DungeonObject
         InventoryManager.instance.UseItem(item, this);
         inventory.DecrementItemAtSlot(slot);
     }
+	
+	protected bool renderingEnabled = true;
+	public void DisableRendering()
+	{
+		GetComponent<HealthBarController>().Disable();
+		classDefiner.DisableRendering();
+		renderingEnabled = false;
+	}
+	
+	public void EnableRendering()
+	{
+		GetComponent<HealthBarController>().Enable();
+		classDefiner.EnableRendering();
+		renderingEnabled = true;
+	}
 }

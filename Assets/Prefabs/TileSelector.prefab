@@ -9298,6 +9298,8 @@ MonoBehaviour:
     type: 2}
   nonselectableTilesMaterial: {fileID: 2100000, guid: d4ce8c5b7a4e4f0419b8958d7ce70419,
     type: 2}
+  interactTilesMaterial: {fileID: 2100000, guid: 9c4bdd583bc376444a09f7eb6675cbab,
+    type: 2}
 --- !u!120 &1074917814717613535
 LineRenderer:
   m_ObjectHideFlags: 0

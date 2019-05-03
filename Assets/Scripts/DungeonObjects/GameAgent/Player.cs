@@ -21,10 +21,11 @@ public class Player : GameAgent
     private bool playerActedThisTurn = false;
     private bool playerUsedPotionThisTurn = false;
     private bool playerWaitingThisTurn = false;
+	private bool playerExtracted = false;
 
     [Header("Player Stats")]
     public string name;
-    public float attack;
+    public float _attack;
     public float maxHealth;
     public float currentHealth;
     public float range;
@@ -36,7 +37,7 @@ public class Player : GameAgent
     public int weapon = 1;
 
 	CharacterAnimator animator;
-    CharacterClassDefiner classDefiner;
+    //CharacterClassDefiner classDefiner; // moved to GameAgent
 
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
@@ -51,7 +52,7 @@ public class Player : GameAgent
 	public AudioClip[] deathRattle;
 	public AudioClip[] hitNoise;
 	public AudioClip[] armorHitNoise;
-
+	
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
@@ -81,69 +82,108 @@ public class Player : GameAgent
 		AI = null; // players don't have AI
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
-
-	public void RespondToKeyboardInput(char key)
-	{
-		switch (key) {
-		    case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
-		    case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
-		    case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
-		    case '4': StartCoroutine(animator.PlayHitAnimation()); break;
-		    case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
-		    case '6': StartCoroutine(animator.PlayKilledAimation()); break;
-            /*case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
-            case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
-            case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
-            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;*/
-        }
-    }
 	
-	private bool attacking = false;
-	
-	public override IEnumerator animate_attack(GameAgent target)
+	public void re_init(Pos position)
 	{
-		//Debug.Log("Starting attack");
-		animating = true;
-		attacking = true;
-		
-        switch (weapon)
-        {
-            case 1:
-                source.PlayOneShot(randomSFX(swordSwing));
-                break;
-            case 2:
-                source.PlayOneShot(randomSFX(bowShot));
-                break;
-            case 3:
-                source.PlayOneShot(randomSFX(fireSpell));
-                break;
-            default:
-				source.PlayOneShot(randomSFX(axeSwing));
-                break;
-        }
-        // get target position, and distance between us and the enemy
-        Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
-		Vector3 ownPos = map_manager.grid_to_world(grid_pos);
-		float distance = Vector3.Distance(ownPos, targetPos);
-		
-		// look at enemy and start attack animation
-		transform.LookAt(targetPos);
-		StartCoroutine(animator.PlayAttackAnimation());
-		
-		// wait for animation trigger
-		while (attacking) yield return null;
-		// wait a little longer based on projectile distance
-		yield return new WaitForSeconds(distance / 10f);
-		
-		target.take_damage(stats.DealDamage());
-		transform.position = ownPos; // reset position after animation, which sometimes offsets it
-		
-		animating = false;
-		//Debug.Log("Ended attack");
+		grid_pos = position;
+		playerExtracted = false;
+		playerMovedThisTurn = false;
+		playerActedThisTurn = false;
+		playerUsedPotionThisTurn = false;
+		playerWaitingThisTurn = false;
+		TurnManager.instance.addToRoster(this); //add player to player list
+		EnableRendering();
 	}
 	
-	public void Hit(){ attacking = false; }
-	public void Shoot(){ attacking = false; }
+	private bool moving = false;
+    public override IEnumerator smooth_movement(List<Pos> path)
+	{
+		while (moving) yield return null; // wait for any previous movement to finish
+		moving = true;
+
+        StartCoroutine(animator.StartMovementAnimation());
+        //source.PlayOneShot(footsteps);
+			Vector3 origin, target;
+			foreach(Pos step in path) {
+				grid_pos = step;
+
+				origin = transform.position;
+				target = map_manager.grid_to_world(step);
+				float dist = Vector3.Distance(origin, target);
+				float time = 0f;
+
+				transform.LookAt(target);
+
+					while(time < 1f && dist > 0f) {
+						time += (Time.deltaTime * speed) / dist;
+						transform.position = Vector3.Lerp(origin, target, time);
+						yield return null;
+					}
+			}
+			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+
+        StartCoroutine(animator.StopMovementAnimation());
+        moving = false;
+		grid_pos = path.Last();
+		
+        playerMovedThisTurn = true;
+	}
+
+	public override void attack(Damageable target)
+	{
+		animating = true;
+		StartCoroutine(currentAttack.Execute(this, target));
+	}
+	
+	public void Hit(){ animating = false; }
+	public void Shoot(){ animating = false; }
+	
+	public override void playAttackAnimation()
+	{
+		StartCoroutine(animator.PlayAttackAnimation());
+	}
+	
+	public override void playHitAnimation()
+	{
+		StartCoroutine(animator.PlayHitAnimation());
+	}
+	
+	public override void playAttackNoise(string type)
+	{
+		switch (type) {
+			case "Melee":
+			switch (weapon) {
+				case 1:
+					source.PlayOneShot(randomSFX(swordSwing));
+					break;
+				case 2:
+					source.PlayOneShot(randomSFX(bowShot));
+					break;
+				case 3:
+					source.PlayOneShot(randomSFX(fireSpell));
+					break;
+				default:
+					source.PlayOneShot(randomSFX(axeSwing));
+					break;
+			}
+			break;
+		}
+	}
+	// TODO: once we have more hit noises, switch based on type of projectile/weapon we are hit by
+	public override void playHitNoise(string type)
+	{
+		switch (type) {
+			default:
+			source.PlayOneShot(randomSFX(hitNoise));
+			source.PlayOneShot(randomSFX(armorHitNoise));
+			break;
+		}
+	}
+	
+	public override bool animationFinished()
+	{
+		return (currentAttack == null || !currentAttack.attacking) && !moving;
+	}
 	
 	public override void take_damage(int amount)
 	{
@@ -153,12 +193,7 @@ public class Player : GameAgent
             if (stats.currentState == GameAgentState.Unconscious) {
                 StartCoroutine(animator.PlayKilledAimation());
 				GameManager.kill(this);
-            } else {
-                StartCoroutine(animator.PlayHitAnimation());
-				source.PlayOneShot(randomSFX(hitNoise));
-				source.PlayOneShot(randomSFX(armorHitNoise));
-            }
-			//StartCoroutine(wait_to_reset_position());
+			}
         }
 
         UpdateViewableEditorPlayerStats();
@@ -194,7 +229,7 @@ public class Player : GameAgent
     }
 
     private void UpdateViewableEditorPlayerStats() {
-        attack = stats.attack;
+        _attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = stats.currentHealth;
         range = stats.range;
@@ -214,49 +249,17 @@ public class Player : GameAgent
         }
     }
 
-    public override IEnumerator smooth_movement(List<Pos> path)
-	{
-		animating = true;
-
-        StartCoroutine(animator.StartMovementAnimation());
-        //source.PlayOneShot(footsteps);
-			Vector3 origin, target;
-			foreach(Pos step in path) {
-				grid_pos = step;
-
-				origin = transform.position;
-				target = map_manager.grid_to_world(step);
-				float dist = Vector3.Distance(origin, target);
-				float time = 0f;
-
-				transform.LookAt(target);
-
-					while(time < 1f && dist > 0f) {
-						time += (Time.deltaTime * speed) / dist;
-						transform.position = Vector3.Lerp(origin, target, time);
-						yield return null;
-					}
-			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
-
-        StartCoroutine(animator.StopMovementAnimation());
-        animating = false;
-		grid_pos = path.Last();
-		
-        playerMovedThisTurn = true;
-	}
-
 	/*** UNUSED ANIMATION RECEIVERS ***/
 	public void FootR(){}
 	public void FootL(){}
 	public void WeaponSwitch(){}
 	/*** END ANIMATION RECEIVERS ***/
 	
-	public string[] getActions()
+	public string[] getActionNames()
 	{
 		List<string> actionNames = new List<string>();
-		foreach (GameAgentAction act in stats.playerCharacterClass.GetAvailableActs())
-			actionNames.Add(act.GetString()); // GetString() defined in MapUtils.EnumUtils
+		foreach (Attack act in stats.playerCharacterClass.GetAvailableActs())
+			actionNames.Add(act.toString()); // GetString() defined in MapUtils.EnumUtils
 		return actionNames.ToArray();
 	}
 	
@@ -265,10 +268,15 @@ public class Player : GameAgent
 	public override void move() { playerMovedThisTurn = true; }
 	public override void act() { playerActedThisTurn = true; }
 	public override bool turn_over() {
-		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
+		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn || playerExtracted;
     }
+	public void extract() {
+		playerExtracted = true;
+		DisableRendering();
+		TurnManager.instance.removeFromRoster(this);
+	}
 	
-	public bool can_take_action() { return !animating && !turn_over(); }
+	public bool can_take_action() { return !playerExtracted && animationFinished() && !turn_over() && Network.allPlayersReady(); }
 	
 	public void SetCharacterClass(string classname) {
 		
@@ -297,7 +305,7 @@ public class Player : GameAgent
 		}
 
         stats = new GameAgentStats(CharacterRaceOptions.Human, classID, 1, weapon);
-        attack = stats.attack;
+        _attack = stats.attack;
         maxHealth = stats.maxHealth;
         currentHealth = maxHealth;
         range = stats.range;
@@ -315,6 +323,23 @@ public class Player : GameAgent
 	
 	// VVVVVVVVVVVVVVVVV CODE JAIL VVVVVVVVVVVVVVVVVV //
 	// 			INTRUDERS WILL BE EXECUTED			  //
+	
+	
+	/*public void RespondToKeyboardInput(char key)
+	{
+		switch (key) {
+		    case '1': StartCoroutine(animator.PlayRotateAnimation()); break;
+		    case '2': StartCoroutine(animator.PlayAttackAnimation()); break;
+		    case '3': StartCoroutine(animator.PlayUseItemAnimation()); break;
+		    case '4': StartCoroutine(animator.PlayHitAnimation()); break;
+		    case '5': StartCoroutine(animator.PlayBlockAnimation()); break;
+		    case '6': StartCoroutine(animator.PlayKilledAimation()); break;
+            /*case 'a': TestCharacterClass(CharacterClassOptions.Knight); break;
+            case 's': TestCharacterClass(CharacterClassOptions.Hunter); break;
+            case 'd': TestCharacterClass(CharacterClassOptions.Mage); break;
+            case 'f': TestCharacterClass(CharacterClassOptions.Healer); break;*/
+        /*}
+    }*/
 	
 	// disabling this for now while I test changes
 	/*public string getActionMode(int action)

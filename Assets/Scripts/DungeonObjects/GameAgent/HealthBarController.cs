@@ -24,7 +24,7 @@ public class HealthBarController : MonoBehaviour
 
     void Start()
     {
-        canvas = GameObject.Find("UICanvas"); //get canvas ref
+        canvas = GameObject.Find("HPBars"); //get canvas ref
 
         //Debug.Log("I am an upset child");
         instance = Instantiate(healthbar); //instantiate prefab

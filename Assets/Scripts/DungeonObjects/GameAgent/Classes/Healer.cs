@@ -35,8 +35,8 @@ public class Healer : CharacterClass
         return 0;
     }
 
-    public override GameAgentAction[] GetAvailableActs() {
-        return new GameAgentAction[] { GameAgentAction.MagicAttackSingleTarget, GameAgentAction.Heal };
+    public override Attack[] GetAvailableActs() {
+        return new Attack[] { Attack.Get["Fire"], Attack.Get["Melee"] };
     }
 
     public override void HandleAct(GameAgentAction action) {

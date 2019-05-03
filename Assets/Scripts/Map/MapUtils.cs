@@ -75,7 +75,7 @@ namespace MapUtils
 			}
 			return Pos.NONE;
 		}
-		public static string GetString(this GameAgentAction action)
+		/*public static string GetString(this GameAgentAction action)
 		{
 			switch (action) {
 				case Move: return "MOVE";
@@ -91,8 +91,8 @@ namespace MapUtils
 				case Neutral: return "NEUTRAL";
 			}
 			return "NONE";
-		}
-		public static string GetMode(this GameAgentAction action)
+		}*/
+		/*public static string GetMode(this GameAgentAction action)
 		{
 			switch (action) {
 				case Move: return "MOVE";
@@ -108,7 +108,7 @@ namespace MapUtils
 				case Neutral: return "NONE";
 			}
 			return "NONE";
-		}
+		}*/
 	}
 	
 	public class Pos 

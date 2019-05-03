@@ -28,6 +28,7 @@ public class TileSelector : MonoBehaviour
 	public Material moveableTilesMaterial;
 	public Material selectableTilesMaterial;
     public Material nonselectableTilesMaterial;
+	public Material interactTilesMaterial;
 	
 	private string modeStr;
 	public string mode {
@@ -41,6 +42,8 @@ public class TileSelector : MonoBehaviour
 					CreateListOfSelectableMovementTiles(); break;
 				case "ACT":
 					CreateListOfSelectableActTiles(); break;
+				case "INTERACT":
+					CreateListOfSelectableInteractTiles(); break;
 			}
 		}
 	}
@@ -153,7 +156,7 @@ public class TileSelector : MonoBehaviour
     public void CreateListOfSelectableActTiles()//, GameAgentAction action) 
 	{
 		Pos position = player_main.grid_pos;
-		int range = (int) player_main.stats.range;
+		int range = player_main.currentAttack.range;
 		
         selectableActTiles = new List<Pos>();
         nonselectableActTiles = new List<Pos>();
@@ -184,6 +187,41 @@ public class TileSelector : MonoBehaviour
 			}
 		}
     }
+	
+	public void CreateListOfSelectableInteractTiles()
+	{
+		Pos position = player_main.grid_pos;
+		int range = 3;
+		
+        selectableActTiles = new List<Pos>();
+        nonselectableActTiles = new List<Pos>();
+
+        int startx = position.x - range >= 0 ? position.x - range : 0;
+        int endx = position.x + range < width ? position.x + range : width - 1;
+
+        int starty = position.y - range >= 0 ? position.y - range : 0;
+        int endy = position.y + range < height ? position.y + range : height - 1;
+
+        // TODO figure out if you are going to create a new method that doesn't fuck around with the List<Path>
+        //if (action == GameAgentAction.MeleeAttack || action == GameAgentAction.MagicAttackSingleTarget
+        //    || action == GameAgentAction.RangedAttack || action == GameAgentAction.RangedAttackMultiShot) {
+
+		for (int x = startx; x <= endx; x++) {
+			for (int y = starty; y <= endy; y++) {
+				if (x == position.x && y == position.y) continue;
+
+				Pos candidate = new Pos(x, y);
+				
+				if (Pos.abs_dist(position, candidate) <= range) 
+					
+					if (map_manager.IsInteractable(candidate))
+						selectableActTiles.Add(candidate);
+
+					else if (map_manager.IsTraversable(candidate))
+						nonselectableActTiles.Add(candidate);
+			}
+		}
+	}
 	
 	// disabling AOE while I test changes
 	/*private void CreateActAOETiles() {
@@ -300,6 +338,14 @@ public class TileSelector : MonoBehaviour
 				foreach (Path path in selectableMovementTiles) {
 					Pos tile = path.endPos();
 					Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), moveableTilesMaterial, 0);
+				}
+				break;
+			case "INTERACT":
+				foreach (Pos tile in selectableActTiles) {
+					Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), interactTilesMaterial, 0);
+				}
+				foreach (Pos tile in nonselectableActTiles) {
+					Graphics.DrawMesh(tileMesh, map_manager.grid_to_world(tile) + Vector3.up * 0.1f, Quaternion.Euler(90, 0, 0), nonselectableTilesMaterial, 0);
 				}
 				break;
 			case "ACT":

@@ -50,7 +50,7 @@ public abstract class CharacterClass
 
     public abstract void LevelUp();
 
-    public abstract GameAgentAction[] GetAvailableActs();
+    public abstract Attack[] GetAvailableActs();
 
     public abstract void HandleAct(GameAgentAction action);
 
