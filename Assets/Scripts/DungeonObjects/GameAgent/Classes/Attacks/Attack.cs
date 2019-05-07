@@ -1,14 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Attack
 {
 	public int range;
-	public int AOE;
+	protected int AOE;
+	protected float damageModifier;
+	
 	public bool attacking;
-	public abstract IEnumerator Execute(GameAgent attacker, GameAgent target);
+	public abstract IEnumerator Execute(GameAgent attacker, Damageable target);
 	public abstract string toString();
+	
+	public Attack(int range, int AOE, float damageModifier) {
+		this.range = range;
+		this.AOE = AOE;
+		this.damageModifier = damageModifier;
+	}
+	public Attack(){}
 	
 	public static Dictionary<string, Attack> Get = new Dictionary<string, Attack>() {
 		["Melee"] = new MeleeAttack(),
@@ -20,20 +30,26 @@ public abstract class Attack
 
 public class MeleeAttack : Attack
 {
-	public MeleeAttack() { this.range = 1; this.AOE = 1; }
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public MeleeAttack() : base(1, 1, 3) {}
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Melee");
 		
+		Debug.Log("Waiting for animation to finish");
 		while (attacker.animating) yield return null;
 		
-		target.playHitAnimation();
-		target.playHitNoise("Melee");
-		target.take_damage(attacker.stats.DealDamage());
+		try {
+			target.playHitAnimation();
+			target.playHitNoise("Melee");
+			target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}
@@ -42,24 +58,29 @@ public class MeleeAttack : Attack
 
 public class ShortbowAttack : Attack
 {
-	public ShortbowAttack() { this.range = 7; this.AOE = 1; }
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public ShortbowAttack() : base(7, 1, 1) {}
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Bow");
 		
 		while (attacker.animating) yield return null;
 		
-		Projectile arrow = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "arrow");
+		Projectile arrow = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "arrow");
 		
-		while (!arrow.reachedDestination) yield return null;
+		while (!(arrow == null)) yield return null;
 		
+		try {
 		target.playHitAnimation();
 		target.playHitNoise("Bow");
-		target.take_damage(attacker.stats.DealDamage());
+		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}
@@ -68,24 +89,29 @@ public class ShortbowAttack : Attack
 
 public class LongbowAttack : Attack
 {
-	public LongbowAttack() { this.range = 11; this.AOE = 1; }
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public LongbowAttack() : base(11, 1, 0.75f) {}
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Bow");
 		
 		while (attacker.animating) yield return null;
 		
-		var arrow = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "arrow");
+		var arrow = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "arrow");
 		
-		while (!arrow.reachedDestination) yield return null;
+		while (!(arrow == null)) yield return null;
 		
+		try {
 		target.playHitAnimation();
 		target.playHitNoise("Bow");
-		target.take_damage(attacker.stats.DealDamage());
+		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}
@@ -94,24 +120,29 @@ public class LongbowAttack : Attack
 
 public class FireSpell : Attack
 {
-	public FireSpell() { this.range = 6; this.AOE = 0; }
-	public override IEnumerator Execute(GameAgent attacker, GameAgent target)
+	public FireSpell() : base(6, 1, 2) {}
+	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
 		
-		attacker.transform.LookAt(target.transform);
+		attacker.transform.LookAt((target as DungeonObject).transform);
 		attacker.playAttackAnimation();
 		attacker.playAttackNoise("Fire");
 		
 		while (attacker.animating) yield return null;
 		
-		Projectile fire = MapManager.AnimateProjectile(attacker.grid_pos, target.grid_pos, "fire");
+		Projectile fire = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "fire");
 		
-		while (!fire.reachedDestination) yield return null;
+		while (!(fire == null)) yield return null;
 		
+		try {
 		target.playHitAnimation();
 		target.playHitNoise("Fire");
-		target.take_damage(attacker.stats.DealDamage());
+		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+		}
+		catch (Exception e) {
+			// swallow the error
+		}
 		
 		attacking = false;
 	}

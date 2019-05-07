@@ -15,7 +15,7 @@ public abstract class NetworkCommand
 	protected enum Directive { START=0, END, DISCONNECT, ECHO, NONE }
 
     public abstract string getString();
-	protected Directive directive;
+	protected Directive directive = Directive.ECHO;
 	
 	public static byte[] assembleCommandBytes(NetworkCommand cmd)
 	{
@@ -43,19 +43,20 @@ public class MoveCommand : NetworkCommand
 {
 	public const int ID = 0;
 	
-	public Pos a, b;
-	public MoveCommand(Pos a, Pos b)
+	public int clientID;
+	public Pos end;
+	public MoveCommand(int clientID, Pos end)
 	{
 		this.directive = Directive.ECHO;
-		this.a = a;
-		this.b = b;
+		this.clientID = clientID;
+		this.end = end;
 	}
-	public override string getString() { return ID + "$" + a.x + "," + a.y + "," + b.x + "," + b.y; }
+	public override string getString() { return ID + "$" + clientID + "," + end.x + "," + end.y; }
 	// parse everything to the right of the '$' in the string returned by getString() for this object
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
 		int[] pts = Array.ConvertAll(cmdString.Split(','), int.Parse);
-		return new MoveCommand(new Pos(pts[0], pts[1]), new Pos(pts[2], pts[3]));
+		return new MoveCommand(pts[0], new Pos(pts[1], pts[2]));
 	}
 }
 
@@ -74,7 +75,7 @@ public class ReadyCommand : NetworkCommand
 	// parse everything to the right of the '$' in the string returned by getString() for this object
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
-		return new ReadyCommand(Int32.Parse(cmdString));
+		return new ReadyCommand(int.Parse(cmdString));
 	}
 }
 
@@ -166,19 +167,21 @@ public class AttackCommand : NetworkCommand
 {
 	public const int ID = 7;
 	
-	public Pos a, b;
-	public AttackCommand(Pos a, Pos b)
+	public Pos end;
+	public int actionNo, clientID;
+	public AttackCommand(int clientID, Pos end, int actionNo)
 	{
 		this.directive = Directive.ECHO;
-		this.a = a;
-		this.b = b;
+		this.clientID = clientID;
+		this.end = end;
+		this.actionNo = actionNo;
 	}
-	public override string getString() { return ID + "$" + a.x + "," + a.y + "," + b.x + "," + b.y; }
+	public override string getString() { return ID + "$" + clientID + "," + end.x + "," + end.y + "," + actionNo; }
 	// parse everything to the right of the '$' in the string returned by getString() for this object
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
 		int[] pts = Array.ConvertAll(cmdString.Split(','), int.Parse);
-		return new AttackCommand(new Pos(pts[0], pts[1]), new Pos(pts[2], pts[3]));
+		return new AttackCommand(pts[0], new Pos(pts[1], pts[2]), pts[3]);
 	}
 }
 
@@ -213,6 +216,27 @@ public class WaitCommand : NetworkCommand
 	public static NetworkCommand ConvertFromString(string cmdString)
 	{
 		return new WaitCommand(int.Parse(cmdString));
+	}
+}
+
+public class InteractCommand : NetworkCommand
+{
+	public const int ID = 10;
+	
+	public Pos end;
+	public int clientID;
+	public InteractCommand(int clientID, Pos end)
+	{
+		this.directive = Directive.ECHO;
+		this.clientID = clientID;
+		this.end = end;
+	}
+	public override string getString() { return ID + "$" + clientID + "," + end.x + "," + end.y; }
+	// parse everything to the right of the '$' in the string returned by getString() for this object
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		int[] pts = Array.ConvertAll(cmdString.Split(','), int.Parse);
+		return new InteractCommand(pts[0], new Pos(pts[1], pts[2]));
 	}
 }
 

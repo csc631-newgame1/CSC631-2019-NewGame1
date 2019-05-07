@@ -35,7 +35,8 @@ public class Network : NetworkBase
 		[UpdateClientInfoCommand.ID] = UpdateClientInfoCommand.ConvertFromString,
 		[AttackCommand.ID]		= AttackCommand		.ConvertFromString,
 		[SetSeedCommand.ID]		= SetSeedCommand	.ConvertFromString,
-		[WaitCommand.ID]		= WaitCommand		.ConvertFromString
+		[WaitCommand.ID]		= WaitCommand		.ConvertFromString,
+		[InteractCommand.ID]	= InteractCommand	.ConvertFromString
 	};
 	
 	private static List<Client> peers = new List<Client>();
@@ -87,11 +88,34 @@ public class Network : NetworkBase
 		return players;
 	}
 	
+	public static Player getPlayer(int clientID)
+	{
+		return getPeer(clientID).playerObject;
+	}
+	
+	public static int playerCount()
+	{
+		return peers.Count;
+	}
+	
+	public static bool allPlayersReady()
+	{
+		foreach (Client player in getPeers()) {
+			if (!player.ready) return false;
+		}
+		return true;
+	}
+	
 	public static List<Client> getPeers()
 	{
 		// sorts list by ID before returning so that list order is the same on all clients
 		peers.Sort(delegate(Client c1, Client c2){ return c1.ID.CompareTo(c2.ID); });
 		return peers;
+	}
+	
+	public static Client localClient()
+	{
+		return getPeer(NetworkManager.clientID);
 	}
 	
 	public static Client getPeer(int ID)

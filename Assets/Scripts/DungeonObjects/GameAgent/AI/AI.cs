@@ -72,10 +72,12 @@ public class AIComponent
 		switch (state) {
 		case STATE.IDLE: 
 			// do nothing
+			Debug.Log("Enemy AI doing nothing!");
 			break;
 		case STATE.ATTACK: 
+			Debug.Log("Enemy AI attacking!");
 			// pathfind towards attacker, attack if possible
-			int result = pathTowards(attacking, (int)parent.stats.range, 1);
+			int result = pathTowards(attacking, (int)parent.currentAttack.range, 1);
 			if (result == -1) {
 				state = STATE.IDLE;
 				attacking = null;
@@ -89,12 +91,16 @@ public class AIComponent
 				while (!parent.animationFinished()) yield return null; // waits for move animation to finish before moving on
 				mapManager.attack(parent.grid_pos, attacking.grid_pos); // attack enemy
 				while (!parent.animationFinished()) yield return null; // waits for attack animation to finish
+				Debug.Log("attacked!");
 			}
 			else if (result == 2) {
+				Debug.Log("Enemy AI attacking, only moving");
 				while (!parent.animationFinished()) yield return null; // waits for move animation to finish
+				Debug.Log("only move...");
 			}
 			break;
 		case STATE.REINFORCE: 
+			Debug.Log("Enemy AI Reinforcing!");
 			// pathfind towards character we're reinforcing
 			if (pathTowards(reinforcing, 3, 1) == -1) {
 				reinforcing = null;
@@ -173,7 +179,9 @@ public class AIComponent
 
 	public void addEnemyToPool(GameAgent enemy)
 	{
+		Debug.Log(enemy.grid_pos + ":" + parent.grid_pos);
 		if (Pos.abs_dist(enemy.grid_pos, parent.grid_pos) <= MAX_ATTACK_RANGE) {
+			//Debug.Log("adding to pool!");
 			enemyPool.Add(enemy);
 		}
 	}
@@ -191,6 +199,7 @@ public class AIComponent
 		foreach (GameAgent e in enemyPool) tempPositions.Add(e.grid_pos);
 		
 		enemyDistances = mapManager.getDistances(parent.grid_pos, tempPositions, true, MAX_ATTACK_RANGE);
+		//Debug.Log(enemyDistances.toString() + " enemies count");
 		
 		tempPositions.Clear();
 		foreach (GameAgent a in alliedPool) tempPositions.Add(a.grid_pos);

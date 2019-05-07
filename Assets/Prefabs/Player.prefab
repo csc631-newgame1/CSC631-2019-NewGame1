@@ -3820,14 +3820,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   nickname: 
-  currentAction: 0
   currentState: 0
   team: 0
   move_budget: 6
   animating: 0
-  godMode: 1
+  godMode: 0
   name: 
-  attack: 0
+  _attack: 0
   maxHealth: 0
   currentHealth: 0
   range: 0
@@ -3890,6 +3889,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10533dce209499149bb2504cdf87fd67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeWeapon: {fileID: 0}
   weaponNum: 0
   sword: {fileID: 3132021457639024835}
   bow: {fileID: 1768564420784622776}

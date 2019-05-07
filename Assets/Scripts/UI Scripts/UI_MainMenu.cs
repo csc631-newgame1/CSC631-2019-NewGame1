@@ -11,6 +11,8 @@ public class UI_MainMenu : MonoBehaviour
 		Panel_SinglePlayer = transform.parent.Find("SinglePlayer").gameObject;
 		Panel_MultiPlayer  = transform.parent.Find("MultiplayerJoin").gameObject;
 		Panel_Settings	   = transform.parent.Find("Settings").gameObject;
+		
+		Application.targetFrameRate = 60;
 	}
 	
 	public void Start()
@@ -38,6 +40,11 @@ public class UI_MainMenu : MonoBehaviour
 	
 	public void Quit()
 	{
-		
+		Debug.Log("Quitting Application...");
+		#if UNITY_EDITOR
+		UnityEditor.EditorApplication.isPlaying = false;
+		#else
+		Application.Quit();
+		#endif
 	}
 }

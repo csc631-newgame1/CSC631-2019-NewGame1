@@ -12,7 +12,7 @@ public class Enemy : GameAgent
 	private bool enemy_turn = false;
 
     private CharacterAnimator animator;
-    private CharacterClassDefiner classDefiner;
+    //private CharacterClassDefiner classDefiner; // moved to GameAgent
 
     [Header("Enemy Stats")]
     public float _attack;
@@ -37,11 +37,9 @@ public class Enemy : GameAgent
 	public AudioClip[] deathRattle;
 	public AudioClip[] hitNoise;
 	
-	private Attack currentAttack;
-	
 	void Update()
 	{
-		if (FogOfWar.IsVisible(grid_pos)) {
+		if (FogOfWar.IsVisible(map_manager.world_to_grid(transform.position))) {
 			EnableRendering();
 		}
 		else {
@@ -83,20 +81,26 @@ public class Enemy : GameAgent
         team = 1;
 		AI = new AIComponent(this); // AI component that decides the actions for this enemy to take
 		TurnManager.instance.addToRoster(this);
+		SetCurrentAction(0);
     }
 
 	private bool moving = false;
-    public override IEnumerator smooth_movement(List<Pos> path) 
+    public override IEnumerator smooth_movement(Path path) 
 	{
 		//Debug.Log("started...");
-		grid_pos = path.Last();
+		grid_pos = path.endPos();
+		if (!FogOfWar.IsVisible(grid_pos)) {
+			transform.position = map_manager.grid_to_world(grid_pos);
+			yield break;
+		}
+		
         moving = true;
         StartCoroutine(animator.StartMovementAnimation());
 
         //source.PlayOneShot(footsteps);
 
 			Vector3 origin, target;
-			foreach(Pos step in path) {
+			foreach(Pos step in path.getPositions()) {
 
 				origin = transform.position;
 				target = map_manager.grid_to_world(step);
@@ -111,7 +115,7 @@ public class Enemy : GameAgent
 						yield return null;
 					}
 			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+			transform.position = map_manager.grid_to_world(path.endPos());
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
@@ -119,18 +123,18 @@ public class Enemy : GameAgent
     }
 	
 	
-	public override void attack(GameAgent target)
+	public override void attack(Damageable target)
 	{
-		animating = true;
-		currentAttack = stats.playerCharacterClass.GetAvailableActs()[0];
-		currentAttack.Execute(this, target);
+		Debug.Log(currentAttack);
+		StartCoroutine(currentAttack.Execute(this, target));
 	}
 	
-    public void Hit() { animating = false; }
-    public void Shoot() { animating = false; }
+    public void Hit() { animating = false; Debug.Log("Just set animating to false"); }
+    public void Shoot() { animating = false; Debug.Log("Just set animating to false"); }
 	
 	public override void playAttackAnimation()
 	{
+		animating = true;
 		StartCoroutine(animator.PlayAttackAnimation());
 	}
 	
@@ -173,7 +177,8 @@ public class Enemy : GameAgent
 	
 	public override bool animationFinished()
 	{
-		return (currentAttack == null || !currentAttack.attacking) && !moving;
+		Debug.Log(!currentAttack.attacking + ", " + !moving);
+		return (!currentAttack.attacking) && !moving;
 	}
 	
     public override void take_damage(int amount) 
@@ -235,17 +240,5 @@ public class Enemy : GameAgent
 	private AudioClip randomSFX(AudioClip[] library)
 	{
 		return library[nextSFX++%library.Length];
-	}
-	
-	public void DisableRendering()
-	{
-		GetComponent<HealthBarController>().Disable();
-		classDefiner.DisableRendering();
-	}
-	
-	public void EnableRendering()
-	{
-		GetComponent<HealthBarController>().Enable();
-		classDefiner.EnableRendering();
 	}
 }

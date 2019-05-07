@@ -21,6 +21,7 @@ public class Player : GameAgent
     private bool playerActedThisTurn = false;
     private bool playerUsedPotionThisTurn = false;
     private bool playerWaitingThisTurn = false;
+	private bool playerExtracted = false;
 
     [Header("Player Stats")]
     public string name;
@@ -36,7 +37,7 @@ public class Player : GameAgent
     public int weapon = 1;
 
 	CharacterAnimator animator;
-    CharacterClassDefiner classDefiner;
+    //CharacterClassDefiner classDefiner; // moved to GameAgent
 
     // Get rid of this when you get rid of using keys to change player class
     List<Player> playersForTestingPurposes;
@@ -52,8 +53,8 @@ public class Player : GameAgent
 	public AudioClip[] hitNoise;
 	public AudioClip[] armorHitNoise;
 	
-	public Attack currentAttack;
-
+	private int max_move_budget;
+	
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
     {
@@ -62,7 +63,8 @@ public class Player : GameAgent
 
         this.stats = stats;
         UpdateViewableEditorPlayerStats();
-		move_budget = 25;
+		max_move_budget = 15;
+		move_budget = max_move_budget;
 		speed = 10;
 		this.nickname = name;
 
@@ -84,15 +86,29 @@ public class Player : GameAgent
 		TurnManager.instance.addToRoster(this); //add player to player list
     }
 	
-	private bool moving = false;
-    public override IEnumerator smooth_movement(List<Pos> path)
+	public void re_init(Pos position)
 	{
+		grid_pos = position;
+		playerExtracted = false;
+		playerMovedThisTurn = false;
+		playerActedThisTurn = false;
+		playerUsedPotionThisTurn = false;
+		playerWaitingThisTurn = false;
+		TurnManager.instance.addToRoster(this); //add player to player list
+		EnableRendering();
+	}
+	
+	private bool moving = false;
+    public override IEnumerator smooth_movement(Path path)
+	{
+		while (moving) yield return null; // wait for any previous movement to finish
 		moving = true;
+		move_budget -= path.distance();
 
         StartCoroutine(animator.StartMovementAnimation());
         //source.PlayOneShot(footsteps);
 			Vector3 origin, target;
-			foreach(Pos step in path) {
+			foreach(Pos step in path.getPositions()) {
 				grid_pos = step;
 
 				origin = transform.position;
@@ -108,19 +124,26 @@ public class Player : GameAgent
 						yield return null;
 					}
 			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+			transform.position = map_manager.grid_to_world(path.endPos());
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
-		grid_pos = path.Last();
+		grid_pos = path.endPos();
 		
         playerMovedThisTurn = true;
 	}
 
-	public override void attack(GameAgent target)
+	public override void attack(Damageable target)
 	{
 		animating = true;
 		StartCoroutine(currentAttack.Execute(this, target));
+		StartCoroutine(waitForAttackEnd());
+	}
+	
+	private IEnumerator waitForAttackEnd()
+	{
+		while (currentAttack.attacking) yield return null;
+		playerActedThisTurn = true;
 	}
 	
 	public void Hit(){ animating = false; }
@@ -176,7 +199,7 @@ public class Player : GameAgent
 	public override void take_damage(int amount)
 	{
         if (stats.currentState == GameAgentState.Alive) {
-            if (!godMode) stats.TakeDamage(amount);
+            if (!godMode) stats.TakeDamage((int)(amount * 0.05));
 
             if (stats.currentState == GameAgentState.Unconscious) {
                 StartCoroutine(animator.PlayKilledAimation());
@@ -211,6 +234,7 @@ public class Player : GameAgent
             playerActedThisTurn = false;
             playerUsedPotionThisTurn = false;
             playerWaitingThisTurn = false;
+			move_budget = max_move_budget;
         }
 
         UpdateViewableEditorPlayerStats();
@@ -256,17 +280,15 @@ public class Player : GameAgent
 	public override void move() { playerMovedThisTurn = true; }
 	public override void act() { playerActedThisTurn = true; }
 	public override bool turn_over() {
-		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn;
+		return playerWaitingThisTurn || playerActedThisTurn || playerUsedPotionThisTurn || playerExtracted;
     }
-	
-	public bool can_take_action() { return (currentAttack == null || !currentAttack.attacking) && !animating && !turn_over(); }
-	
-	public void SetCurrentAction(int action)
-	{
-		Attack[] attacks = stats.playerCharacterClass.GetAvailableActs();
-		if (action >= attacks.Length) return;
-		else currentAttack = attacks[action];
+	public void extract() {
+		playerExtracted = true;
+		DisableRendering();
+		TurnManager.instance.removeFromRoster(this);
 	}
+	
+	public bool can_take_action() { return !playerExtracted && animationFinished() && !turn_over() && Network.allPlayersReady(); }
 	
 	public void SetCharacterClass(string classname) {
 		

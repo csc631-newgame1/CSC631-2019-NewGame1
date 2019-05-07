@@ -13,7 +13,10 @@ public class MapManager : MonoBehaviour
 	private class MapCell {
         public bool traversable;
         public bool occupied;
-        public DungeonObject resident;
+        public DungeonObject resident; // foreground objects that can be interacted with & block tiles
+		public DungeonObject environment; // background objects that cannot be interacted with
+        public bool reserved = false;
+        public bool spawn = false;
         public MapCell(bool traversable) {
             this.traversable = traversable;
             occupied = false;
@@ -28,13 +31,22 @@ public class MapManager : MonoBehaviour
 	private int width;
 	private int height;
 	private float cell_size;
+	public static int MapWidth {
+		get {
+			return instance.width;
+		}
+	}
+	public static int MapHeight {
+		get {
+			return instance.height;
+		}
+	}
 
 	// map data
 	private int[,] map_raw;
 	private Region region_tree_root; // the root node of the region tree for the map
     private MapCell[,] map;
 	private NavigationHandler nav_map;
-	public static Pos endPos;
 
 	private GameManager parentManager = null;
 	private TileSelector tileSelector = null;
@@ -68,7 +80,7 @@ public class MapManager : MonoBehaviour
 			}
 		}
 		
-		rng = new System.Random(Settings.Seed);
+		rng = new System.Random(Settings.MasterSeed);
 		environmentObjects = new List<GameObject>();
 	}
 	
@@ -80,13 +92,24 @@ public class MapManager : MonoBehaviour
 		this.height = config.height;
 		this.cell_size = config.cell_size;
 	}
-	
-	/*****************/
-	/* MAP FUNCTIONS */
-	/*****************/
 
-	// instantiates an agent into the map at a random position
-	public GameObject instantiate_randomly(GameObject type)
+    /*****************/
+    /* MAP FUNCTIONS */
+    /*****************/
+
+    public void setTileReserved(Pos position)
+    {
+        map[position.x, position.y].reserved = true;
+    }
+
+    public void setTileSpawn(Pos position)
+    {
+        map[position.x, position.y].reserved = true;
+        map[position.x, position.y].spawn = true;
+    }
+
+    // instantiates an agent into the map at a random position
+    public GameObject instantiate_randomly(GameObject type)
 	{
 		int x = rng.Next(0, width - 1);
 		int y = rng.Next(0, height - 1);
@@ -121,22 +144,50 @@ public class MapManager : MonoBehaviour
 		return clone;
 	}
 	
-	public GameObject instantiate_environment(GameObject prefab, Pos pos, bool traversable = true)
+	public GameObject instantiate_environment(GameObject environmentObject, Pos pos, bool traversable = true)
 	{
-		GameObject clone = Instantiate(prefab, grid_to_world(pos), Quaternion.identity);
+        int randomY = rng.Next(1, 4) * 90;
+		
+		// detect whether this object is a prefab or has already been spawned
+		if (environmentObject.scene.name != null) {
+			environmentObject.transform.position = grid_to_world(pos);
+			environmentObject.transform.rotation = Quaternion.Euler(new Vector3(0, randomY, 0));
+		}
+		else {
+			environmentObject = Instantiate(environmentObject, grid_to_world(pos), Quaternion.Euler(new Vector3(0, randomY, 0)));
+		}
+		
+		DungeonObject env = environmentObject.GetComponent<DungeonObject>();
+		(env as Environment).init_environment(pos);
 		
 		if (!traversable) {
 			nav_map.removeTraversableTile(pos);
-			map[pos.x, pos.y].traversable = false;
+			map[pos.x, pos.y].traversable = true;
+			map[pos.x, pos.y].occupied = true;
+			map[pos.x, pos.y].resident = env;
+		}
+		else {
+			nav_map.insertTraversableTile(pos);
+			map[pos.x, pos.y].traversable = true;
+			map[pos.x, pos.y].occupied = false;
+			map[pos.x, pos.y].environment = env;
 		}
 		
-		EnvironmentObject env = clone.GetComponent<EnvironmentObject>();
-		env.init_environment(pos);
+		return environmentObject;
+	}
+	
+	// place a player's object back onto the map
+	public void re_instantiate(GameObject agentObject, Pos pos)
+	{
+		agentObject.transform.position = grid_to_world(pos);
+		agentObject.transform.rotation = Quaternion.identity;
 		
+		Player player = agentObject.GetComponent<Player>();
+		player.re_init(pos);
+		
+		nav_map.removeTraversableTile(pos);
+		map[pos.x, pos.y].resident = player;
 		map[pos.x, pos.y].occupied = true;
-		map[pos.x, pos.y].resident = env;
-		
-		return clone;
 	}
 
 	// removes an object from the map, destroying its game object
@@ -153,12 +204,15 @@ public class MapManager : MonoBehaviour
 	public void clear_map()
 	{
 		for (int x = 0; x < width; x++)
-			for (int y = 0; y < height; y++) 
+			for (int y = 0; y < height; y++)  {
+				if (map[x, y].environment != null)
+					Destroy(map[x, y].environment.gameObject);
 				if (map[x, y].resident != null) {
 					Destroy(map[x, y].resident.gameObject);
 					map[x, y].occupied = false;
 					map[x, y].resident = null;
 				}
+			}
 	}
 	
 	// move a character from source to dest
@@ -182,23 +236,41 @@ public class MapManager : MonoBehaviour
 		map[source.x, source.y].occupied = false;
 		map[source.x, source.y].resident = null;
 		
-		StartCoroutine(agent.smooth_movement(path.getPositions()));
+		StartCoroutine(agent.smooth_movement(path));
 	}
 	
 	// applies damage to agent at position, if one is there
-	public void attack(Pos source, Pos dest)
+	public void attack(Pos source, Pos dest, int actionNo=0)
 	{
 		DungeonObject obj_attacker = map[source.x, source.y].resident;
 		DungeonObject obj_target = map[dest.x, dest.y].resident;
-		if (obj_attacker == null || obj_target == null || !(obj_attacker is GameAgent) || !(obj_target is GameAgent)) {
+		if (obj_attacker == null || obj_target == null || !(obj_attacker is GameAgent) || !((obj_target is GameAgent) || (obj_target is Damageable))) {
 			Debug.Log("Attack command was invalid!");
 			return;
 		}
 		
 		GameAgent attacker = obj_attacker as GameAgent;
-		GameAgent target = obj_target as GameAgent;
+		attacker.SetCurrentAction(actionNo);
 		
-		attacker.attack(target);
+		if (obj_target is Damageable) {
+			Damageable target = obj_target as Damageable;
+			attacker.attack(target);
+		}
+	}
+	
+	public void interact(Pos source, Pos dest)
+	{
+		DungeonObject obj_interactor = map[source.x, source.y].resident;
+		DungeonObject obj_interactee = map[dest.x, dest.y].resident;
+		if (obj_interactor == null || obj_interactee == null || !(obj_interactor is GameAgent) || !(obj_interactee is Interactable)) {
+			Debug.Log("Interact command was invalid!");
+			return;
+		}
+		
+		GameAgent interactor = obj_interactor as GameAgent;
+		Interactable interactee = obj_interactee as Interactable;
+		
+		interactee.interact(interactor);
 	}
 	
 	public static Projectile AnimateProjectile(Pos start, Pos end, string type = "fire")
@@ -217,6 +289,14 @@ public class MapManager : MonoBehaviour
 		var projectile = clone.GetComponent<Projectile>();
 		projectile	.Init(startPos, endPos);
 		return projectile;
+	}
+	
+	public static void ExtractAgent(Player agent)
+	{
+		Pos agentPos = agent.grid_pos;
+		instance.map[agentPos.x, agentPos.y].resident = null;
+		instance.map[agentPos.x, agentPos.y].occupied = false;
+		agent.extract();
 	}
 	
 	/*************************/
@@ -305,7 +385,7 @@ public class MapManager : MonoBehaviour
 	 *		the maximum allowed distance for resulting distances. By default this value is zero, which means there is no limit to distance </param>
 	 *		enabling this can significantly improve pathfinding performance
 	 * <returns>
-	 * A list of distances from the source to each o the destination points </returns> */
+	 * A list of distances from the source to each o the destination points, or null if no results were found </returns> */
 	public List<int> getDistances(Pos source, List<Pos> destinations, bool preserve_null = false, int maxDistance=0)
 	{
 		// getDistances will ignore whether or not the destination tiles are traversable, just gets distances to them
@@ -323,12 +403,28 @@ public class MapManager : MonoBehaviour
 		}
 		return distances;
 	}
-	
-	/*********************/
-	/* UTILITY FUNCTIONS */
-	/*********************/
-	
-	private class RegionNode
+
+    /*********************/
+    /* UTILITY FUNCTIONS */
+    /*********************/
+
+    // returns true if tile terrain at position is a spawn point.
+    public bool IsSpawnPoint(Pos pos)
+    {
+        if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+            return false;
+        return map[pos.x, pos.y].spawn;
+    }
+
+    // returns true if tile terrain at position is reserved.
+    public bool IsReserved(Pos pos)
+    {
+        if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+            return false;
+        return map[pos.x, pos.y].reserved;
+    }
+
+    private class RegionNode
 	{
 		public Region region;
 		public int height = 0;
@@ -350,10 +446,75 @@ public class MapManager : MonoBehaviour
 			else return children[n].find_nth_furthest_region(0);
 		}
 	}
-	
-	// finds <amount> spawnpoints + 1 endpoint, for initial placement of players/level end. endpoint is always at 0th position in list
-	// traverses region tree to find the two furthest away regions
-	public List<Pos> findSpawnpoints(int amount)
+
+    public Region[] findFurthestRegions(int amount)
+    {
+        RegionNode root = new RegionNode(region_tree_root);
+        Stack<RegionNode> bottom = new Stack<RegionNode>();
+        Stack<RegionNode> top = new Stack<RegionNode>();
+
+        // traverses tree from bottom->top, pushing nodes to a stack so we can traverse them top->bottom later
+        bottom.Push(root);
+        while (bottom.Count > 0)
+        {
+            RegionNode curr = bottom.Pop();
+            top.Push(curr);
+            foreach (RegionNode child in curr.children)
+            {
+                bottom.Push(child);
+            }
+        }
+
+        RegionNode diameterNode = null; // root node of the subtree with the largest diameter
+        int maxDiameter = 0;
+        // gets the node in the region tree where the two furthest-most leaf nodes are from one another
+        while (top.Count > 0)
+        {
+            RegionNode curr = top.Pop();
+            int diameter;
+            // if this node is a leaf node, set height/diameter to 1
+            if (curr.children.Count == 0)
+            {
+                curr.height = 1;
+                diameter = 1;
+            }
+            // if this node only has one child, set height/diameter to child height + 1
+            else if (curr.children.Count == 1)
+            {
+                curr.height = curr.children[0].height + 1;
+                diameter = curr.height;
+            }
+            // otherwise, find the two tallest children, set height to the height of the tallest child, and set diameter to the sum of the tallest children + 1
+            else
+            {
+                curr.children.Sort( // sorts children by height
+                    delegate (RegionNode a, RegionNode b) {
+                        return a.height.CompareTo(b.height);
+                    });
+                curr.children.Reverse(); // sorts from tallest->smallest
+
+                curr.height = curr.children[0].height + 1;
+                diameter = curr.children[0].height + curr.children[1].height + 1;
+                Debug.Log("diameter:" + diameter);
+            }
+            if (diameter > maxDiameter)
+            {
+                maxDiameter = diameter;
+                diameterNode = curr;
+            }
+        }
+
+        Debug.Log("Max diameter: " + maxDiameter);
+        // once the diameter root has been found, get the farthest-most regions
+        Region spawnRegion = diameterNode.find_nth_furthest_region(0);
+        Region endRegion = diameterNode.find_nth_furthest_region(1);
+
+        return new Region[] { spawnRegion, endRegion };
+    }
+
+    // finds <amount> spawnpoints + 1 endpoint, for initial placement of players/level end. endpoint is always at 0th position in list
+    // traverses region tree to find the two furthest away regions
+    public List<Pos> findSpawnpoints(int amount)
 	{
 		RegionNode root = new RegionNode(region_tree_root);
 		Stack<RegionNode> bottom = new Stack<RegionNode>();
@@ -415,7 +576,7 @@ public class MapManager : MonoBehaviour
 			do {
 				x = rng.Next(0, width - 1);
 				y = rng.Next(0, height - 1);
-			} while (map_raw[x, y] != spawnRegion.ID);
+			} while (map_raw[x, y] != spawnRegion.ID || !IsWalkable(new Pos(x, y)));
 			
 			spawnPositions.Add(new Pos(x, y));
 		}
@@ -428,11 +589,6 @@ public class MapManager : MonoBehaviour
 		
 		return spawnPositions;
 	}
-	
-	public static void setEndPos(Pos endpos)
-	{
-		MapManager.endPos = endpos;
-	}
 
 	// returns true if tile terrain at position is traversable
     public bool IsTraversable(Pos pos)
@@ -441,6 +597,18 @@ public class MapManager : MonoBehaviour
 			return false;
 		return map[pos.x, pos.y].traversable;
     }
+	
+	public bool IsInteractable(Pos pos)
+	{
+		if (pos.x >= width || pos.x < 0 || pos.y >= height || pos.y < 0)
+			return false;
+		return map[pos.x, pos.y].resident is Interactable;
+	}
+	
+	public bool IsBridge(Pos pos)
+	{
+		return map_raw[pos.x, pos.y] == BRIDGE || map_raw[pos.x, pos.y] == PLATFORM;
+	}
 
     public bool IsTileInRegion(Pos tile, int ID) {
         return (map_raw[tile.x, tile.y] == ID);
