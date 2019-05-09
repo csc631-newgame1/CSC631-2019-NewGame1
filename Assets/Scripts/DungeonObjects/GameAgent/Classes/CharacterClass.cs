@@ -11,6 +11,7 @@
     public const int Club = 9;
     public const int Unarmed = 0;
     public const int RandomClassWeapon = -1;
+    public const int BossWeapon = 10;
 	
 	public static string getWeaponDescriptor(int weapon)
 	{
@@ -21,6 +22,7 @@
 			case Axe: return "Destroyer";
 			case Club: return "Barbarian";
 			case Unarmed: return "Brawler";
+            case BossWeapon: return "Boss";
 			default: return "";
 		}
 	}
@@ -30,11 +32,13 @@ public static class CharacterRaceOptions {
     public const int Human = 1;
     public const int Orc = 4;
     public const int Skeleton = 5;
+    public const int Dragon = 7;
 	public static string getString(int race) {
 		switch (race) {
 			case Human: return "Human";
 			case Orc: return "Orc";
 			case Skeleton: return "Skeleton";
+            case Dragon: return "Dragon";
 			default: return "Cryptid";
 		}
 	}
