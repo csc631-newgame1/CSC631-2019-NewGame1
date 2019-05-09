@@ -121,6 +121,8 @@ public class BossAnimator : MonoBehaviour
     {
         //animationNumber = UnityEngine.Random.Range(1, maxHitAnimations + 1);
         //animator.SetTrigger("GetHit" + (animationNumber).ToString() + "Trigger");
+        //NOTE: Dragon Model doesn't seem to have a functioning damage animation
+        //make it turn red?
         animator.SetTrigger("Damage");
         SpawnParticleSystemAtCharacter(blood);
         SpawnParticleSystemAtCharacter(hit);
