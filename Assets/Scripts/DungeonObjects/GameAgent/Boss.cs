@@ -18,7 +18,7 @@ public class Boss : GameAgent
     private bool enemy_turn = false;
 
     private BossAnimator animator;
-    private CharacterClassDefiner classDefiner;
+    //private CharacterClassDefiner classDefiner; // moved to GameAgent
 
     [Header("Enemy Stats")]
     public float _attack;
@@ -31,6 +31,7 @@ public class Boss : GameAgent
     public int moveBudget;
     public int level;
     public GameAgentState viewableState;
+    private int weapon;
 
     //sound effects
     private AudioSource source;
@@ -39,23 +40,15 @@ public class Boss : GameAgent
     public AudioClip[] deathRattle;
     public AudioClip[] hitNoise;
 
-    private Attack currentAttack;
-
     void Update()
     {
-
-        if (FogOfWar.IsVisible(grid_pos))
+        if (FogOfWar.IsVisible(map_manager.world_to_grid(transform.position)))
         {
             EnableRendering();
         }
         else
         {
             DisableRendering();
-        }
-
-        if (Input.anyKey)
-        {
-            animate_attack(this);
         }
     }
 
@@ -74,6 +67,8 @@ public class Boss : GameAgent
         _speed = stats.speed;
         this.nickname = CharacterRaceOptions.getString(stats.characterRace) + " " + CharacterClassOptions.getWeaponDescriptor(stats.playerCharacterClass.weapon);
 
+        weapon = stats.playerCharacterClass.weapon;
+
         speed = 10;
         move_budget = 10;
 
@@ -91,20 +86,27 @@ public class Boss : GameAgent
         team = 1;
         AI = new AIComponent(this); // AI component that decides the actions for this enemy to take
         TurnManager.instance.addToRoster(this);
+        SetCurrentAction(0);
     }
 
     private bool moving = false;
-    public override IEnumerator smooth_movement(List<Pos> path)
+    public override IEnumerator smooth_movement(Path path)
     {
         //Debug.Log("started...");
-        grid_pos = path.Last();
+        grid_pos = path.endPos();
+        if (!FogOfWar.IsVisible(grid_pos))
+        {
+            transform.position = map_manager.grid_to_world(grid_pos);
+            yield break;
+        }
+
         moving = true;
         StartCoroutine(animator.StartMovementAnimation());
 
         //source.PlayOneShot(footsteps);
 
         Vector3 origin, target;
-        foreach (Pos step in path)
+        foreach (Pos step in path.getPositions())
         {
 
             origin = transform.position;
@@ -121,53 +123,26 @@ public class Boss : GameAgent
                 yield return null;
             }
         }
-        transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+        transform.position = map_manager.grid_to_world(path.endPos());
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
         //Debug.Log("ended...");
     }
 
-    private bool attacking = false;
 
-    public IEnumerator animate_attack(GameAgent target)
+    public override void attack(Damageable target)
     {
-        //Debug.Log("started...");
-        animating = true;
-        attacking = true;
-
-        source.PlayOneShot(randomSFX(axeSwing));
-
-        // get target position, and distance between us and the enemy
-        Vector3 targetPos = map_manager.grid_to_world(target.grid_pos);
-        Vector3 ownPos = map_manager.grid_to_world(grid_pos);
-        float distance = Math.Max(1, Vector3.Distance(ownPos, targetPos));
-
-        // look at enemy and start attack animation
-        transform.LookAt(targetPos);
-        StartCoroutine(animator.PlayAttackAnimation());
-
-        // wait for animation trigger
-        while (attacking) yield return null;
-        // wait a little longer based on projectile distance
-        yield return new WaitForSeconds(distance / 100f);
-
-        target.take_damage(stats.DealDamage());
-        transform.position = ownPos; // reset to previous position after animation
-
-        //Debug.Log("ended...");
-        animating = false;
+        Debug.Log(currentAttack);
+        StartCoroutine(currentAttack.Execute(this, target));
     }
 
-    public override void attack(GameAgent target)
-    {
-        animating = true;
-        currentAttack = stats.playerCharacterClass.GetAvailableActs()[0];
-        currentAttack.Execute(this, target);
-    }
+    public void Hit() { animating = false; Debug.Log("Just set animating to false"); }
+    public void Shoot() { animating = false; Debug.Log("Just set animating to false"); }
 
     public override void playAttackAnimation()
     {
+        animating = true;
         StartCoroutine(animator.PlayAttackAnimation());
     }
 
@@ -178,9 +153,11 @@ public class Boss : GameAgent
 
     public override void playAttackNoise(string type)
     {
+    
         source.PlayOneShot(randomSFX(axeSwing));
     }
 
+    // TODO: once we have more hit noises, switch based on type of projectile/weapon we are hit by
     public override void playHitNoise(string type)
     {
         switch (type)
@@ -193,11 +170,9 @@ public class Boss : GameAgent
 
     public override bool animationFinished()
     {
-        return (currentAttack == null || !currentAttack.attacking) && !moving;
+        Debug.Log(!currentAttack.attacking + ", " + !moving);
+        return (!currentAttack.attacking) && !moving;
     }
-
-    public void Hit() { attacking = false; }
-    public void Shoot() { attacking = false; }
 
     public override void take_damage(int amount)
     {
@@ -207,16 +182,9 @@ public class Boss : GameAgent
         {
             StartCoroutine(animator.PlayKilledAimation());
             stats.currentState = GameAgentState.Dead;
-            source.PlayOneShot(randomSFX(deathRattle));
             GameManager.kill(this);
         }
-        else
-        {
-            StartCoroutine(animator.PlayHitAnimation());
-            source.PlayOneShot(randomSFX(hitNoise));
-        }
 
-        //StartCoroutine(wait_to_reset_position());
         currentHealth = stats.currentHealth;
     }
 
@@ -272,17 +240,5 @@ public class Boss : GameAgent
     private AudioClip randomSFX(AudioClip[] library)
     {
         return library[nextSFX++ % library.Length];
-    }
-
-    public void DisableRendering()
-    {
-        GetComponent<HealthBarController>().Disable();
-        classDefiner.DisableRendering();
-    }
-
-    public void EnableRendering()
-    {
-        GetComponent<HealthBarController>().Enable();
-        classDefiner.EnableRendering();
     }
 }
