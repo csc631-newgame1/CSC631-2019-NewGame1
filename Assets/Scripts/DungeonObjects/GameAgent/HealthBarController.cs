@@ -39,11 +39,12 @@ public class HealthBarController : MonoBehaviour
 
         bar.SetSliderValue(1);
         bar.SetMPSliderValue(1);
-		
+
+        float barwidth = Mathf.Min(parent.stats.maxHealth, parent.stats.maxMagicPoints, 40);
 		RectTransform barTransform = instance.transform.Find("HPBar").GetComponent<RectTransform>();
-		barTransform.sizeDelta = new Vector2(parent.stats.maxHealth, 20);
+		barTransform.sizeDelta = new Vector2(barwidth, 15);
         RectTransform barTransform2 = instance.transform.Find("MPBar").GetComponent<RectTransform>();
-        barTransform2.sizeDelta = new Vector2(parent.stats.maxMagicPoints, 20);
+        barTransform2.sizeDelta = new Vector2(barwidth, 10);
     }
 
     void LateUpdate()
@@ -51,7 +52,7 @@ public class HealthBarController : MonoBehaviour
         bar.SetSliderValue(parent.stats.currentHealth / parent.stats.maxHealth);
         bar.SetMPSliderValue(parent.stats.currentMagicPoints / parent.stats.maxMagicPoints);
 		float camera_zoom_ratio = 10 / CameraControl.currentZoom;
-        Vector3 offset = new Vector3(0, 50, 0) * camera_zoom_ratio;
+        Vector3 offset = new Vector3(0, 40, 0) * camera_zoom_ratio;
         Vector3 wantedPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position) + offset;
 		bar.transform.localScale = Vector3.one * camera_zoom_ratio;
         instance.transform.position = wantedPosition;
