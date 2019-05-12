@@ -3,6 +3,7 @@
     public const int Hunter = 2;
     public const int Mage = 3;
     public const int Healer = 6;
+    public const int Boss = 7;
 
     public const int Sword = 1;
     public const int Bow = 4;
