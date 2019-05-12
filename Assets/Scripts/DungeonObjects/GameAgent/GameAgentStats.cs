@@ -173,7 +173,7 @@ public class GameAgentStats
         return 0;
     }
 
-    public int GetFireStormCount() {
+    public int GetMultiHitCount() {
         int min = 2;
         int max = 4;
         int mean = (min + max) / 2;
@@ -182,6 +182,10 @@ public class GameAgentStats
 
     public int GetFireStormDamage() {
         return Mathf.RoundToInt(UnityEngine.Random.Range(0.55f, 0.7f) * (attack + attackStatBoost));
+    }
+
+    public int GetBerserkDamage() {
+        return Mathf.RoundToInt(UnityEngine.Random.Range(0.45f, 0.75f) * (attack + attackStatBoost));
     }
 
     private void CheckLevelProgression() {

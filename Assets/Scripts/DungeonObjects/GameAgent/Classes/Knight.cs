@@ -15,7 +15,7 @@ public class Knight : CharacterClass {
     }
 
     public override Attack[] GetAvailableActs() {
-        return new Attack[] { Attack.Get["Melee"] };
+        return new Attack[] { Attack.Get["Melee"], Attack.Get["Berserk"] };
     }
 
     public override int GetHealthStatIncreaseFromLevelUp(int level = -1) {
