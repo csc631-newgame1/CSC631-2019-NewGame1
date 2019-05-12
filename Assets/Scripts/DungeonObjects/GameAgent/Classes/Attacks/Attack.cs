@@ -24,13 +24,15 @@ public abstract class Attack
 		["Melee"] = new MeleeAttack(),
 		["Shortbow"] = new ShortbowAttack(),
 		["Longbow"] = new LongbowAttack(),
-		["Fire"] = new FireSpell()
+		["Fire"] = new FireSpell(),
+        ["Fire Storm"] = new FireStormSpell(),
+        ["Berserk"] = new Berserk()
 	};
 }
 
 public class MeleeAttack : Attack
 {
-	public MeleeAttack() : base(1, 1, 3) {}
+	public MeleeAttack() : base(1, 1, 2) {}
 	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
 		attacking = true;
@@ -138,8 +140,8 @@ public class FireSpell : Attack
 		try {
 		target.playHitAnimation();
 		target.playHitNoise("Fire");
-		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
-		}
+        target.take_damage((int)(attacker.stats.DealDamage() * damageModifier));
+        }
 		catch (Exception e) {
 			// swallow the error
 		}
@@ -149,12 +151,81 @@ public class FireSpell : Attack
 	public override string toString() { return "Fire Burst"; }
 }
 
-/*public class StormSpell : Attack
+public class FireStormSpell : Attack
 {
+    public FireStormSpell() : base(6, 1, 2) {}
+    public override IEnumerator Execute(GameAgent attacker, Damageable target) {
+        int count = attacker.stats.GetMultiHitCount();
 
+        while (count > 0) {
+            attacking = true;
+
+            attacker.transform.LookAt((target as DungeonObject).transform);
+            attacker.playAttackAnimation();
+            attacker.playAttackNoise("Fire");
+
+            while (attacker.animating) yield return null;
+
+            Projectile fire = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "fire");
+
+            while (!(fire == null)) yield return null;
+
+            try {
+                target.playHitAnimation();
+                target.playHitNoise("Fire");
+                target.take_damage((int)(attacker.stats.GetFireStormDamage() * damageModifier));
+            } catch (Exception e) {
+                // swallow the error
+            }
+
+            attacking = false;
+
+            // if Damageable is dead, stop loop
+            // implement this
+
+
+            count--;
+        }
+        Debug.Log("After while loop");
+    }
+    public override string toString() { return "Fire Storm"; }
 }
 
-public class Taunt : Attack
+public class Berserk : Attack {
+    public Berserk() : base(1, 1, 3) { }
+    public override IEnumerator Execute(GameAgent attacker, Damageable target) {
+        int count = attacker.stats.GetMultiHitCount();
+
+        while (count > 0) {
+            attacking = true;
+
+            attacker.transform.LookAt((target as DungeonObject).transform);
+            attacker.playAttackAnimation();
+            attacker.playAttackNoise("Melee");
+
+            Debug.Log("Waiting for animation to finish");
+            while (attacker.animating) yield return null;
+
+            try {
+                target.playHitAnimation();
+                target.playHitNoise("Melee");
+                target.take_damage((int)(attacker.stats.GetBerserkDamage() * damageModifier));
+            } catch (Exception e) {
+                // swallow the error
+            }
+
+            attacking = false;
+            count--;
+        }
+    }
+    public override string toString() {
+        return "Berserk";
+    }
+}
+
+
+    /*public class Taunt : Attack
 {
 	
-}*/
+}
+*/
