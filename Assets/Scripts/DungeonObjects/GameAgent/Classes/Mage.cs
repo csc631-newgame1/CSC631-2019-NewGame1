@@ -36,7 +36,7 @@ public class Mage : CharacterClass
     }
 
     public override Attack[] GetAvailableActs() {
-        return new Attack[] { Attack.Get["Fire"] };
+        return new Attack[] { Attack.Get["Fire"], Attack.Get["Fire Storm"] };
     }
 
     public override void HandleAct(GameAgentAction action) {

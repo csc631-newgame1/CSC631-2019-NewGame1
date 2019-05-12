@@ -10,7 +10,7 @@ public abstract class Attack
 	protected float damageModifier;
 	
 	public bool attacking;
-	public abstract IEnumerator Execute(GameAgent attacker, Damageable target);
+	public abstract IEnumerator Execute(GameAgent attacker, Damageable target, int damage = -1);
 	public abstract string toString();
 	
 	public Attack(int range, int AOE, float damageModifier) {
@@ -24,14 +24,15 @@ public abstract class Attack
 		["Melee"] = new MeleeAttack(),
 		["Shortbow"] = new ShortbowAttack(),
 		["Longbow"] = new LongbowAttack(),
-		["Fire"] = new FireSpell()
+		["Fire"] = new FireSpell(),
+        ["Fire Storm"] = new FireStormSpell()
 	};
 }
 
 public class MeleeAttack : Attack
 {
 	public MeleeAttack() : base(1, 1, 3) {}
-	public override IEnumerator Execute(GameAgent attacker, Damageable target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target, int damage = -1)
 	{
 		attacking = true;
 		
@@ -59,7 +60,7 @@ public class MeleeAttack : Attack
 public class ShortbowAttack : Attack
 {
 	public ShortbowAttack() : base(7, 1, 1) {}
-	public override IEnumerator Execute(GameAgent attacker, Damageable target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target, int damage = -1)
 	{
 		attacking = true;
 		
@@ -90,7 +91,7 @@ public class ShortbowAttack : Attack
 public class LongbowAttack : Attack
 {
 	public LongbowAttack() : base(11, 1, 0.75f) {}
-	public override IEnumerator Execute(GameAgent attacker, Damageable target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target, int damage = -1)
 	{
 		attacking = true;
 		
@@ -121,7 +122,7 @@ public class LongbowAttack : Attack
 public class FireSpell : Attack
 {
 	public FireSpell() : base(6, 1, 2) {}
-	public override IEnumerator Execute(GameAgent attacker, Damageable target)
+	public override IEnumerator Execute(GameAgent attacker, Damageable target, int damage = -1)
 	{
 		attacking = true;
 		
@@ -138,7 +139,11 @@ public class FireSpell : Attack
 		try {
 		target.playHitAnimation();
 		target.playHitNoise("Fire");
-		target.take_damage((int) (attacker.stats.DealDamage() * damageModifier));
+            if (damage == -1) {
+                target.take_damage((int)(attacker.stats.DealDamage() * damageModifier));
+            } else {
+                target.take_damage((int)(damage * damageModifier));
+            }
 		}
 		catch (Exception e) {
 			// swallow the error
@@ -149,12 +154,56 @@ public class FireSpell : Attack
 	public override string toString() { return "Fire Burst"; }
 }
 
-/*public class StormSpell : Attack
+public class FireStormSpell : Attack
 {
+    public FireStormSpell() : base(6, 1, 2) {}
+    public override IEnumerator Execute(GameAgent attacker, Damageable target, int damage = -1) {
+        FireSpell fireSpell = new FireSpell();
+        int count = attacker.stats.GetFireStormCount();
+        Debug.Log("FIRE STORM ATTACK BEGINS! " + count);
 
+        while (count > 0) {
+            Debug.Log("FIRE STORM ATTACK");
+            attacking = true;
+
+            attacker.transform.LookAt((target as DungeonObject).transform);
+            attacker.playAttackAnimation();
+            attacker.playAttackNoise("Fire");
+
+            while (attacker.animating) yield return null;
+
+            Projectile fire = MapManager.AnimateProjectile(attacker.grid_pos, (target as DungeonObject).grid_pos, "fire");
+
+            while (!(fire == null)) yield return null;
+
+            try {
+                target.playHitAnimation();
+                target.playHitNoise("Fire");
+                if (damage == -1) {
+                    target.take_damage((int)(attacker.stats.DealDamage() * damageModifier));
+                } else {
+                    target.take_damage((int)(attacker.stats.GetFireStormDamage() * damageModifier));
+                }
+            } catch (Exception e) {
+                // swallow the error
+            }
+
+            attacking = false;
+
+            // if Damageable is dead, stop loop
+            // implement this
+
+
+            count--;
+        }
+        Debug.Log("After while loop");
+    }
+    public override string toString() { return "Fire Storm"; }
 }
 
-public class Taunt : Attack
+
+    /*public class Taunt : Attack
 {
 	
-}*/
+}
+*/

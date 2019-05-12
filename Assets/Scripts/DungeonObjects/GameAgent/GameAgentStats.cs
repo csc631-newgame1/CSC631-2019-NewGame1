@@ -173,17 +173,14 @@ public class GameAgentStats
         return 0;
     }
 
-    public int GetMultiShotCount() {
-        if (characterClassOption == CharacterClassOptions.Hunter) {
-            int min = 1;
-            int max = 4;
-            int mean = (min + max) / 2;
-            return Utility.NextGaussian(mean, 1, min, max, rng);
-        }
-        return 0;
+    public int GetFireStormCount() {
+        int min = 2;
+        int max = 4;
+        int mean = (min + max) / 2;
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
-    public int GetMultiShotDamage() {
+    public int GetFireStormDamage() {
         return Mathf.RoundToInt(UnityEngine.Random.Range(0.55f, 0.7f) * (attack + attackStatBoost));
     }
 
