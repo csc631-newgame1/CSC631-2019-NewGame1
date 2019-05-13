@@ -3,7 +3,7 @@
 public class Knight : CharacterClass {
 
     public Knight() {
-        baseStats = new GameAgentStats(17, 50, 1, 7, true);
+        baseStats = new GameAgentStats(17, 100, 1, 7, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 

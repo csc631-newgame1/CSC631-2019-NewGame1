@@ -3,7 +3,7 @@
 public class Hunter : CharacterClass
 {
     public Hunter() {
-        baseStats = new GameAgentStats(18, 35, 9, 9, true);
+        baseStats = new GameAgentStats(18, 70, 9, 9, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
