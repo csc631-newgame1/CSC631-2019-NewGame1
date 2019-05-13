@@ -117,9 +117,7 @@ public class CharacterClassDefiner : MonoBehaviour
                         break;
                 }
                 break;
-            case CharacterClassOptions.Boss:
-                characterModel = CharacterRaceOptions.Dragon;
-                break;
+
         }
 		
 		weaponNum = characterWeapon;
@@ -138,7 +136,6 @@ public class CharacterClassDefiner : MonoBehaviour
         else if (modelID == 3) characterAvatar = transform.Find("Chr_Fantasy_Wizard_01");
         else if (modelID == 4) characterAvatar = transform.GetChild(GetRandomOrc());
         else if (modelID == 5) characterAvatar = transform.GetChild(GetRandomSkeleton());
-        else if (modelID == 7) characterAvatar = transform.Find("dragon");
         else characterAvatar = transform.Find("Chr_Western_Woman_01");
 
         characterAvatar.gameObject.SetActive(true);
