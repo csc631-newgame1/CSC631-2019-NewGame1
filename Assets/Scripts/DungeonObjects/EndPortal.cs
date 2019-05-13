@@ -27,7 +27,7 @@ public class EndPortal : DungeonObject, Environment, Interactable, Renderable
 	public void interact(GameAgent interactor)
 	{
         if (extractedPlayersCount == Network.playerCount()) {
-            source.PlayOneShot(longPortalSound);
+            source.PlayOneShot(mediumPortalSound);
         }
         else
         {
