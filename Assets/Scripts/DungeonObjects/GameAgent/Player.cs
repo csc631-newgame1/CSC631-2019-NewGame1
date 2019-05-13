@@ -262,8 +262,12 @@ public class Player : GameAgent
     }
 
 	/*** UNUSED ANIMATION RECEIVERS ***/
-	public void FootR(){}
-	public void FootL(){}
+	public void FootR(){
+        source.PlayOneShot(randomSFX(footsteps));
+    }
+	public void FootL(){
+        source.PlayOneShot(randomSFX(footsteps));
+    }
 	public void WeaponSwitch(){}
 	/*** END ANIMATION RECEIVERS ***/
 	

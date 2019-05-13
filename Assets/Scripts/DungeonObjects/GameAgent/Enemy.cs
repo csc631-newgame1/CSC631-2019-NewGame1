@@ -232,8 +232,12 @@ public class Enemy : GameAgent
     public override void potion() {
     }
 
-    public void FootR() { }
-    public void FootL() { }
+    public void FootR() {
+        source.PlayOneShot(randomSFX(footsteps));
+    }
+    public void FootL() {
+        source.PlayOneShot(randomSFX(footsteps));
+    }
     public void WeaponSwitch() { }
 	
 	private static int nextSFX = 0;
