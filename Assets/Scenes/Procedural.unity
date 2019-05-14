@@ -3259,6 +3259,9 @@ MonoBehaviour:
     type: 3}
   randomChest: {fileID: 5539044942602581205, guid: 23aeddc0f049ccd4ab4d593683d33a8e,
     type: 3}
+  ilmiPrefab: {fileID: 1681421950760243006, guid: 3651dfd4c31c6524d80cdc6702182ed6,
+    type: 3}
+  level: 1
 --- !u!114 &1591538342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3276,6 +3279,8 @@ MonoBehaviour:
   fireProjectile: {fileID: 4479903999552307122, guid: 03e4c37920de4e64f9d78163211e82d2,
     type: 3}
   arrowProjectile: {fileID: 3804442292852072848, guid: 17891d07b20d50e4fb17d104cf277bc2,
+    type: 3}
+  lightningProjectile: {fileID: 7123571416476213774, guid: 01fbfc0ee180c4de6ac29c03e9cbac75,
     type: 3}
 --- !u!114 &1591538343
 MonoBehaviour:
@@ -3696,7 +3701,6 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-<<<<<<< HEAD
   m_Children:
   - {fileID: 7672805618487984256}
   - {fileID: 176766791}
@@ -3725,81 +3729,6 @@ RectTransform:
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1628912875
-=======
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1591538338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591538335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e7913fe360f8a049a458a0ee8989c0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  showEnemySpawnZones: 0
-  enemyPrefab: {fileID: 1681421950760243006, guid: 3651dfd4c31c6524d80cdc6702182ed6,
-    type: 3}
-  distanceBetweenZones: 10
-  lowerRadius: 2
-  upperRadius: 6
-  minimumNumberOfTilesInSpawnZone: 4
-  maximumNumberOfTilesInSpawnZone: 10
-  maxNumberOfSpawnZones: 5
---- !u!114 &1591538339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591538335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e62f91107bc241a7815bea04211dfc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1591538341
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591538335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90021a5cb851bcb4783c1502ef62cd49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 1012216741, guid: 88fb51aa428a83e459f041adf801e6aa, type: 3}
-  endportal: {fileID: 1506806999855239151, guid: 6762552eb0acbb7488318c5b2aaadac7,
-    type: 3}
---- !u!114 &1591538342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591538335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1281cb76421430648b4367a29ff2e0bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mapPrefab: {fileID: 3944264686662586777, guid: b2c9801dc5e38b84fa19b23bc71ec1a2,
-    type: 3}
-  fireProjectile: {fileID: 4479903999552307122, guid: 03e4c37920de4e64f9d78163211e82d2,
-    type: 3}
-  arrowProjectile: {fileID: 3804442292852072848, guid: 17891d07b20d50e4fb17d104cf277bc2,
-    type: 3}
-  lightningProjectile: {fileID: 7123571416476213774, guid: 01fbfc0ee180c4de6ac29c03e9cbac75,
-    type: 3}
---- !u!114 &1591538343
->>>>>>> 7f688f91b878d989865e1e1acda2ce51bcc32ce0
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

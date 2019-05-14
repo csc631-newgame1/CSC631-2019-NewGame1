@@ -59,7 +59,9 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+		if (name == null)
 		this.nickname = CharacterRaceOptions.getString(stats.characterRace) + " " + CharacterClassOptions.getWeaponDescriptor(stats.playerCharacterClass.weapon);
+		else this.nickname = name;
 		
 		weapon = stats.playerCharacterClass.weapon;
 		

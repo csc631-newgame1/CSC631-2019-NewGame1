@@ -135,7 +135,7 @@ public class MapManager : MonoBehaviour
         if (stats == null) {
             agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), name);
         } else {
-            agent.init_agent(pos, stats);
+            agent.init_agent(pos, stats, name);
         }
 
 		nav_map.removeTraversableTile(pos);
@@ -144,13 +144,19 @@ public class MapManager : MonoBehaviour
 		return clone;
 	}
 	
-	public GameObject instantiate_environment_randomly(GameObject environmentObject, bool traversable = true)
+	private Pos random_traversable_pos()
 	{
 		Pos candidate;
 		do {
 			candidate = new Pos(rng.Next(width), rng.Next(height));
 		} while (!IsTraversable(candidate));
-		return instantiate_environment(environmentObject, candidate, traversable);
+		return candidate;
+	}
+	
+	public GameObject instantiate_environment_randomly(GameObject environmentObject, bool traversable = true)
+	{
+		
+		return instantiate_environment(environmentObject, random_traversable_pos(), traversable);
 	}
 	
 	public GameObject instantiate_environment(GameObject environmentObject, Pos pos, bool traversable = true)
@@ -607,6 +613,11 @@ public class MapManager : MonoBehaviour
 		for (int i = 0; i < chestsToSpawn; i++) {
 			instantiate_environment_randomly(chestPrefab, false);
 		}
+	}
+	
+	public void SPAWN_ILMI_DEVOURER_OF_WORLDS(GameObject ilmiPrefab)
+	{
+		instantiate(ilmiPrefab, random_traversable_pos(), new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Healer, 100), "ILMI, DEVOURER OF WORLDS");
 	}
 
 	// returns true if tile terrain at position is traversable

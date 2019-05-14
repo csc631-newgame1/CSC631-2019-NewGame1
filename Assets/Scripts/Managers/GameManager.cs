@@ -20,9 +20,10 @@ public class GameManager : MonoBehaviour
 
     private List<SpawnZone> spawnZones;
 	
-    public GameObject playerPrefab, endportal, randomChest;
+    public GameObject playerPrefab, endportal, randomChest, ilmiPrefab;
 
     public static GameManager instance; //static so we can carry oour levels and st
+	public int level = 1;
     
 	void Start()
 	{
@@ -67,7 +68,13 @@ public class GameManager : MonoBehaviour
 			}
 		}
 		// spawn enemies
-		enemySpawner.Init(map_manager);
+		if (level%3 != 0) {
+			enemySpawner.Init(map_manager);
+		}
+		else {
+			map_manager.SPAWN_ILMI_DEVOURER_OF_WORLDS(ilmiPrefab);
+			UI_TextAlert.DisplayText("A cold chill goes across your spine...", 1000);
+		}
 
 		tileSelector.setPlayer(localPlayer);
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
@@ -90,6 +97,7 @@ public class GameManager : MonoBehaviour
 		}
 		instance.DeInit();
 		instance.Init();
+		instance.level++;
 	}
 	
 	public static void GameOver()
