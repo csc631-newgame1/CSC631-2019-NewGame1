@@ -266,8 +266,6 @@ public class FireStormSpell : Attack
                 // swallow the error
             }
 
-            attacking = false;
-
             // if Damageable is dead, stop loop
             // implement this
 
@@ -275,6 +273,7 @@ public class FireStormSpell : Attack
             count--;
         }
         Debug.Log("After while loop");
+		attacking = false;
     }
     public override string toString() { return "Fire Storm"; }
 }
@@ -307,10 +306,10 @@ public class Berserk : Attack {
             } catch (Exception e) {
                 // swallow the error
             }
-
-            attacking = false;
+			
             count--;
         }
+		attacking = false;
     }
     public override string toString() {
         return "Berserk";
@@ -355,14 +354,13 @@ public class Multishot : Attack
                 // swallow the error
             }
 
-            attacking = false;
-
             // if Damageable is dead, stop loop
             // implement this
 
 
             count--;
         }
+		attacking = false;
         Debug.Log("After while loop");
     }
     public override string toString() { return "Multishot"; }
