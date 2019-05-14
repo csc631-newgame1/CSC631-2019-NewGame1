@@ -24,7 +24,7 @@ public class MapManager : MonoBehaviour
         }
     }
 
-	public GameObject mapPrefab, fireProjectile, arrowProjectile;
+	public GameObject mapPrefab, fireProjectile, arrowProjectile, lightningProjectile;
 	//public MapManager instance;
 
 	// config variables
@@ -282,6 +282,7 @@ public class MapManager : MonoBehaviour
 		switch (type) {
 			case "fire": projectilePrefab = instance.fireProjectile; break;
 			case "arrow": projectilePrefab = instance.arrowProjectile; break;
+            case "lightning": projectilePrefab = instance.lightningProjectile; break;
 			default: projectilePrefab = instance.fireProjectile; break;
 		}	
 		

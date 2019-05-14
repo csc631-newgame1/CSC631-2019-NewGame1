@@ -48,6 +48,7 @@ public class Player : GameAgent
     public AudioClip[] axeSwing;
     public AudioClip[] bowShot;
     public AudioClip[] fireSpell;
+    public AudioClip lightningSpell;
     public AudioClip[] footsteps;
 	public AudioClip[] deathRattle;
 	public AudioClip[] hitNoise;
@@ -135,9 +136,12 @@ public class Player : GameAgent
 
 	public override void attack(Damageable target)
 	{
-		animating = true;
-		StartCoroutine(currentAttack.Execute(this, target));
-		StartCoroutine(waitForAttackEnd());
+        if (stats.currentMagicPoints >= currentAttack.MPcost)
+        {
+            animating = true;
+            StartCoroutine(currentAttack.Execute(this, target));
+            StartCoroutine(waitForAttackEnd());
+        }
 	}
 	
 	private IEnumerator waitForAttackEnd()
@@ -178,6 +182,10 @@ public class Player : GameAgent
 					break;
 			}
 			break;
+            case "Lightning":
+                source.PlayOneShot(lightningSpell);
+                break;
+            
 		}
 	}
 	// TODO: once we have more hit noises, switch based on type of projectile/weapon we are hit by
@@ -200,6 +208,7 @@ public class Player : GameAgent
 	{
         if (stats.currentState == GameAgentState.Alive) {
             if (!godMode) stats.TakeDamage((int)(amount * 0.05));
+            //if (!godMode) stats.TakeDamage(amount);
 
             if (stats.currentState == GameAgentState.Unconscious) {
                 StartCoroutine(animator.PlayKilledAimation());

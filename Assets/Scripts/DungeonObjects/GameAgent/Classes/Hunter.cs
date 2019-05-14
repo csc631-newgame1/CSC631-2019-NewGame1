@@ -3,7 +3,7 @@
 public class Hunter : CharacterClass
 {
     public Hunter() {
-        baseStats = new GameAgentStats(18, 70, 9, 9, true);
+        baseStats = new GameAgentStats(18, 80, 9, 9, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
@@ -36,7 +36,7 @@ public class Hunter : CharacterClass
     }
 
     public override Attack[] GetAvailableActs() {
-        return new Attack[] { Attack.Get["Shortbow"], Attack.Get["Longbow"] };
+        return new Attack[] { Attack.Get["Shortbow"], Attack.Get["Longbow"], Attack.Get["Multishot"] };
     }
 
     public override void HandleAct(GameAgentAction action) {

@@ -3852,6 +3852,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3a5ec5dba446ce24dbe134245612cf7d, type: 3}
   - {fileID: 8300000, guid: aaea69c0b9a824393b2cd06426857db4, type: 3}
   - {fileID: 8300000, guid: 46a5834046ae548458d7edc1b9ac970b, type: 3}
+  lightningSpell: {fileID: 8300000, guid: 282b181386d264d729bd59209369216a, type: 3}
   footsteps:
   - {fileID: 8300000, guid: c18bb08675dad4bf1ae3c0a4f4c17f13, type: 3}
   - {fileID: 8300000, guid: 3012d7d0871d94b5f895ad83355c4f5a, type: 3}
