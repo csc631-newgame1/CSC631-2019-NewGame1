@@ -103,7 +103,7 @@ public class Player : GameAgent
 	private bool moving = false;
     public override IEnumerator smooth_movement(Path path)
 	{
-		if (path == null) yield break;
+		if (path.getPositions() == null) yield break;
 		while (moving) yield return null; // wait for any previous movement to finish
 		moving = true;
 		move_budget -= path.distance();
