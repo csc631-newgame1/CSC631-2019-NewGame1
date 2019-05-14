@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
 			enemySpawner.Init(map_manager);
 		}
 		else {
-			map_manager.SPAWN_ILMI_DEVOURER_OF_WORLDS(ilmiPrefab);
+			map_manager.SPAWN_ILMI_DEVOURER_OF_WORLDS(ilmiPrefab, level / 3);
 			UI_TextAlert.DisplayText("A cold chill goes across your spine...", 1000);
 		}
 

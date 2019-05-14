@@ -615,9 +615,9 @@ public class MapManager : MonoBehaviour
 		}
 	}
 	
-	public void SPAWN_ILMI_DEVOURER_OF_WORLDS(GameObject ilmiPrefab)
+	public void SPAWN_ILMI_DEVOURER_OF_WORLDS(GameObject ilmiPrefab, int level)
 	{
-		instantiate(ilmiPrefab, random_traversable_pos(), new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Healer, 100), "ILMI, DEVOURER OF WORLDS");
+		instantiate(ilmiPrefab, random_traversable_pos(), new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Healer, level * 100), "ILMI, DEVOURER OF WORLDS");
 	}
 
 	// returns true if tile terrain at position is traversable
