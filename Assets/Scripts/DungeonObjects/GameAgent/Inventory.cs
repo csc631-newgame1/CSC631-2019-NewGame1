@@ -18,6 +18,10 @@ public class Inventory
 
     public int AddItem(Item item)
     {
+        if (item == null)
+        {
+            return 0;
+        }
         int count = 0;
         for (int i = 0; i < numItemSlots; i++)
         {
