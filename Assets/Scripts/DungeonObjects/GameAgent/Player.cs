@@ -142,7 +142,6 @@ public class Player : GameAgent
             animating = true;
             StartCoroutine(currentAttack.Execute(this, target));
             StartCoroutine(waitForAttackEnd());
-			playerActedThisTurn = true;
         }
 	}
 	

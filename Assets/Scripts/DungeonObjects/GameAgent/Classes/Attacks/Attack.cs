@@ -69,6 +69,7 @@ public class WeakMeleeAttack : Attack
     public WeakMeleeAttack() : base(2, 1, 1, 0) { }
     public override IEnumerator Execute(GameAgent attacker, Damageable target)
     {
+		while (attacking) yield return null;
         attacking = true;
 
         attacker.transform.LookAt((target as DungeonObject).transform);
@@ -99,6 +100,7 @@ public class StrongMeleeAttack : Attack
     public StrongMeleeAttack() : base(2, 1, 4.25f, 2) { }
     public override IEnumerator Execute(GameAgent attacker, Damageable target)
     {
+		while (attacking) yield return null;
         if (attacker.stats.currentMagicPoints < 2)
         {
             yield break;
@@ -134,6 +136,7 @@ public class ShortbowAttack : Attack
 	public ShortbowAttack() : base(7, 1, 1.3f, 0) {}
 	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
+		while (attacking) yield return null;
 		attacking = true;
 		
 		attacker.transform.LookAt((target as DungeonObject).transform);
@@ -165,6 +168,7 @@ public class LongbowAttack : Attack
 	public LongbowAttack() : base(11, 1, 0.9f, 0) {}
 	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
+		while (attacking) yield return null;
 		attacking = true;
 		
 		attacker.transform.LookAt((target as DungeonObject).transform);
@@ -196,6 +200,7 @@ public class FireSpell : Attack
 	public FireSpell() : base(6, 1, 2, 2) {}
 	public override IEnumerator Execute(GameAgent attacker, Damageable target)
 	{
+		while (attacking) yield return null;
         if (attacker.stats.currentMagicPoints < 2)
         {
             yield break;
@@ -230,7 +235,9 @@ public class FireSpell : Attack
 public class FireStormSpell : Attack
 {
     public FireStormSpell() : base(6, 1, 2, 5) {}
-    public override IEnumerator Execute(GameAgent attacker, Damageable target) {
+    public override IEnumerator Execute(GameAgent attacker, Damageable target) 
+	{
+		while (attacking) yield return null;
         if (attacker.stats.currentMagicPoints < 5)
         {
             yield break;
@@ -274,7 +281,9 @@ public class FireStormSpell : Attack
 
 public class Berserk : Attack {
     public Berserk() : base(2, 1, 3, 3) { }
-    public override IEnumerator Execute(GameAgent attacker, Damageable target) {
+    public override IEnumerator Execute(GameAgent attacker, Damageable target) 
+	{
+		while (attacking) yield return null;
         if (attacker.stats.currentMagicPoints < 3) {
             yield break;
         }
@@ -313,6 +322,7 @@ public class Multishot : Attack
     public Multishot() : base(7, 1, 1.25f, 4) { }
     public override IEnumerator Execute(GameAgent attacker, Damageable target)
     {
+		while (attacking) yield return null;
         if (attacker.stats.currentMagicPoints < 4)
         {
             yield break;
@@ -363,6 +373,7 @@ public class LightningSpell : Attack
     public LightningSpell() : base(9, 1, 1.7f, 3) { }
     public override IEnumerator Execute(GameAgent attacker, Damageable target)
     {
+		while (attacking) yield return null;
         if (attacker.stats.currentMagicPoints < 3)
         {
             yield break;
