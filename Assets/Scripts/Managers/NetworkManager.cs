@@ -145,6 +145,9 @@ public class NetworkManager : MonoBehaviour
 							client.ready = false;
 						}
 					}
+					else {
+						GameManager.NextLevel();
+					}
 				}
 				if (cmd is EndCommand) {
 					EndCommand end = (EndCommand) cmd;

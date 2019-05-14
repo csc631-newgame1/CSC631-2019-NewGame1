@@ -92,6 +92,8 @@ public class GameManager : MonoBehaviour
 	
 	public static void NextLevel()
 	{
+		foreach (Player player in Network.getPlayers())
+					MapManager.ExtractAgent(player);
 		foreach (Client client in Network.getPeers()) {
 			client.ready = false;
 		}
@@ -122,9 +124,7 @@ public class GameManager : MonoBehaviour
 			
 			switch (key) {
 			case 'r':
-				foreach (Player player in Network.getPlayers())
-					MapManager.ExtractAgent(player);
-				NextLevel();
+				Network.submitCommand(new StartCommand());
 				break;
 			}
 			
