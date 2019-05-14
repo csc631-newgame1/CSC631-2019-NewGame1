@@ -61,6 +61,14 @@ public class NetworkManager : MonoBehaviour
 					
 					mapManager.interact(start, end);
 				}
+				if (cmd is UseItemCommand) {
+					UseItemCommand item = (UseItemCommand) cmd;
+					Player player = Network.getPlayer(item.clientID);
+					Item itemToUse = player.inventory.GetItemFromSlot(item.slotIndex);
+					player.inventory.DecrementItemAtSlot(item.slotIndex);
+					InventoryManager.UseItem(itemToUse, player);
+					Debug.Log("Use Item received! From client#" + item.clientID + " for item in slot #" + item.slotIndex);
+				}
 				/*** LOBBY ACTIONS ***/
 				if (cmd is ReadyCommand) {
 					ReadyCommand ready = (ReadyCommand) cmd;
@@ -136,6 +144,9 @@ public class NetworkManager : MonoBehaviour
 						foreach (Client client in Network.getPeers()) {
 							client.ready = false;
 						}
+					}
+					else {
+						GameManager.NextLevel();
 					}
 				}
 				if (cmd is EndCommand) {

@@ -36,7 +36,6 @@ public class Player : GameAgent
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
 
-	CharacterAnimator animator;
     //CharacterClassDefiner classDefiner; // moved to GameAgent
 
     // Get rid of this when you get rid of using keys to change player class
@@ -48,10 +47,13 @@ public class Player : GameAgent
     public AudioClip[] axeSwing;
     public AudioClip[] bowShot;
     public AudioClip[] fireSpell;
+    public AudioClip lightningSpell;
     public AudioClip[] footsteps;
 	public AudioClip[] deathRattle;
 	public AudioClip[] hitNoise;
 	public AudioClip[] armorHitNoise;
+	
+	private int max_move_budget;
 	
     // Gets references to necessary game components
     public override void init_agent(Pos position, GameAgentStats stats, string name = null)
@@ -61,7 +63,8 @@ public class Player : GameAgent
 
         this.stats = stats;
         UpdateViewableEditorPlayerStats();
-		move_budget = 25;
+		max_move_budget = 15;
+		move_budget = max_move_budget;
 		speed = 10;
 		this.nickname = name;
 
@@ -76,6 +79,8 @@ public class Player : GameAgent
 		animating = false;
 
         source = GetComponent<AudioSource>();
+		inventory.AddItem(new HealthPot(5));
+		inventory.AddItem(new ManaPot(5));
 
         // AI init
         team = 0;
@@ -96,15 +101,17 @@ public class Player : GameAgent
 	}
 	
 	private bool moving = false;
-    public override IEnumerator smooth_movement(List<Pos> path)
+    public override IEnumerator smooth_movement(Path path)
 	{
+		if (path.getPositions() == null) yield break;
 		while (moving) yield return null; // wait for any previous movement to finish
 		moving = true;
+		move_budget -= path.distance();
 
         StartCoroutine(animator.StartMovementAnimation());
         //source.PlayOneShot(footsteps);
 			Vector3 origin, target;
-			foreach(Pos step in path) {
+			foreach(Pos step in path.getPositions()) {
 				grid_pos = step;
 
 				origin = transform.position;
@@ -120,19 +127,29 @@ public class Player : GameAgent
 						yield return null;
 					}
 			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+			transform.position = map_manager.grid_to_world(path.endPos());
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
-		grid_pos = path.Last();
+		grid_pos = path.endPos();
 		
         playerMovedThisTurn = true;
 	}
 
 	public override void attack(Damageable target)
 	{
-		animating = true;
-		StartCoroutine(currentAttack.Execute(this, target));
+        if (stats.currentMagicPoints >= currentAttack.MPcost)
+        {
+            animating = true;
+            StartCoroutine(currentAttack.Execute(this, target));
+            StartCoroutine(waitForAttackEnd());
+        }
+	}
+	
+	private IEnumerator waitForAttackEnd()
+	{
+		while (currentAttack.attacking) yield return null;
+		playerActedThisTurn = true;
 	}
 	
 	public void Hit(){ animating = false; }
@@ -167,6 +184,10 @@ public class Player : GameAgent
 					break;
 			}
 			break;
+            case "Lightning":
+                source.PlayOneShot(lightningSpell);
+                break;
+            
 		}
 	}
 	// TODO: once we have more hit noises, switch based on type of projectile/weapon we are hit by
@@ -188,7 +209,8 @@ public class Player : GameAgent
 	public override void take_damage(int amount)
 	{
         if (stats.currentState == GameAgentState.Alive) {
-            if (!godMode) stats.TakeDamage(amount);
+            if (!godMode) stats.TakeDamage((int)(amount * 0.05));
+            //if (!godMode) stats.TakeDamage(amount);
 
             if (stats.currentState == GameAgentState.Unconscious) {
                 StartCoroutine(animator.PlayKilledAimation());
@@ -223,6 +245,7 @@ public class Player : GameAgent
             playerActedThisTurn = false;
             playerUsedPotionThisTurn = false;
             playerWaitingThisTurn = false;
+			move_budget = max_move_budget;
         }
 
         UpdateViewableEditorPlayerStats();
@@ -250,8 +273,12 @@ public class Player : GameAgent
     }
 
 	/*** UNUSED ANIMATION RECEIVERS ***/
-	public void FootR(){}
-	public void FootL(){}
+	public void FootR(){
+        source.PlayOneShot(randomSFX(footsteps));
+    }
+	public void FootL(){
+        source.PlayOneShot(randomSFX(footsteps));
+    }
 	public void WeaponSwitch(){}
 	/*** END ANIMATION RECEIVERS ***/
 	

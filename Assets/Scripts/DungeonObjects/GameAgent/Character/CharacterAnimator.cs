@@ -158,6 +158,11 @@ public class CharacterAnimator : MonoBehaviour
         yield return null;
         isDead = true;
     }
+	
+	public void PlayHealedAnimation()
+	{
+		SpawnParticleSystemAtCharacter(healAura);
+	}
     #endregion
 
     // SpawnParticleSystemAtCharacter(ParticleSystem particle)

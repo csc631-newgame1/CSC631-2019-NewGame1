@@ -240,6 +240,24 @@ public class InteractCommand : NetworkCommand
 	}
 }
 
+public class UseItemCommand : NetworkCommand
+{
+	public const int ID = 11;
+	
+	public int clientID;
+	public int slotIndex;
+	public UseItemCommand(int clientID, int slotIndex) {
+		this.clientID = clientID;
+		this.slotIndex = slotIndex;
+	}
+	public override string getString() { return ID + "$" + clientID + "," + slotIndex; }
+	public static NetworkCommand ConvertFromString(string cmdString)
+	{
+		int[] IDSlot = Array.ConvertAll(cmdString.Split(','), int.Parse);
+		return new UseItemCommand(IDSlot[0], IDSlot[1]);
+	}
+}
+
 /* #######################
  * ## NON-ECHO Commands ##
  * #######################

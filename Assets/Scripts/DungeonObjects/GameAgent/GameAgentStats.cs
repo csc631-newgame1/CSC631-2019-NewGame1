@@ -20,9 +20,9 @@ public class GameAgentStats
     // unit current health
     public float currentHealth;
     // unit max mp
-    public float maxMagicPoints = 100;
+    public float maxMagicPoints = 40;
     // unit current mp
-    public float currentMagicPoints = 100;
+    public float currentMagicPoints = 40;
     // unit attack radius
     public float range;
     // unit move radius
@@ -173,18 +173,19 @@ public class GameAgentStats
         return 0;
     }
 
-    public int GetMultiShotCount() {
-        if (characterClassOption == CharacterClassOptions.Hunter) {
-            int min = 1;
-            int max = 4;
-            int mean = (min + max) / 2;
-            return Utility.NextGaussian(mean, 1, min, max, rng);
-        }
-        return 0;
+    public int GetMultiHitCount() {
+        int min = 2;
+        int max = 4;
+        int mean = (min + max) / 2;
+        return Utility.NextGaussian(mean, 1, min, max, rng);
     }
 
-    public int GetMultiShotDamage() {
+    public int GetFireStormDamage() {
         return Mathf.RoundToInt(UnityEngine.Random.Range(0.55f, 0.7f) * (attack + attackStatBoost));
+    }
+
+    public int GetBerserkDamage() {
+        return Mathf.RoundToInt(UnityEngine.Random.Range(0.45f, 0.75f) * (attack + attackStatBoost));
     }
 
     private void CheckLevelProgression() {

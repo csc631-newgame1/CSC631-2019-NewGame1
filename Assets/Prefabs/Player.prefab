@@ -3820,14 +3820,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   nickname: 
-  currentAction: 0
   currentState: 0
   team: 0
   move_budget: 6
   animating: 0
-  godMode: 1
+  godMode: 0
   name: 
-  attack: 0
+  _attack: 0
   maxHealth: 0
   currentHealth: 0
   range: 0
@@ -3838,20 +3837,41 @@ MonoBehaviour:
   swordSwing:
   - {fileID: 8300000, guid: 9bebec336d8345d4d99302d483703e6d, type: 3}
   - {fileID: 8300000, guid: 75847b5b43dbd3b4ca412f7624f4ec34, type: 3}
+  - {fileID: 8300000, guid: 3bab56702b93d4852a25c37f5a0bd7c1, type: 3}
+  - {fileID: 8300000, guid: 986cc9e647a584c27aec507c799dc7bd, type: 3}
   axeSwing:
   - {fileID: 8300000, guid: a925cb22a2ad99b47a46ab3e965da9dd, type: 3}
   - {fileID: 8300000, guid: 87b70462dfd231a42b00e4d7bbf0cce6, type: 3}
-  - {fileID: 8300000, guid: a925cb22a2ad99b47a46ab3e965da9dd, type: 3}
+  - {fileID: 8300000, guid: ff200a9cadf844294b0b02e101310f7a, type: 3}
   bowShot:
   - {fileID: 8300000, guid: b1a580e874ea4ce4a80ce4fa6a28c35c, type: 3}
+  - {fileID: 8300000, guid: b631697ca7b4943fc9a41ef1be36e586, type: 3}
+  - {fileID: 8300000, guid: c5da04257cfb640cd9e3b59a8ecc820d, type: 3}
+  - {fileID: 8300000, guid: dc01f12e8c8694cfc810287cb7c15d63, type: 3}
   fireSpell:
   - {fileID: 8300000, guid: 3a5ec5dba446ce24dbe134245612cf7d, type: 3}
-  footsteps: []
+  - {fileID: 8300000, guid: aaea69c0b9a824393b2cd06426857db4, type: 3}
+  - {fileID: 8300000, guid: 46a5834046ae548458d7edc1b9ac970b, type: 3}
+  lightningSpell: {fileID: 8300000, guid: 282b181386d264d729bd59209369216a, type: 3}
+  footsteps:
+  - {fileID: 8300000, guid: c18bb08675dad4bf1ae3c0a4f4c17f13, type: 3}
+  - {fileID: 8300000, guid: 3012d7d0871d94b5f895ad83355c4f5a, type: 3}
+  - {fileID: 8300000, guid: 325470f725bb549879dd93466185beb1, type: 3}
+  - {fileID: 8300000, guid: b18fbb219539e490fb31e399b8af774c, type: 3}
+  - {fileID: 8300000, guid: c57c0577345c64578aa0e3d188f4e0bf, type: 3}
+  - {fileID: 8300000, guid: 9f7bf89094bab462689fb5141d530b39, type: 3}
+  - {fileID: 8300000, guid: 87e711f4bead642bc9aee3741b08acbd, type: 3}
   deathRattle:
   - {fileID: 8300000, guid: 7d8935aea74e01a4eaae79eb6b2628f3, type: 3}
   hitNoise:
   - {fileID: 8300000, guid: 1e852f38e2e9a7047a6e9e9bafcbe2f3, type: 3}
   - {fileID: 8300000, guid: e19dfd4ca1cae5d4f8d0f87aaf64b991, type: 3}
+  - {fileID: 8300000, guid: 650271be1be284e4d9083b9da5770731, type: 3}
+  - {fileID: 8300000, guid: 65494bbec1d674b3fbb455ecb2b83319, type: 3}
+  - {fileID: 8300000, guid: 1f6720ae40ac647dbb5cc6a42f434c13, type: 3}
+  - {fileID: 8300000, guid: 1f7c732988bbe485396579c0cf7f5ede, type: 3}
+  - {fileID: 8300000, guid: e83ca42b737c04a01b0d0e932ae36576, type: 3}
+  - {fileID: 8300000, guid: 510febc82080f4c259d5e731da7702d4, type: 3}
   armorHitNoise:
   - {fileID: 8300000, guid: 87b70462dfd231a42b00e4d7bbf0cce6, type: 3}
   - {fileID: 8300000, guid: c667612fe54e4194691085890dd309d7, type: 3}
@@ -3890,6 +3910,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10533dce209499149bb2504cdf87fd67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeWeapon: {fileID: 0}
   weaponNum: 0
   sword: {fileID: 3132021457639024835}
   bow: {fileID: 1768564420784622776}
@@ -8560,15 +8581,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e7134bd16b21cc4a8551794a16703c4, type: 3}
---- !u!1 &501910598235988853 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1688207647419120, guid: 9e7134bd16b21cc4a8551794a16703c4,
-    type: 3}
-  m_PrefabInstance: {fileID: 500702674002217349}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &496483700455322627 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4792935863598470, guid: 9e7134bd16b21cc4a8551794a16703c4,
+    type: 3}
+  m_PrefabInstance: {fileID: 500702674002217349}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &501910598235988853 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1688207647419120, guid: 9e7134bd16b21cc4a8551794a16703c4,
     type: 3}
   m_PrefabInstance: {fileID: 500702674002217349}
   m_PrefabAsset: {fileID: 0}
@@ -8718,15 +8739,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 681cb6d4cd64a814fbbe1286870a0ffd, type: 3}
---- !u!1 &3132021457639024835 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1700325355730914, guid: 681cb6d4cd64a814fbbe1286870a0ffd,
-    type: 3}
-  m_PrefabInstance: {fileID: 3130325565243727649}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3134436311125411969 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4195409888696224, guid: 681cb6d4cd64a814fbbe1286870a0ffd,
+    type: 3}
+  m_PrefabInstance: {fileID: 3130325565243727649}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3132021457639024835 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1700325355730914, guid: 681cb6d4cd64a814fbbe1286870a0ffd,
     type: 3}
   m_PrefabInstance: {fileID: 3130325565243727649}
   m_PrefabAsset: {fileID: 0}
@@ -8803,15 +8824,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e600491f73a29184299be916770e9832, type: 3}
---- !u!4 &6604644012218920010 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4363749778080852, guid: e600491f73a29184299be916770e9832,
-    type: 3}
-  m_PrefabInstance: {fileID: 6604502958431365150}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6603477974045568422 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1033858192197048, guid: e600491f73a29184299be916770e9832,
+    type: 3}
+  m_PrefabInstance: {fileID: 6604502958431365150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6604644012218920010 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4363749778080852, guid: e600491f73a29184299be916770e9832,
     type: 3}
   m_PrefabInstance: {fileID: 6604502958431365150}
   m_PrefabAsset: {fileID: 0}

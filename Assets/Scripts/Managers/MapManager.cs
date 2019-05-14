@@ -24,7 +24,7 @@ public class MapManager : MonoBehaviour
         }
     }
 
-	public GameObject mapPrefab, fireProjectile, arrowProjectile;
+	public GameObject mapPrefab, fireProjectile, arrowProjectile, lightningProjectile;
 	//public MapManager instance;
 
 	// config variables
@@ -135,13 +135,28 @@ public class MapManager : MonoBehaviour
         if (stats == null) {
             agent.init_agent(pos, new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Knight, 1, CharacterClassOptions.Sword), name);
         } else {
-            agent.init_agent(pos, stats);
+            agent.init_agent(pos, stats, name);
         }
 
 		nav_map.removeTraversableTile(pos);
 		map[pos.x, pos.y].resident = agent;
 		map[pos.x, pos.y].occupied = true;
 		return clone;
+	}
+	
+	private Pos random_traversable_pos()
+	{
+		Pos candidate;
+		do {
+			candidate = new Pos(rng.Next(width), rng.Next(height));
+		} while (!IsTraversable(candidate));
+		return candidate;
+	}
+	
+	public GameObject instantiate_environment_randomly(GameObject environmentObject, bool traversable = true)
+	{
+		
+		return instantiate_environment(environmentObject, random_traversable_pos(), traversable);
 	}
 	
 	public GameObject instantiate_environment(GameObject environmentObject, Pos pos, bool traversable = true)
@@ -198,6 +213,7 @@ public class MapManager : MonoBehaviour
 		nav_map.insertTraversableTile(pos);
 		map[pos.x, pos.y].resident = null;
 		map[pos.x, pos.y].occupied = false;
+		map[pos.x, pos.y].environment = null;
 	}
 
 	// destroys all game objects currently on the map
@@ -236,7 +252,7 @@ public class MapManager : MonoBehaviour
 		map[source.x, source.y].occupied = false;
 		map[source.x, source.y].resident = null;
 		
-		StartCoroutine(agent.smooth_movement(path.getPositions()));
+		StartCoroutine(agent.smooth_movement(path));
 	}
 	
 	// applies damage to agent at position, if one is there
@@ -282,6 +298,7 @@ public class MapManager : MonoBehaviour
 		switch (type) {
 			case "fire": projectilePrefab = instance.fireProjectile; break;
 			case "arrow": projectilePrefab = instance.arrowProjectile; break;
+            case "lightning": projectilePrefab = instance.lightningProjectile; break;
 			default: projectilePrefab = instance.fireProjectile; break;
 		}	
 		
@@ -576,7 +593,7 @@ public class MapManager : MonoBehaviour
 			do {
 				x = rng.Next(0, width - 1);
 				y = rng.Next(0, height - 1);
-			} while (map_raw[x, y] != spawnRegion.ID);
+			} while (map_raw[x, y] != spawnRegion.ID || !IsWalkable(new Pos(x, y)));
 			
 			spawnPositions.Add(new Pos(x, y));
 		}
@@ -588,6 +605,19 @@ public class MapManager : MonoBehaviour
 		spawnPositions.Insert(0, new Pos(x, y));
 		
 		return spawnPositions;
+	}
+	
+	public void spawnChests(GameObject chestPrefab)
+	{
+		int chestsToSpawn = rng.Next((int) Math.Ceiling(Math.Sqrt(width * height) / 10f));
+		for (int i = 0; i < chestsToSpawn; i++) {
+			instantiate_environment_randomly(chestPrefab, false);
+		}
+	}
+	
+	public void SPAWN_ILMI_DEVOURER_OF_WORLDS(GameObject ilmiPrefab, int level)
+	{
+		instantiate(ilmiPrefab, random_traversable_pos(), new GameAgentStats(CharacterRaceOptions.Human, CharacterClassOptions.Healer, level * 100), "ILMI, DEVOURER OF WORLDS");
 	}
 
 	// returns true if tile terrain at position is traversable

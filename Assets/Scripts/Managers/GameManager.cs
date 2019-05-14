@@ -20,9 +20,10 @@ public class GameManager : MonoBehaviour
 
     private List<SpawnZone> spawnZones;
 	
-    public GameObject playerPrefab, endportal;
+    public GameObject playerPrefab, endportal, randomChest, ilmiPrefab;
 
     public static GameManager instance; //static so we can carry oour levels and st
+	public int level = 1;
     
 	void Start()
 	{
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
 		turn_manager = GetComponent<TurnManager>();
 		turn_manager.Init(this);
 		
+		map_manager.spawnChests(randomChest);
 		List<Client> players = Network.getPeers();
 		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
 		
@@ -54,6 +56,7 @@ public class GameManager : MonoBehaviour
 		// spawn players
 		for (int i = 0; i < players.Count; i++) {
 			if (players[i].playerObject == null) {
+				Debug.Log(spawn_locations[i+1] + "," + players.Count);
 				Player instance = map_manager.instantiate(playerPrefab, spawn_locations[i+1], null, players[i].nickname).GetComponent<Player>();
 				instance.SetCharacterClass(players[i].classname);
 				players[i].playerObject = instance;
@@ -65,7 +68,13 @@ public class GameManager : MonoBehaviour
 			}
 		}
 		// spawn enemies
-		enemySpawner.Init(map_manager);
+		if (level%3 != 0) {
+			enemySpawner.Init(map_manager);
+		}
+		else {
+			map_manager.SPAWN_ILMI_DEVOURER_OF_WORLDS(ilmiPrefab, level / 3);
+			UI_TextAlert.DisplayText("A cold chill goes across your spine...", 1000);
+		}
 
 		tileSelector.setPlayer(localPlayer);
 		Camera.main.GetComponent<CameraControl>().SetTarget(localPlayer.gameObject);
@@ -83,11 +92,14 @@ public class GameManager : MonoBehaviour
 	
 	public static void NextLevel()
 	{
+		foreach (Player player in Network.getPlayers())
+					MapManager.ExtractAgent(player);
 		foreach (Client client in Network.getPeers()) {
 			client.ready = false;
 		}
 		instance.DeInit();
 		instance.Init();
+		instance.level++;
 	}
 	
 	public static void GameOver()
@@ -112,9 +124,7 @@ public class GameManager : MonoBehaviour
 			
 			switch (key) {
 			case 'r':
-				foreach (Player player in Network.getPlayers())
-					MapManager.ExtractAgent(player);
-				NextLevel();
+				Network.submitCommand(new StartCommand());
 				break;
 			}
 			

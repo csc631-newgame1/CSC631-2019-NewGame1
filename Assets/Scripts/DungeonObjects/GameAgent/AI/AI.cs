@@ -135,6 +135,9 @@ public class AIComponent
 		Pos source = parent.grid_pos;
 		Pos target = agent.grid_pos;
 		List<Pos> testDestinations = new List<Pos>();
+		if (Pos.abs_dist(agent.grid_pos, parent.grid_pos) <= parent.currentAttack.range) {
+			return 1;
+		}
 		
 		for (int x = target.x - maxStopDistance; x <= target.x + maxStopDistance; x++) {
 			for (int y = target.y - maxStopDistance; y <= target.y + maxStopDistance; y++) {
@@ -209,7 +212,19 @@ public class AIComponent
 	
 	public bool calcAttack()
 	{
-		if (alliedDistances == null) return false;
+		/*if (enemyPool.Count == 0) return false;
+		enemyPool.Sort(delegate (GameAgent g1, GameAgent g2) {
+			int g1d = Pos.abs_dist(g1.grid_pos, parent.grid_pos);
+			int g2d = Pos.abs_dist(g2.grid_pos, parent.grid_pos);
+			return g2d.CompareTo(g1d);
+		});
+		if (Pos.abs_dist(enemyPool[0].grid_pos, parent.grid_pos) <= parent.currentAttack.range) {
+			attacking = enemyPool[0];
+			state = STATE.ATTACK;
+			return true;
+		}*/
+		
+		if (enemyDistances == null) return false;
 		
 		GameAgent mostDesireable = null;
 		float bestRating = -1;

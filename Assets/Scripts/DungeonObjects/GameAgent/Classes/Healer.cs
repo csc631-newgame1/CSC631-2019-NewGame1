@@ -3,7 +3,7 @@
 public class Healer : CharacterClass
 {
     public Healer() {
-        baseStats = new GameAgentStats(15, 32, 7, 10, true);
+        baseStats = new GameAgentStats(16, 65, 7, 10, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
@@ -36,7 +36,7 @@ public class Healer : CharacterClass
     }
 
     public override Attack[] GetAvailableActs() {
-        return new Attack[] { Attack.Get["Fire"], Attack.Get["Melee"] };
+        return new Attack[] { Attack.Get["WeakMelee"], Attack.Get["Fire"], Attack.Get["Lightning"] };
     }
 
     public override void HandleAct(GameAgentAction action) {

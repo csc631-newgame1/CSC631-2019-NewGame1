@@ -7,7 +7,8 @@ public class Inventory
 {
 
     public Item[] items = new Item[numItemSlots];
-    public const int numItemSlots = 10;
+    public const int numItemSlots = 18;
+	public Inventory() {}
 
     public EquipItem helmet;
     public EquipItem armor;
@@ -17,10 +18,20 @@ public class Inventory
 
     public int AddItem(Item item)
     {
+        if (item == null)
+        {
+            return 0;
+        }
         int count = 0;
         for (int i = 0; i < numItemSlots; i++)
         {
-            if (items[i].ID == item.ID)
+			if (items[i] == null)
+            {
+                count += item.Amount;
+                items[i] = item;
+                return count;
+            }
+            else if (items[i].ID == item.ID)
             {
                 int maxInsert = items[i].maxAmount - items[i].Amount;
                 if (item.Amount - maxInsert > 0)
@@ -35,12 +46,6 @@ public class Inventory
                     count += item.Amount;
                     return count;
                 }
-            }
-            else if (items[i] == null)
-            {
-                count += item.Amount;
-                items[i] = item;
-                return count;
             }
         }
 

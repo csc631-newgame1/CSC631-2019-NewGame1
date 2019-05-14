@@ -3,7 +3,7 @@
 public class Knight : CharacterClass {
 
     public Knight() {
-        baseStats = new GameAgentStats(17, 50, 1, 7, true);
+        baseStats = new GameAgentStats(20, 100, 2, 7, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
@@ -15,7 +15,7 @@ public class Knight : CharacterClass {
     }
 
     public override Attack[] GetAvailableActs() {
-        return new Attack[] { Attack.Get["Melee"] };
+        return new Attack[] { Attack.Get["Melee"], Attack.Get["StrongMelee"], Attack.Get["Berserk"] };
     }
 
     public override int GetHealthStatIncreaseFromLevelUp(int level = -1) {

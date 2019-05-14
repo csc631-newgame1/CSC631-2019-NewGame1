@@ -10,8 +10,7 @@ public class Enemy : GameAgent
     private MapManager map_manager; // reference to MapManager instance with map data
 
 	private bool enemy_turn = false;
-
-    private CharacterAnimator animator;
+	
     //private CharacterClassDefiner classDefiner; // moved to GameAgent
 
     [Header("Enemy Stats")]
@@ -60,7 +59,9 @@ public class Enemy : GameAgent
         currentHealth = maxHealth;
         range = stats.range;
         _speed = stats.speed;
+		if (name == null)
 		this.nickname = CharacterRaceOptions.getString(stats.characterRace) + " " + CharacterClassOptions.getWeaponDescriptor(stats.playerCharacterClass.weapon);
+		else this.nickname = name;
 		
 		weapon = stats.playerCharacterClass.weapon;
 		
@@ -85,10 +86,10 @@ public class Enemy : GameAgent
     }
 
 	private bool moving = false;
-    public override IEnumerator smooth_movement(List<Pos> path) 
+    public override IEnumerator smooth_movement(Path path) 
 	{
 		//Debug.Log("started...");
-		grid_pos = path.Last();
+		grid_pos = path.endPos();
 		if (!FogOfWar.IsVisible(grid_pos)) {
 			transform.position = map_manager.grid_to_world(grid_pos);
 			yield break;
@@ -100,7 +101,7 @@ public class Enemy : GameAgent
         //source.PlayOneShot(footsteps);
 
 			Vector3 origin, target;
-			foreach(Pos step in path) {
+			foreach(Pos step in path.getPositions()) {
 
 				origin = transform.position;
 				target = map_manager.grid_to_world(step);
@@ -115,7 +116,7 @@ public class Enemy : GameAgent
 						yield return null;
 					}
 			}
-			transform.position = map_manager.grid_to_world(path[path.Count - 1]);
+			transform.position = map_manager.grid_to_world(path.endPos());
 
         StartCoroutine(animator.StopMovementAnimation());
         moving = false;
@@ -232,8 +233,12 @@ public class Enemy : GameAgent
     public override void potion() {
     }
 
-    public void FootR() { }
-    public void FootL() { }
+    public void FootR() {
+        source.PlayOneShot(randomSFX(footsteps));
+    }
+    public void FootL() {
+        source.PlayOneShot(randomSFX(footsteps));
+    }
     public void WeaponSwitch() { }
 	
 	private static int nextSFX = 0;
