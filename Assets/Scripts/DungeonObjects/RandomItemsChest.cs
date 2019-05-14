@@ -5,12 +5,15 @@ using MapUtils;
 
 public class RandomItemsChest : DungeonObject, Interactable, Environment, Renderable, Damageable
 {
+    public AudioClip chestOpeningSFX;
+    private AudioSource source;
 	private GameObject chestObject;
 	public void init_environment(Pos grid_pos, int health=1)
 	{
 		this.grid_pos = grid_pos;
 		this.
 		chestObject = transform.Find("SM_Prop_Chest_01").gameObject;
+        source = GetComponent<AudioSource>();
 	}
 	void Update()
 	{
@@ -30,6 +33,7 @@ public class RandomItemsChest : DungeonObject, Interactable, Environment, Render
 	string[] itemOptions = { "health", "mana", "helmet", "armor", "gloves", "boot" };
 	public void interact(GameAgent interactor)
 	{
+        source.PlayOneShot(chestOpeningSFX);
 		int randomItemIndex = Settings.globalRNG.Next(itemOptions.Length);
 		int randomItemAmount = Settings.globalRNG.Next(1, 5);
 		string itemChoice = itemOptions[randomItemIndex];
