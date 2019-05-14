@@ -3,7 +3,7 @@
 public class Mage : CharacterClass
 {
     public Mage() {
-        baseStats = new GameAgentStats(23, 40, 7, 6, true);
+        baseStats = new GameAgentStats(23, 70, 7, 6, true);
         rng = GameObject.FindGameObjectWithTag("Map").GetComponent<MapConfiguration>().GetRNG();
     }
 
@@ -36,7 +36,7 @@ public class Mage : CharacterClass
     }
 
     public override Attack[] GetAvailableActs() {
-        return new Attack[] { Attack.Get["Fire"], Attack.Get["Fire Storm"] };
+        return new Attack[] { Attack.Get["WeakMelee"], Attack.Get["Fire"], Attack.Get["Fire Storm"] };
     }
 
     public override void HandleAct(GameAgentAction action) {

@@ -117,6 +117,7 @@ public class CharacterClassDefiner : MonoBehaviour
                         break;
                 }
                 break;
+
         }
 		
 		weaponNum = characterWeapon;
