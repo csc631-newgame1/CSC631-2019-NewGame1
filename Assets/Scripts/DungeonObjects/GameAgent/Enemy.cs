@@ -10,8 +10,7 @@ public class Enemy : GameAgent
     private MapManager map_manager; // reference to MapManager instance with map data
 
 	private bool enemy_turn = false;
-
-    private CharacterAnimator animator;
+	
     //private CharacterClassDefiner classDefiner; // moved to GameAgent
 
     [Header("Enemy Stats")]

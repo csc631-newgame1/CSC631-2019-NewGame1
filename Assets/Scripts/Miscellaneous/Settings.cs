@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class Settings
 {
-	private static System.Random rng = new System.Random(MasterSeed);
+	private static System.Random seedRNG = new System.Random(MasterSeed);
 	private static int _MasterSeed = 1111111;
 	public static int MasterSeed {
 		get {
@@ -12,14 +12,15 @@ public static class Settings
 		}
 		set {
 			_MasterSeed = value;
-			rng = new System.Random(_MasterSeed);
+			seedRNG = new System.Random(_MasterSeed);
 		}
 	}
 	public static int MapSeed {
 		get {
-			return rng.Next();
+			return seedRNG.Next();
 		}
 	}
+	public static System.Random globalRNG = new System.Random(MasterSeed);
 	public static float Volume = 0;
 	public static float AnimationSpeed = 10;
 }

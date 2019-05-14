@@ -144,6 +144,15 @@ public class MapManager : MonoBehaviour
 		return clone;
 	}
 	
+	public GameObject instantiate_environment_randomly(GameObject environmentObject, bool traversable = true)
+	{
+		Pos candidate;
+		do {
+			candidate = new Pos(rng.Next(width), rng.Next(height));
+		} while (!IsTraversable(candidate));
+		return instantiate_environment(environmentObject, candidate, traversable);
+	}
+	
 	public GameObject instantiate_environment(GameObject environmentObject, Pos pos, bool traversable = true)
 	{
         int randomY = rng.Next(1, 4) * 90;
@@ -198,6 +207,7 @@ public class MapManager : MonoBehaviour
 		nav_map.insertTraversableTile(pos);
 		map[pos.x, pos.y].resident = null;
 		map[pos.x, pos.y].occupied = false;
+		map[pos.x, pos.y].environment = null;
 	}
 
 	// destroys all game objects currently on the map
@@ -588,6 +598,14 @@ public class MapManager : MonoBehaviour
 		spawnPositions.Insert(0, new Pos(x, y));
 		
 		return spawnPositions;
+	}
+	
+	public void spawnChests(GameObject chestPrefab)
+	{
+		int chestsToSpawn = rng.Next((int) Math.Ceiling(Math.Sqrt(width * height) / 10f));
+		for (int i = 0; i < chestsToSpawn; i++) {
+			instantiate_environment_randomly(chestPrefab, false);
+		}
 	}
 
 	// returns true if tile terrain at position is traversable

@@ -18,6 +18,7 @@ public abstract class GameAgent : DungeonObject, Damageable, Renderable
 	public int team;
 	public int move_budget;
 
+	public CharacterAnimator animator;
     public Inventory inventory = new Inventory();
 	public bool animating = false;
 	protected CharacterClassDefiner classDefiner;
@@ -65,7 +66,7 @@ public abstract class GameAgent : DungeonObject, Damageable, Renderable
     public void UseItemOnSelf(int slot)
     {
         Item item = inventory.GetItemFromSlot(slot);
-        InventoryManager.instance.UseItem(item, this);
+        InventoryManager.UseItem(item, this);
         inventory.DecrementItemAtSlot(slot);
     }
 	

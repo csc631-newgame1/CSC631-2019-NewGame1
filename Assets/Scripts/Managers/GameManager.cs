@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
 
     private List<SpawnZone> spawnZones;
 	
-    public GameObject playerPrefab, endportal;
+    public GameObject playerPrefab, endportal, randomChest;
 
     public static GameManager instance; //static so we can carry oour levels and st
     
@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
 		turn_manager = GetComponent<TurnManager>();
 		turn_manager.Init(this);
 		
+		map_manager.spawnChests(randomChest);
 		List<Client> players = Network.getPeers();
 		List<Pos> spawn_locations = map_manager.findSpawnpoints(players.Count);
 		

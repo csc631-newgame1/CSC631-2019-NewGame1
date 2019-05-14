@@ -36,7 +36,6 @@ public class Player : GameAgent
     // 0 - unarmed, 1 - sword, 2 - bow, 3 - staff
     public int weapon = 1;
 
-	CharacterAnimator animator;
     //CharacterClassDefiner classDefiner; // moved to GameAgent
 
     // Get rid of this when you get rid of using keys to change player class
@@ -79,6 +78,8 @@ public class Player : GameAgent
 		animating = false;
 
         source = GetComponent<AudioSource>();
+		inventory.AddItem(new HealthPot(5));
+		inventory.AddItem(new ManaPot(5));
 
         // AI init
         team = 0;
