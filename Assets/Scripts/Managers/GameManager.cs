@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour
 			
         }
 
-		if (Input.GetMouseButtonDown(1)) {
+		if (Input.GetMouseButtonDown(0)) {
 			switch (tileSelector.mode) {
 				case "MOVE":
 					if (tileSelector.hoveringValidMoveTile()) {
