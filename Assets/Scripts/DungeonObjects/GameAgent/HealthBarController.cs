@@ -26,7 +26,6 @@ public class HealthBarController : MonoBehaviour
     {
         canvas = GameObject.Find("HPBars"); //get canvas ref
 
-        //Debug.Log("I am an upset child");
         instance = Instantiate(healthbar); //instantiate prefab
         Vector2 screenPos = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         parent = GetComponent<GameAgent>();
