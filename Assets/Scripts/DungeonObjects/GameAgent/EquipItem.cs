@@ -13,8 +13,8 @@ public enum EquipType {
 public class EquipItem : Item
 {
     public EquipType type;
-    private int atkbonus;
-    private int defbonus;
+    public int atkbonus;
+    public int defbonus;
 
 	public EquipItem() {}
     public EquipItem(string name, int id, EquipType etype, int atk, int def)

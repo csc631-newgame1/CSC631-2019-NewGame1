@@ -17,7 +17,12 @@ public class InventoryManager : MonoBehaviour
     delegate void ItemFunc(Item item, GameAgent agent);
     IDictionary<int, ItemFunc> itemFuncs = new Dictionary<int, ItemFunc>() {
 		[HealthPot._ID] = ApplyHealthPotion,
-		[ManaPot._ID] = ApplyManaPotion
+		[ManaPot._ID] = ApplyManaPotion,
+        [Helmet._ID] = EquipEquipment,
+        [Armor._ID] = EquipEquipment,
+        [Glove._ID] = EquipEquipment,
+        [Boot._ID] = EquipEquipment,
+        [EquipWeapon._ID] = EquipEquipment,
 	};
 
     public static InventoryManager instance = null;
@@ -61,7 +66,48 @@ public class InventoryManager : MonoBehaviour
 	private static void EquipEquipment(Item item, GameAgent agent)
 	{
 		Debug.Log("Equipping item!");
-	}
+        EquipItem equip = (EquipItem)item;
+        EquipItem oldItem;
+
+        switch (equip.type)
+        {
+            case EquipType.HELMET:
+                oldItem = agent.inventory.helmet;
+                agent.inventory.helmet = equip;
+                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
+                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
+                agent.inventory.AddItem(oldItem);
+                break;
+            case EquipType.BOOT:
+                oldItem = agent.inventory.boots;
+                agent.inventory.helmet = equip;
+                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
+                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
+                agent.inventory.AddItem(oldItem);
+                break;
+            case EquipType.ARMOR:
+                oldItem = agent.inventory.armor;
+                agent.inventory.helmet = equip;
+                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
+                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
+                agent.inventory.AddItem(oldItem);
+                break;
+            case EquipType.GLOVE:
+                oldItem = agent.inventory.gloves;
+                agent.inventory.helmet = equip;
+                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
+                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
+                agent.inventory.AddItem(oldItem);
+                break;
+            case EquipType.WEAPON:
+                oldItem = agent.inventory.weapon;
+                agent.inventory.helmet = equip;
+                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
+                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
+                agent.inventory.AddItem(oldItem);
+                break;
+        }
+    }
 
     /*private void EquipHelmet(Item item, GameAgent agent)
     {
