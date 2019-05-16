@@ -75,9 +75,6 @@ public class MapGenerator : MonoBehaviour
 		BridgeMeshGenerator bridge_mesh_gen = transform.Find("Bridges").GetComponent<BridgeMeshGenerator>();
 		bridge_mesh_gen.generateBridgeMesh(map);
 		
-		Boundary boundary_gen = transform.Find("Boundaries").GetComponent<Boundary>();
-		boundary_gen.generateBoundary();
-		
 		BoxCollider box = GetComponent<BoxCollider>();
 		box.center = GetComponent<MapConfiguration>().GetCenter();
 		box.size = new Vector3(width, 0.5f, height);
