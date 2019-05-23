@@ -74,38 +74,37 @@ public class InventoryManager : MonoBehaviour
             case EquipType.HELMET:
                 oldItem = agent.inventory.helmet;
                 agent.inventory.helmet = equip;
-                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
-                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
-                agent.inventory.AddItem(oldItem);
                 break;
             case EquipType.BOOT:
                 oldItem = agent.inventory.boots;
                 agent.inventory.helmet = equip;
-                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
-                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
-                agent.inventory.AddItem(oldItem);
                 break;
             case EquipType.ARMOR:
                 oldItem = agent.inventory.armor;
                 agent.inventory.helmet = equip;
-                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
-                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
-                agent.inventory.AddItem(oldItem);
                 break;
             case EquipType.GLOVE:
                 oldItem = agent.inventory.gloves;
                 agent.inventory.helmet = equip;
-                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
-                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
-                agent.inventory.AddItem(oldItem);
                 break;
             case EquipType.WEAPON:
                 oldItem = agent.inventory.weapon;
                 agent.inventory.helmet = equip;
-                agent.stats.attack = (equip.atkbonus - oldItem.atkbonus);
-                agent.stats.defense = (equip.defbonus - oldItem.defbonus);
-                agent.inventory.AddItem(oldItem);
                 break;
+            default:
+                oldItem = null;
+                break;
+        }
+        if (oldItem == null)
+        {
+            agent.stats.attack += equip.atkbonus;
+            agent.stats.defense += equip.defbonus;
+        }
+        else
+        {
+            agent.stats.attack = equip.atkbonus - oldItem.atkbonus;
+            agent.stats.defense = equip.defbonus - oldItem.defbonus;
+            agent.inventory.AddItem(oldItem);
         }
     }
 
